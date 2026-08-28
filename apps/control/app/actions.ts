@@ -1,0 +1,46 @@
+"use server";
+import { revalidatePath } from "next/cache";
+import { controlPost } from "../lib/api";
+
+export async function updateTicketStatus(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  const status = String(formData.get("status") ?? "");
+  const locale = String(formData.get("locale") ?? "es");
+  if (!id || !status) return;
+  await controlPost(`/v1/control/support/tickets/${encodeURIComponent(id)}/status`, { status });
+  revalidatePath(`/${locale}/support`);
+}
+
+export async function reprocessAssessment(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  const locale = String(formData.get("locale") ?? "es");
+  if (!id) return;
+  await controlPost(`/v1/control/assessments/${encodeURIComponent(id)}/reprocess`);
+  revalidatePath(`/${locale}/assessments`);
+  revalidatePath(`/${locale}/operations`);
+}
+
+export async function retryJob(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  const locale = String(formData.get("locale") ?? "es");
+  if (!id) return;
+  await controlPost(`/v1/control/operations/jobs/${encodeURIComponent(id)}/retry`);
+  revalidatePath(`/${locale}/operations`);
+}
+
+export async function releaseLegalHold(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  const locale = String(formData.get("locale") ?? "es");
+  if (!id) return;
+  await controlPost(`/v1/control/legal-holds/${encodeURIComponent(id)}/release`);
+  revalidatePath(`/${locale}/privacy`);
+  revalidatePath(`/${locale}/legal`);
+}
+
+export async function assignSupportTicket(formData: FormData) {const id=String(formData.get("id")??""),locale=String(formData.get("locale")??"es");if(!id)return;await controlPost(`/v1/control/support/tickets/${encodeURIComponent(id)}/assign-me`);revalidatePath(`/${locale}/support`);revalidatePath(`/${locale}/support/${id}`)}
+export async function addSupportMessage(formData: FormData) {const id=String(formData.get("id")??""),locale=String(formData.get("locale")??"es"),body=String(formData.get("body")??""),visibility=String(formData.get("visibility")??"CUSTOMER");if(!id||!body.trim())return;await controlPost(`/v1/control/support/tickets/${encodeURIComponent(id)}/messages`,{body,visibility});revalidatePath(`/${locale}/support/${id}`);revalidatePath(`/${locale}/support`)}
+export async function updateAccountChangeStatus(formData: FormData) {const id=String(formData.get("id")??""),locale=String(formData.get("locale")??"es"),status=String(formData.get("status")??""),resolutionNote=String(formData.get("resolutionNote")??"");if(!id||!status)return;await controlPost(`/v1/control/account-change-requests/${encodeURIComponent(id)}/status`,{status,resolutionNote});revalidatePath(`/${locale}/support`)}
+export async function updateCommercialStage(formData: FormData) {const id=String(formData.get("id")??""),locale=String(formData.get("locale")??"es"),stage=String(formData.get("stage")??"");if(!id||!stage)return;await controlPost(`/v1/control/sales/${encodeURIComponent(id)}/stage`,{stage});revalidatePath(`/${locale}/sales`)}
+export async function createEvaluationWorkspace(formData: FormData) {const id=String(formData.get("id")??""),locale=String(formData.get("locale")??"es");if(!id)return;await controlPost(`/v1/control/sales/${encodeURIComponent(id)}/evaluation`);revalidatePath(`/${locale}/sales`);revalidatePath(`/${locale}/organizations`)}
+export async function provisionCustomer(formData: FormData) {const id=String(formData.get("id")??""),locale=String(formData.get("locale")??"es");if(!id)return;await controlPost(`/v1/control/sales/${encodeURIComponent(id)}/provision`);revalidatePath(`/${locale}/sales`);revalidatePath(`/${locale}/organizations`)}
+export async function createInternalUser(formData: FormData) {const locale=String(formData.get("locale")??"es"),email=String(formData.get("email")??""),displayName=String(formData.get("displayName")??""),role=String(formData.get("role")??"");if(!email||!displayName||!role)return;await controlPost(`/v1/control/internal-users`,{email,displayName,role});revalidatePath(`/${locale}/security`)}

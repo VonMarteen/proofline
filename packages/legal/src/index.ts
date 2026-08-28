@@ -1,0 +1,1 @@
+export type LegalAction = "ACCEPT" | "ACKNOWLEDGE" | "CONSENT" | "EXPLICIT_CONSENT" | "REJECT" | "WITHDRAW";

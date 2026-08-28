@@ -1,0 +1,10 @@
+import { normalizeLocale } from "@proofline/i18n";
+import { controlGet } from "../../../lib/api";
+import { PageIntro, Status, eur, date } from "../../../components/control-ui";
+
+export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale: raw } = await params; const locale = normalizeLocale(raw); const es = locale === "es"; const rows = await controlGet("/v1/control/organizations");
+  return <div className="control-stack"><PageIntro title={es ? "Organizaciones" : "Organizations"} text={es ? "Clientes y tenants con su estado comercial, uso, soporte y señales de cumplimiento." : "Customers and tenants with commercial status, usage, support and compliance signals."}/>
+    <div className="control-table-wrap"><table className="control-table"><thead><tr><th>{es ? "Organización" : "Organization"}</th><th>Plan</th><th>{es ? "Assessments" : "Assessments"}</th><th>{es ? "Uso" : "Usage"}</th><th>{es ? "Pendiente" : "Outstanding"}</th><th>{es ? "Riesgos" : "Risks"}</th></tr></thead><tbody>{rows.map((o:any) => <tr key={o.id}><td><a className="control-link-strong" href={`/${locale}/organizations/${o.id}`}>{o.name}</a><span className="control-cell-secondary">{o.slug} · {o.owners[0]?.email ?? o.billingEmail ?? "—"}</span></td><td>{o.subscription ? <><Status value={o.subscription.status}/><span className="control-cell-secondary">{o.subscription.plan} · {date(o.subscription.renewsAt, locale)}</span></> : "—"}</td><td><strong>{o.assessments.total}</strong><span className="control-cell-secondary">{o.assessments.active} {es ? "activos" : "active"}</span></td><td><strong>{o.usage.billableUnits.toLocaleString(locale)}</strong><span className="control-cell-secondary">{o.usage.period}</span></td><td>{eur(o.billing.openBalanceCents, locale)}</td><td>{o.activeLegalHolds || o.support.open ? <span className="control-risk">{o.activeLegalHolds ? `${o.activeLegalHolds} hold` : ""}{o.activeLegalHolds && o.support.open ? " · " : ""}{o.support.open ? `${o.support.open} ticket` : ""}</span> : <span className="control-ok">OK</span>}</td></tr>)}</tbody></table></div>
+  </div>;
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@proofline/worker",
+  "version": "0.2.4",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "nodemailer": "7.0.6"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "@types/nodemailer": "7.0.1",
+    "tsx": "4.20.5",
+    "typescript": "6.0.3"
+  }
+}

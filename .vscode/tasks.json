@@ -1,0 +1,341 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Proofline: 0 · DIAGNÓSTICO",
+      "type": "process",
+      "command": "node",
+      "args": [
+        "scripts/doctor.mjs"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Proofline: 1 · PREPARAR LOCAL (primera vez)",
+      "type": "process",
+      "command": "node",
+      "args": [
+        "scripts/setup-local.mjs"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: 2 · ARRANCAR TODO",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 dev",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: 2B · DETENER APPS",
+      "type": "process",
+      "command": "node",
+      "args": [
+        "scripts/stop-local.mjs"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Proofline: 3 · COMPROBAR SERVICIOS",
+      "type": "process",
+      "command": "node",
+      "args": [
+        "scripts/check-services.mjs"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Proofline: 4 · AUDITORÍA ESTÁTICA",
+      "type": "process",
+      "command": "node",
+      "args": [
+        "scripts/static-audit.mjs"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Proofline: 5 · VALIDAR TIPOS + BUILD",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 quality:local",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$tsc"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: Infra · ARRANCAR",
+      "type": "shell",
+      "command": "docker compose -f docker-compose.dev.yml up -d --wait --remove-orphans",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Proofline: Infra · PARAR",
+      "type": "shell",
+      "command": "docker compose -f docker-compose.dev.yml down",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Proofline: Infra · RESET TOTAL",
+      "type": "shell",
+      "command": "docker compose -f docker-compose.dev.yml down -v --remove-orphans",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Proofline: DB · REGENERAR DEMO",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 db:setup",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Proofline: DEV · API",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 dev:api",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: DEV · WORKER",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 dev:worker",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: DEV · SITE",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 dev:site",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: DEV · APP",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 dev:web",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: DEV · RESPOND",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 dev:respond",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: DEV · CONTROL",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 dev:control",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: API · RUNTIME DI CHECK",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 runtime:check",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: DB · COMPROBAR CONEXIÓN REAL",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 db:check",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: DB · APLICAR C2 + AUTH LOCAL",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 db:generate && npx -y pnpm@10.15.1 db:push && npx -y pnpm@10.15.1 auth:bootstrap-local",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: DEMO · CARGAR CLIENTES + SOPORTE C2.1",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 demo:support-fixtures",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    },
+    {
+      "label": "Proofline: DEV · SUPPORT",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 dev:support",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true,
+        "focus": true
+      }
+    }
+  ]
+}

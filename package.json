@@ -1,0 +1,44 @@
+{
+  "name": "proofline",
+  "version": "0.2.5",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.15.1",
+  "engines": {
+    "node": ">=20.19 <25"
+  },
+  "scripts": {
+    "doctor": "node scripts/doctor.mjs",
+    "infra:up": "docker compose -f docker-compose.dev.yml up -d --wait --remove-orphans",
+    "infra:down": "docker compose -f docker-compose.dev.yml down",
+    "infra:reset": "docker compose -f docker-compose.dev.yml down -v --remove-orphans",
+    "infra:logs": "docker compose -f docker-compose.dev.yml logs -f --tail=120",
+    "db:generate": "pnpm --filter @proofline/api db:generate",
+    "db:push": "pnpm --filter @proofline/api db:push",
+    "db:seed": "pnpm --filter @proofline/api db:seed",
+    "db:setup": "pnpm db:generate && pnpm db:push && pnpm db:seed",
+    "dev": "node scripts/dev-all.mjs",
+    "dev:site": "pnpm --filter @proofline/site dev",
+    "dev:web": "pnpm --filter @proofline/web dev",
+    "dev:respond": "pnpm --filter @proofline/respond dev",
+    "dev:control": "pnpm --filter @proofline/control dev",
+    "dev:api": "pnpm --filter @proofline/api build && pnpm --filter @proofline/api dev",
+    "dev:worker": "pnpm --filter @proofline/worker dev",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "audit:static": "node scripts/static-audit.mjs",
+    "stop": "node scripts/stop-local.mjs",
+    "quality:local": "pnpm audit:static && pnpm typecheck && pnpm build",
+    "db:check": "pnpm --filter @proofline/api db:check",
+    "runtime:check": "pnpm --filter @proofline/api runtime:check",
+    "auth:bootstrap-local": "pnpm --filter @proofline/api auth:bootstrap-local",
+    "dev:control-api": "pnpm --filter @proofline/api dev:control",
+    "demo:support-fixtures": "pnpm --filter @proofline/api demo:support-fixtures",
+    "dev:support": "pnpm --filter @proofline/support dev"
+  },
+  "devDependencies": {
+    "turbo": "2.10.10",
+    "typescript": "6.0.3"
+  }
+}

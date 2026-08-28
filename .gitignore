@@ -1,0 +1,19 @@
+node_modules
+.pnpm-store
+.next
+dist
+coverage
+*.log
+.env
+.env.local
+.DS_Store
+apps/api/src/generated/prisma
+services/analytics/.venv
+__pycache__
+.pytest_cache
+*.pyc
+local-data/
+
+# Build / tooling caches
+.turbo/
+**/.turbo/

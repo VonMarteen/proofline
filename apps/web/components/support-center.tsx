@@ -1,0 +1,27 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export function SupportCenter({locale,canRequestAccountChange}:{locale:"es"|"en";canRequestAccountChange:boolean}){
+  const es=locale==="es",router=useRouter();const[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null);
+  async function send(path:string,body:Record<string,unknown>){setBusy(true);setError(null);try{const r=await fetch(`/api/proxy/${path}`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)}),d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d?.message??"Request failed");router.refresh();return d}catch(e){setError(e instanceof Error?e.message:String(e));throw e}finally{setBusy(false)}}
+  return <div className="support-create-grid">
+    <form className="support-form" onSubmit={async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{await send("v1/workspace/support/tickets",{subject:f.get("subject"),description:f.get("description"),category:f.get("category"),priority:f.get("priority")});e.currentTarget.reset()}catch{}}}>
+      <h3>{es?"Abrir un ticket":"Open a ticket"}</h3><p>{es?"Para incidencias técnicas, acceso, facturación, privacidad, seguridad o dudas funcionales.":"For technical issues, access, billing, privacy, security or product questions."}</p>
+      <label className="label">{es?"Asunto":"Subject"}<input className="input" name="subject" minLength={4} maxLength={180} required/></label>
+      <div className="support-form-row"><label className="label">{es?"Categoría":"Category"}<select className="input" name="category" defaultValue="TECHNICAL"><option value="TECHNICAL">{es?"Incidencia técnica":"Technical"}</option><option value="ACCESS">{es?"Acceso y usuarios":"Access & users"}</option><option value="BILLING">{es?"Facturación":"Billing"}</option><option value="PRIVACY">{es?"Privacidad":"Privacy"}</option><option value="SECURITY">{es?"Seguridad":"Security"}</option><option value="FUNCTIONAL">{es?"Consulta funcional":"Product question"}</option><option value="OTHER">{es?"Otro":"Other"}</option></select></label><label className="label">{es?"Prioridad":"Priority"}<select className="input" name="priority" defaultValue="NORMAL"><option value="LOW">LOW</option><option value="NORMAL">NORMAL</option><option value="HIGH">HIGH</option><option value="URGENT">URGENT</option></select></label></div>
+      <label className="label">{es?"Describe lo que ocurre":"Describe the issue"}<textarea className="textarea" name="description" minLength={10} maxLength={5000} required/></label>
+      <button className="btn btn-accent" disabled={busy}>{busy?(es?"Enviando…":"Sending…"):(es?"Crear ticket":"Create ticket")}</button>
+    </form>
+    {canRequestAccountChange?<form className="support-form support-account-change" onSubmit={async e=>{e.preventDefault();const f=new FormData(e.currentTarget),value=String(f.get("newValue")??"");try{await send("v1/workspace/account-change-requests",{type:f.get("type"),summary:f.get("summary"),requestedData:{requestedValue:value}});e.currentTarget.reset()}catch{}}}>
+      <h3>{es?"Solicitar un cambio de cuenta o contrato":"Request an account or contract change"}</h3><p>{es?"Los datos sensibles de contratación no se editan directamente. La solicitud queda trazada y la revisa Proofline.":"Sensitive contracting data is not edited directly. The request is tracked and reviewed by Proofline."}</p>
+      <label className="label">{es?"Tipo de cambio":"Change type"}<select className="input" name="type" defaultValue="BILLING_EMAIL"><option value="BILLING_EMAIL">{es?"Email de facturación":"Billing email"}</option><option value="LEGAL_NAME">{es?"Razón social":"Legal name"}</option><option value="TAX_ID">NIF / VAT</option><option value="CONTRACT_OWNER">{es?"Titular contractual":"Contract owner"}</option><option value="PRIMARY_OWNER">{es?"Owner principal":"Primary owner"}</option><option value="OTHER">{es?"Otro":"Other"}</option></select></label>
+      <label className="label">{es?"Nuevo dato solicitado":"Requested new value"}<input className="input" name="newValue" required/></label>
+      <label className="label">{es?"Motivo / contexto":"Reason / context"}<textarea className="textarea" name="summary" minLength={8} maxLength={2000} required/></label>
+      <button className="btn" disabled={busy}>{es?"Enviar solicitud":"Submit request"}</button>
+    </form>:null}
+    {error?<div className="workspace-alert danger support-wide">{error}</div>:null}
+  </div>
+}
+
+export function SupportReply({locale,ticketId}:{locale:"es"|"en";ticketId:string}){const es=locale==="es",router=useRouter();const[body,setBody]=useState(""),[busy,setBusy]=useState(false),[error,setError]=useState<string|null>(null);return <form className="support-reply" onSubmit={async e=>{e.preventDefault();setBusy(true);setError(null);const r=await fetch(`/api/proxy/v1/workspace/support/tickets/${ticketId}/messages`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({body})}),d=await r.json().catch(()=>({}));setBusy(false);if(!r.ok){setError(d?.message??"Request failed");return}setBody("");router.refresh()}}><label className="label">{es?"Añadir respuesta":"Add reply"}<textarea className="textarea" value={body} onChange={e=>setBody(e.target.value)} required maxLength={5000}/></label>{error?<div className="workspace-alert danger">{error}</div>:null}<button className="btn btn-accent" disabled={busy||!body.trim()}>{busy?(es?"Enviando…":"Sending…"):(es?"Responder":"Reply")}</button></form>}

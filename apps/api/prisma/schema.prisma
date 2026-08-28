@@ -1,0 +1,1131 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum MembershipRole {
+  OWNER
+  ADMIN
+  BILLING_ADMIN
+  ASSESSMENT_MANAGER
+  REVIEWER
+  ANALYST
+  VIEWER
+  PARTNER_ADMIN
+}
+
+enum ThemePreference {
+  LIGHT
+  DARK
+  SYSTEM
+}
+enum AssessmentStatus {
+  DRAFT
+  PREPARATION
+  REVIEW
+  READY
+  ACTIVE
+  CLOSED
+  ARCHIVED
+}
+enum PrivacyMode {
+  IDENTIFIED
+  CONFIDENTIAL
+  ANONYMOUS
+}
+enum OrganizationUnitType {
+  DEPARTMENT
+  BUSINESS_UNIT
+  TEAM
+  LOCATION
+  OTHER
+}
+enum DirectoryPersonStatus {
+  ACTIVE
+  INACTIVE
+}
+enum AudienceTargetType {
+  ALL
+  UNIT
+  PERSON
+  EXCLUDE_PERSON
+}
+enum ReportKind {
+  EXECUTIVE
+  FULL
+}
+enum ReportStatus {
+  DRAFT
+  APPROVED
+  DISTRIBUTED
+}
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}
+enum RecordStatus {
+  ACTIVE
+  RETENTION_PENDING
+  BLOCKED
+  ANONYMIZED
+  DELETION_SCHEDULED
+  DESTROYED
+}
+enum RetentionAction {
+  DELETE
+  ANONYMIZE
+  BLOCK
+  RETAIN
+}
+enum LegalHoldStatus {
+  ACTIVE
+  RELEASED
+}
+enum ImportStatus {
+  UPLOADED
+  ANALYZED
+  APPLIED
+  FAILED
+}
+enum ImportClassification {
+  QUESTIONNAIRE
+  CONTEXT_DOCUMENT
+  MIXED
+  UNKNOWN
+}
+enum QuestionType {
+  SINGLE
+  MULTI
+  CHECKBOX
+  YES_NO
+  LIKERT
+  NPS
+  NUMERIC
+  RANGE
+  PERCENTAGE
+  SLIDER
+  MATRIX
+  DUAL
+  RANKING
+  ALLOCATION
+  SHORT_TEXT
+  LONG_TEXT
+  INFO
+}
+enum ParticipantStatus {
+  INVITED
+  STARTED
+  COMPLETED
+  REVOKED
+}
+enum LegalAction {
+  ACCEPT
+  ACKNOWLEDGE
+  CONSENT
+  EXPLICIT_CONSENT
+  REJECT
+  WITHDRAW
+}
+enum LegalActorType {
+  PUBLIC_VISITOR
+  USER
+  PARTICIPANT
+  ORGANIZATION
+  INTERNAL
+}
+enum AnalysisRunStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+enum OutboxStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+enum FrameworkOrigin {
+  PROOFLINE
+  VALIDATED
+  PARTNER
+  PRIVATE
+}
+enum FrameworkVisibility {
+  PUBLIC
+  PRIVATE
+  LICENSED
+}
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  SUSPENDED
+}
+enum InvoiceStatus {
+  DRAFT
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
+enum TicketStatus {
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  WAITING
+  RESOLVED
+  ESCALATED
+  CLOSED
+}
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+enum TicketCategory {
+  TECHNICAL
+  BILLING
+  ACCESS
+  ACCOUNT_CHANGE
+  CONTRACT_DATA
+  PRIVACY
+  SECURITY
+  FUNCTIONAL
+  OTHER
+}
+enum SupportMessageVisibility {
+  CUSTOMER
+  INTERNAL
+}
+enum AccountChangeType {
+  LEGAL_NAME
+  TAX_ID
+  BILLING_EMAIL
+  CONTRACT_OWNER
+  PRIMARY_OWNER
+  OTHER
+}
+enum AccountChangeStatus {
+  REQUESTED
+  IN_REVIEW
+  NEEDS_INFO
+  APPROVED
+  REJECTED
+  APPLIED
+}
+enum UserAccountStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  DISABLED
+}
+enum InternalUserStatus {
+  PENDING_ACTIVATION
+  ACTIVE
+  DISABLED
+}
+enum AuthChallengeAudience {
+  CLIENT
+  INTERNAL
+}
+enum AuthChallengePurpose {
+  LOGIN
+  EMAIL_VERIFICATION
+  STEP_UP
+}
+enum CommercialMode {
+  DEMO
+  START
+}
+enum CommercialStage {
+  NEW
+  QUALIFIED
+  DEMO_SCHEDULED
+  EVALUATION
+  PROPOSAL
+  CONTRACT_PENDING
+  WON
+  LOST
+  PROVISIONED
+}
+
+model Organization {
+  id             String   @id @default(cuid())
+  name           String
+  slug           String   @unique
+  billingEmail   String?
+  legalName      String?
+  taxId          String?
+  country        String?
+  contractOwnerEmail String?
+  defaultLocale  String   @default("es")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  memberships    Membership[]
+  assessments    Assessment[]
+  subscriptions  Subscription[]
+  entitlements   Entitlement[]
+  invoices       BillingInvoice[]
+  tickets        SupportTicket[]
+  leads          Lead[]
+  auditEvents    AuditEvent[]
+  organizationUnits OrganizationUnit[]
+  directoryPeople   DirectoryPerson[]
+  usageEvents       UsageEvent[]
+  records           DocumentRecord[]
+  imports           AssessmentImport[]
+  retentionPolicies RetentionPolicy[]
+  legalHolds        LegalHold[]
+  branding          OrganizationBranding?
+  commercialRequests CommercialRequest[]
+  accountChangeRequests AccountChangeRequest[]
+}
+
+
+model OrganizationBranding {
+  id              String         @id @default(cuid())
+  organizationId  String         @unique
+  enabled         Boolean        @default(true)
+  primaryColor    String         @default("#5B63F2")
+  backgroundColor String         @default("#F6F7FB")
+  surfaceColor    String         @default("#FFFFFF")
+  textColor       String         @default("#171B26")
+  logoDocumentId  String?        @unique
+  logoAltText     String?
+  updatedBy       String?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  logoDocument    DocumentRecord? @relation(fields: [logoDocumentId], references: [id], onDelete: SetNull)
+}
+
+model User {
+  id              String            @id @default(cuid())
+  email           String            @unique
+  displayName     String
+  locale          String            @default("es")
+  theme           ThemePreference   @default(SYSTEM)
+  passwordHash    String?
+  accountStatus   UserAccountStatus @default(PENDING_VERIFICATION)
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime          @default(now())
+  memberships     Membership[]
+  authChallenges  AuthChallenge[]
+  sessions        ClientAuthSession[]
+  trustedDevices  TrustedLoginDevice[]
+  activations     AccountActivation[]
+  requestedTickets SupportTicket[] @relation("TicketRequester")
+  supportMessages SupportMessage[] @relation("SupportMessageUser")
+  accountChangeRequests AccountChangeRequest[]
+}
+
+model Membership {
+  id             String         @id @default(cuid())
+  organizationId String
+  userId         String
+  role           MembershipRole
+  createdAt      DateTime       @default(now())
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessmentAccesses AssessmentAccess[]
+  authSessions       ClientAuthSession[]
+  @@unique([organizationId, userId])
+  @@index([organizationId, role])
+}
+
+model AssessmentAccess {
+  id           String     @id @default(cuid())
+  membershipId String
+  assessmentId String
+  createdAt    DateTime   @default(now())
+  membership   Membership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  @@unique([membershipId, assessmentId])
+  @@index([assessmentId])
+}
+
+model InternalUser {
+  id              String             @id @default(cuid())
+  email           String             @unique
+  displayName     String
+  role            String
+  passwordHash    String
+  status          InternalUserStatus @default(PENDING_ACTIVATION)
+  emailVerifiedAt DateTime?
+  lastLoginAt     DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  authChallenges  AuthChallenge[]
+  sessions        InternalAuthSession[]
+  trustedDevices  InternalTrustedDevice[]
+  activations     InternalAccountActivation[]
+  assignedTickets SupportTicket[] @relation("TicketAssignee")
+  supportMessages SupportMessage[] @relation("SupportMessageInternal")
+}
+
+model AuthChallenge {
+  id             String                @id @default(cuid())
+  audience       AuthChallengeAudience
+  purpose        AuthChallengePurpose  @default(LOGIN)
+  userId         String?
+  internalUserId String?
+  emailLookup    String
+  codeHash       String
+  deviceHash     String
+  userAgentHash  String?
+  ipHash         String?
+  expiresAt      DateTime
+  usedAt         DateTime?
+  attempts       Int                   @default(0)
+  createdAt      DateTime              @default(now())
+  user           User?                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  internalUser   InternalUser?         @relation(fields: [internalUserId], references: [id], onDelete: Cascade)
+  @@index([audience, emailLookup, createdAt])
+  @@index([expiresAt, usedAt])
+}
+
+model TrustedLoginDevice {
+  id            String   @id @default(cuid())
+  userId        String
+  deviceHash    String
+  label         String?
+  userAgentHash String?
+  lastIpHash    String?
+  trustedUntil  DateTime
+  lastSeenAt    DateTime @default(now())
+  revokedAt     DateTime?
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions      ClientAuthSession[]
+  @@unique([userId, deviceHash])
+  @@index([trustedUntil, revokedAt])
+}
+
+model InternalTrustedDevice {
+  id             String       @id @default(cuid())
+  internalUserId String
+  deviceHash     String
+  label          String?
+  userAgentHash  String?
+  lastIpHash     String?
+  trustedUntil   DateTime
+  lastSeenAt     DateTime     @default(now())
+  revokedAt      DateTime?
+  createdAt      DateTime     @default(now())
+  internalUser   InternalUser @relation(fields: [internalUserId], references: [id], onDelete: Cascade)
+  sessions       InternalAuthSession[]
+  @@unique([internalUserId, deviceHash])
+  @@index([trustedUntil, revokedAt])
+}
+
+model ClientAuthSession {
+  id              String              @id @default(cuid())
+  userId          String
+  membershipId    String
+  trustedDeviceId String?
+  tokenHash       String              @unique
+  expiresAt       DateTime
+  lastSeenAt      DateTime            @default(now())
+  stepUpAt        DateTime?
+  revokedAt       DateTime?
+  createdAt       DateTime            @default(now())
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  membership      Membership          @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  trustedDevice   TrustedLoginDevice? @relation(fields: [trustedDeviceId], references: [id], onDelete: SetNull)
+  @@index([userId, expiresAt, revokedAt])
+}
+
+model InternalAuthSession {
+  id              String                 @id @default(cuid())
+  internalUserId  String
+  trustedDeviceId String?
+  tokenHash       String                 @unique
+  expiresAt       DateTime
+  lastSeenAt      DateTime               @default(now())
+  stepUpAt        DateTime?
+  revokedAt       DateTime?
+  createdAt       DateTime               @default(now())
+  internalUser    InternalUser           @relation(fields: [internalUserId], references: [id], onDelete: Cascade)
+  trustedDevice   InternalTrustedDevice? @relation(fields: [trustedDeviceId], references: [id], onDelete: SetNull)
+  @@index([internalUserId, expiresAt, revokedAt])
+}
+
+model AccountActivation {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId, expiresAt, usedAt])
+}
+
+model InternalAccountActivation {
+  id             String       @id @default(cuid())
+  internalUserId String
+  tokenHash      String       @unique
+  expiresAt      DateTime
+  usedAt         DateTime?
+  createdAt      DateTime     @default(now())
+  internalUser   InternalUser @relation(fields: [internalUserId], references: [id], onDelete: Cascade)
+  @@index([internalUserId, expiresAt, usedAt])
+}
+
+model Plan {
+  id                 String         @id @default(cuid())
+  code               String         @unique
+  name               String
+  monthlyAmountCents Int
+  currency           String         @default("EUR")
+  entitlementsJson   Json
+  createdAt          DateTime       @default(now())
+  subscriptions      Subscription[]
+}
+
+model Subscription {
+  id             String             @id @default(cuid())
+  organizationId String
+  planId         String
+  status         SubscriptionStatus @default(TRIAL)
+  externalRef    String?
+  startsAt       DateTime            @default(now())
+  renewsAt       DateTime?
+  createdAt      DateTime            @default(now())
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan           Plan               @relation(fields: [planId], references: [id])
+  @@index([organizationId, status])
+}
+
+model Entitlement {
+  id             String       @id @default(cuid())
+  organizationId String
+  key            String
+  value          Json
+  source         String       @default("plan")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@unique([organizationId, key])
+}
+
+model BillingInvoice {
+  id             String        @id @default(cuid())
+  organizationId String
+  externalRef    String?       @unique
+  invoiceNumber  String?       @unique
+  amountCents    Int
+  taxCents       Int           @default(0)
+  currency       String        @default("EUR")
+  status         InvoiceStatus @default(OPEN)
+  issuedAt       DateTime      @default(now())
+  dueAt          DateTime?
+  paidAt         DateTime?
+  billingSnapshot Json?
+  documentRecordId String?     @unique
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  documentRecord DocumentRecord? @relation(fields: [documentRecordId], references: [id], onDelete: SetNull)
+  @@index([organizationId, status])
+}
+
+model Framework {
+  id          String              @id @default(cuid())
+  name        String
+  slug        String              @unique
+  origin      FrameworkOrigin
+  visibility  FrameworkVisibility @default(PUBLIC)
+  publisher   String
+  description String
+  category    String              @default("General")
+  tags        Json?
+  useCases    Json?
+  audience    Json?
+  durationMin Int                 @default(10)
+  createdAt   DateTime            @default(now())
+  versions    FrameworkVersion[]
+}
+
+model FrameworkVersion {
+  id           String    @id @default(cuid())
+  frameworkId  String
+  version      String
+  objective    String
+  dimensions            Json
+  license               String
+  editable              Boolean   @default(true)
+  methodology           String    @default("Proofline structured assessment")
+  recommendedPopulation String    @default("Organization")
+  questionBlueprint     Json?
+  scoring               Json?
+  publishedAt           DateTime  @default(now())
+  framework    Framework @relation(fields: [frameworkId], references: [id], onDelete: Cascade)
+  assessments  Assessment[]
+  @@unique([frameworkId, version])
+}
+
+model Assessment {
+  id                 String           @id @default(cuid())
+  organizationId     String
+  frameworkVersionId String?
+  title              String
+  objective          String
+  status             AssessmentStatus @default(DRAFT)
+  locale             String           @default("es")
+  privacyMode        PrivacyMode      @default(CONFIDENTIAL)
+  minCohortSize      Int              @default(7)
+  readinessScore     Int?
+  launchedAt         DateTime?
+  closedAt           DateTime?
+  launchedVersion    Int?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  organization       Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  frameworkVersion   FrameworkVersion? @relation(fields: [frameworkVersionId], references: [id])
+  questions          Question[]
+  translations       AssessmentTranslation[]
+  legalProfile       AssessmentLegalProfile?
+  participantNotices ParticipantNoticeVersion[]
+  participants       Participant[]
+  analysisRuns       AnalysisRun[]
+  audienceTargets    AssessmentAudienceTarget[]
+  resultRecipients   ResultRecipient[]
+  reports            Report[]
+  usageEvents        UsageEvent[]
+  records            DocumentRecord[]
+  retentionPolicies  RetentionPolicy[]
+  legalHolds         LegalHold[]
+  assessmentAccesses AssessmentAccess[]
+  imports            AssessmentImport[]
+  versions           AssessmentVersion[]
+  @@index([organizationId, status])
+}
+
+model AssessmentVersion {
+  id           String     @id @default(cuid())
+  assessmentId String
+  version      Int
+  contentHash  String
+  snapshot     Json
+  createdBy    String
+  createdAt    DateTime   @default(now())
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  @@unique([assessmentId, version])
+  @@index([assessmentId, createdAt])
+}
+
+model AssessmentTranslation {
+  id           String     @id @default(cuid())
+  assessmentId String
+  locale       String
+  title        String
+  objective    String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  @@unique([assessmentId, locale])
+}
+
+model Question {
+  id           String       @id @default(cuid())
+  assessmentId String
+  order        Int
+  type         QuestionType
+  prompt       String
+  dimension    String?
+  subdimension String?
+  required     Boolean      @default(true)
+  weight       Float        @default(1)
+  reverseScore Boolean      @default(false)
+  config       Json?
+  assessment   Assessment   @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  translations QuestionTranslation[]
+  answers      Answer[]
+  @@unique([assessmentId, order])
+}
+
+model QuestionTranslation {
+  id         String   @id @default(cuid())
+  questionId String
+  locale     String
+  prompt     String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  @@unique([questionId, locale])
+}
+
+model AssessmentLegalProfile {
+  id                String     @id @default(cuid())
+  assessmentId      String     @unique
+  controllerName    String
+  purpose           String
+  legalBasis        String
+  article9Condition String?
+  participationMode String
+  confidentiality   String
+  dataFields        Json
+  retentionDays     Int
+  recipients        Json
+  transferPolicy    String
+  dpoContact        String?
+  aiUse             Json
+  approvedAt        DateTime?
+  assessment        Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+}
+
+model ParticipantNoticeVersion {
+  id           String     @id @default(cuid())
+  assessmentId String
+  version      String
+  locale       String
+  title        String
+  content      String
+  contentHash  String
+  active       Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  @@unique([assessmentId, version, locale])
+}
+
+model Participant {
+  id           String            @id @default(cuid())
+  assessmentId String
+  pseudonym    String
+  tokenHash    String            @unique
+  status       ParticipantStatus @default(INVITED)
+  createdAt    DateTime          @default(now())
+  startedAt    DateTime?
+  completedAt  DateTime?
+  assessment   Assessment        @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  identity     ParticipantIdentity?
+  response     Response?
+  @@index([assessmentId, status])
+}
+
+model ParticipantIdentity {
+  id             String      @id @default(cuid())
+  participantId  String      @unique
+  emailEncrypted String
+  emailLookup    String
+  nameEncrypted  String?
+  participant    Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  @@index([emailLookup])
+}
+
+model Response {
+  id            String      @id @default(cuid())
+  participantId String      @unique
+  startedAt     DateTime    @default(now())
+  completedAt   DateTime?
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  answers       Answer[]
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  responseId String
+  questionId String
+  value      Json
+  createdAt  DateTime @default(now())
+  response   Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  @@unique([responseId, questionId])
+  @@index([questionId])
+}
+
+model OrganizationUnit {
+  id              String               @id @default(cuid())
+  organizationId  String
+  name            String
+  code            String?
+  type            OrganizationUnitType @default(DEPARTMENT)
+  parentId        String?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  organization    Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parent          OrganizationUnit?     @relation("OrganizationUnitTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children        OrganizationUnit[]    @relation("OrganizationUnitTree")
+  people          DirectoryPerson[]
+  audienceTargets AssessmentAudienceTarget[]
+  @@unique([organizationId, name])
+  @@index([organizationId, type])
+}
+
+model DirectoryPerson {
+  id                   String                @id @default(cuid())
+  organizationId       String
+  unitId               String?
+  employeeCode         String?
+  displayNameEncrypted String
+  emailEncrypted       String
+  emailLookup          String
+  jobTitleEncrypted    String?
+  locale               String                @default("es")
+  status               DirectoryPersonStatus @default(ACTIVE)
+  attributes           Json?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  organization         Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  unit                 OrganizationUnit?      @relation(fields: [unitId], references: [id], onDelete: SetNull)
+  audienceTargets      AssessmentAudienceTarget[]
+  @@unique([organizationId, emailLookup])
+  @@index([organizationId, status])
+  @@index([unitId])
+}
+
+model AssessmentAudienceTarget {
+  id           String             @id @default(cuid())
+  assessmentId String
+  type         AudienceTargetType
+  unitId       String?
+  personId     String?
+  createdAt    DateTime           @default(now())
+  assessment   Assessment         @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  unit         OrganizationUnit?  @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  person       DirectoryPerson?   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  @@index([assessmentId, type])
+}
+
+model ResultRecipient {
+  id             String     @id @default(cuid())
+  assessmentId   String
+  displayName    String
+  emailEncrypted String
+  emailLookup    String
+  roleLabel      String?
+  locale         String     @default("es")
+  active         Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+  assessment     Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  deliveries     ReportDelivery[]
+  @@unique([assessmentId, emailLookup])
+}
+
+model Report {
+  id            String       @id @default(cuid())
+  assessmentId  String
+  kind          ReportKind
+  status        ReportStatus @default(DRAFT)
+  version       Int          @default(1)
+  snapshot      Json
+  snapshotHash  String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  approvedAt    DateTime?
+  distributedAt DateTime?
+  retentionUntil DateTime?
+  assessment    Assessment   @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  deliveries    ReportDelivery[]
+  @@index([assessmentId, status, createdAt])
+}
+
+model ReportDelivery {
+  id          String          @id @default(cuid())
+  reportId    String
+  recipientId String
+  status      DeliveryStatus  @default(PENDING)
+  channel     String          @default("EMAIL")
+  sentAt      DateTime?
+  error       String?
+  createdAt   DateTime        @default(now())
+  report      Report          @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  recipient   ResultRecipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  @@unique([reportId, recipientId])
+}
+
+model UsageEvent {
+  id             String       @id @default(cuid())
+  organizationId String
+  assessmentId   String?
+  idempotencyKey String       @unique
+  eventType      String
+  quantity       Int          @default(1)
+  unit           String
+  billable       Boolean      @default(false)
+  periodKey      String
+  metadata       Json?
+  occurredAt     DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assessment     Assessment?  @relation(fields: [assessmentId], references: [id], onDelete: SetNull)
+  @@index([organizationId, periodKey, eventType])
+  @@index([assessmentId, occurredAt])
+}
+
+model DocumentRecord {
+  id              String        @id @default(cuid())
+  organizationId  String
+  assessmentId    String?
+  recordClass     String
+  documentType    String
+  title           String
+  fileName        String
+  mimeType        String
+  storageRef      String?
+  contentHash     String
+  version         Int           @default(1)
+  immutable       Boolean       @default(true)
+  status          RecordStatus  @default(ACTIVE)
+  retentionUntil  DateTime?
+  metadata        Json?
+  createdAt       DateTime      @default(now())
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assessment      Assessment?   @relation(fields: [assessmentId], references: [id], onDelete: SetNull)
+  invoice         BillingInvoice?
+  blob            DocumentBlob?
+  importSource    AssessmentImport?
+  brandingLogo    OrganizationBranding?
+  @@index([organizationId, recordClass, createdAt])
+  @@index([assessmentId, createdAt])
+}
+
+model DocumentBlob {
+  id               String         @id @default(cuid())
+  documentRecordId String         @unique
+  bytes            Bytes
+  createdAt        DateTime       @default(now())
+  documentRecord   DocumentRecord @relation(fields: [documentRecordId], references: [id], onDelete: Cascade)
+}
+
+model AssessmentImport {
+  id              String               @id @default(cuid())
+  organizationId  String
+  assessmentId    String?
+  sourceRecordId  String               @unique
+  fileName        String
+  mimeType        String
+  status          ImportStatus         @default(UPLOADED)
+  classification  ImportClassification @default(UNKNOWN)
+  extractedText   String
+  analysis        Json?
+  analysisEngine  String
+  createdAt       DateTime             @default(now())
+  analyzedAt      DateTime?
+  appliedAt       DateTime?
+  organization    Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assessment      Assessment?           @relation(fields: [assessmentId], references: [id], onDelete: SetNull)
+  sourceRecord    DocumentRecord       @relation(fields: [sourceRecordId], references: [id], onDelete: Cascade)
+  @@index([organizationId, createdAt])
+  @@index([assessmentId])
+}
+
+model RetentionPolicy {
+  id              String          @id @default(cuid())
+  organizationId  String
+  assessmentId    String?
+  recordClass     String
+  durationDays    Int
+  action          RetentionAction
+  legalBasis      String
+  locked          Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assessment      Assessment?     @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  @@index([organizationId, recordClass])
+}
+
+model LegalHold {
+  id              String          @id @default(cuid())
+  organizationId  String
+  assessmentId    String?
+  scope            String
+  reason           String
+  status           LegalHoldStatus @default(ACTIVE)
+  createdAt        DateTime        @default(now())
+  releasedAt       DateTime?
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assessment      Assessment?     @relation(fields: [assessmentId], references: [id], onDelete: SetNull)
+  @@index([organizationId, status])
+}
+
+model LegalDocument {
+  id          String                 @id @default(cuid())
+  key         String                 @unique
+  scope       String
+  description String
+  versions    LegalDocumentVersion[]
+}
+
+model LegalDocumentVersion {
+  id           String             @id @default(cuid())
+  documentId   String
+  version      String
+  locale       String
+  title        String
+  content      String
+  contentHash  String
+  effectiveAt  DateTime           @default(now())
+  active       Boolean            @default(true)
+  document     LegalDocument      @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  interactions LegalInteraction[]
+  @@unique([documentId, version, locale])
+}
+
+model LegalInteraction {
+  id                String               @id @default(cuid())
+  documentVersionId String
+  actorType         LegalActorType
+  actorRef          String
+  action            LegalAction
+  locale            String
+  evidence          Json
+  createdAt         DateTime             @default(now())
+  documentVersion   LegalDocumentVersion @relation(fields: [documentVersionId], references: [id])
+  @@index([actorType, actorRef, createdAt])
+}
+
+model AnalysisRun {
+  id           String            @id @default(cuid())
+  assessmentId String
+  status       AnalysisRunStatus @default(PENDING)
+  engineVersion String           @default("analytics-local-0.1")
+  result       Json?
+  error        String?
+  createdAt    DateTime          @default(now())
+  startedAt    DateTime?
+  completedAt  DateTime?
+  assessment   Assessment        @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  @@index([assessmentId, createdAt])
+}
+
+model OutboxEvent {
+  id          String       @id @default(cuid())
+  type        String
+  payload     Json
+  status      OutboxStatus @default(PENDING)
+  attempts    Int          @default(0)
+  availableAt DateTime     @default(now())
+  lockedAt    DateTime?
+  result      Json?
+  error       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  @@index([status, availableAt])
+}
+
+model AuditEvent {
+  id             String        @id @default(cuid())
+  organizationId String?
+  actorType      String
+  actorId        String
+  action         String
+  targetType     String
+  targetId       String?
+  metadata       Json
+  createdAt      DateTime      @default(now())
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  @@index([organizationId, createdAt])
+}
+
+model SupportTicket {
+  id                     String          @id @default(cuid())
+  organizationId         String
+  requesterUserId        String?
+  assigneeInternalUserId String?
+  subject                String
+  description            String          @default("")
+  category               TicketCategory  @default(TECHNICAL)
+  status                 TicketStatus    @default(OPEN)
+  priority               TicketPriority  @default(NORMAL)
+  slaDueAt               DateTime        @default(now())
+  assignedAt             DateTime?
+  escalatedAt            DateTime?
+  resolvedAt             DateTime?
+  closedAt               DateTime?
+  lastCustomerReplyAt    DateTime?
+  lastInternalReplyAt    DateTime?
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+  organization           Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  requester              User?           @relation("TicketRequester", fields: [requesterUserId], references: [id], onDelete: SetNull)
+  assignee               InternalUser?   @relation("TicketAssignee", fields: [assigneeInternalUserId], references: [id], onDelete: SetNull)
+  messages               SupportMessage[]
+  accountChangeRequest   AccountChangeRequest?
+  @@index([status, priority, slaDueAt])
+  @@index([organizationId, updatedAt])
+  @@index([assigneeInternalUserId, status])
+}
+
+model SupportMessage {
+  id             String                   @id @default(cuid())
+  ticketId       String
+  userId         String?
+  internalUserId String?
+  visibility     SupportMessageVisibility @default(CUSTOMER)
+  body           String
+  createdAt      DateTime                 @default(now())
+  ticket         SupportTicket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user           User?                    @relation("SupportMessageUser", fields: [userId], references: [id], onDelete: SetNull)
+  internalUser   InternalUser?            @relation("SupportMessageInternal", fields: [internalUserId], references: [id], onDelete: SetNull)
+  @@index([ticketId, createdAt])
+}
+
+model AccountChangeRequest {
+  id                String              @id @default(cuid())
+  organizationId    String
+  requestedByUserId String
+  supportTicketId   String              @unique
+  type              AccountChangeType
+  status            AccountChangeStatus @default(REQUESTED)
+  summary           String
+  requestedData     Json
+  resolutionNote    String?
+  reviewedBy        String?
+  reviewedAt        DateTime?
+  appliedAt         DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  organization      Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  requestedBy       User                @relation(fields: [requestedByUserId], references: [id], onDelete: Restrict)
+  supportTicket     SupportTicket       @relation(fields: [supportTicketId], references: [id], onDelete: Cascade)
+  @@index([organizationId, status, createdAt])
+}
+
+model Lead {
+  id                   String        @id @default(cuid())
+  organizationId       String?
+  name                 String
+  emailEncrypted       String
+  emailLookup          String
+  company              String
+  message              String?
+  marketingConsent     Boolean       @default(false)
+  privacyNoticeVersion String
+  locale               String        @default("es")
+  createdAt            DateTime      @default(now())
+  organization         Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  commercialRequest    CommercialRequest?
+  @@index([emailLookup])
+}
+
+model CommercialRequest {
+  id                    String          @id @default(cuid())
+  leadId                String?         @unique
+  organizationId        String?
+  mode                  CommercialMode
+  stage                 CommercialStage @default(NEW)
+  name                  String
+  emailEncrypted        String
+  emailLookup           String
+  company               String
+  legalName             String?
+  taxId                 String?
+  billingEmail          String?
+  country               String?
+  estimatedParticipants Int?
+  planCode              String?
+  useCase               String?
+  locale                String          @default("es")
+  evaluationExpiresAt   DateTime?
+  lostReason            String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  lead                   Lead?          @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  organization           Organization?  @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  @@index([stage, createdAt])
+  @@index([emailLookup])
+}
