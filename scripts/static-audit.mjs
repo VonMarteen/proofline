@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, dirname } from "node:path";
 
 const root = process.cwd();
@@ -129,6 +129,65 @@ for (const f of source) {
     if (workspaceNames.has(base) && !declared[base]) fail(`${f}: imports ${base} but ${pkg.name} does not declare it.`);
   }
 }
+
+
+// C2.3.3 visual-rhythm guardrail: prevent arbitrary spacing from returning to the core surfaces.
+const tokenCss = read("packages/design-tokens/base.css");
+if (!/--space-container:\s*20px;/.test(tokenCss) || !/--space-section:\s*20px;/.test(tokenCss)) {
+  fail("packages/design-tokens/base.css: core sibling-container rhythm must remain 20px.");
+}
+const workspaceCss = read("apps/web/app/workspace.css");
+for (const required of [
+  ".workspace-page { gap: 20px; }",
+  ".directory-manager { display: grid; gap: 20px; }",
+  ".workspace-form { display: grid; gap: 20px; }",
+  ".privacy-detail-grid { gap: 20px; margin-top: 20px; }",
+]) {
+  if (!workspaceCss.includes(required)) fail(`apps/web/app/workspace.css: missing C2.3.3 rhythm contract: ${required}`);
+}
+const commercialHome = read("apps/site/app/[locale]/page.tsx");
+if (commercialHome.includes("commercial-flow-step") || commercialHome.includes("flow-step-top")) {
+  fail("apps/site/app/[locale]/page.tsx: decorative numbered flow filler must not return to the commercial home.");
+}
+if (commercialHome.includes("site-product-orbit orbit-")) {
+  fail("apps/site/app/[locale]/page.tsx: decorative product-orbit micro-labels must not return.");
+}
+
+// C2.3.4: Team & permissions must honor the exact rhythm at selector-specific level.
+for (const required of [
+  ".workspace-team-list { display:grid; gap:20px; min-width:0; }",
+  ".workspace-role-grid.role-explainer { gap:20px; }",
+  ".workspace-invite-card { display:grid; gap:20px; padding:20px; }",
+]) {
+  if (!workspaceCss.includes(required)) fail(`apps/web/app/workspace.css: missing C2.3.4 team rhythm contract: ${required}`);
+}
+
+// C2.3.5 browser identity contract: brand-only public site, tenant-aware Workspace,
+// assessment-aware Respond, and explicit internal Control/Support surfaces.
+const staticSurfaceTitles = {
+  site: "PROOFLINE",
+  control: "PROOFLINE — Control",
+  support: "PROOFLINE — Support",
+};
+for (const [app, title] of Object.entries(staticSurfaceTitles)) {
+  const layout = read(`apps/${app}/app/layout.tsx`);
+  if (!layout.includes(`title: "${title}"`)) fail(`apps/${app}/app/layout.tsx: browser title must be ${title}.`);
+  if (!layout.includes('icon: "/icon.svg"')) fail(`apps/${app}/app/layout.tsx: PROOFLINE browser icon metadata is missing.`);
+  if (!existsSync(join(root, `apps/${app}/app/icon.svg`))) fail(`apps/${app}/app/icon.svg: shared PROOFLINE browser icon is missing.`);
+}
+for (const app of ["web", "respond"]) {
+  const layout = read(`apps/${app}/app/layout.tsx`);
+  if (!layout.includes('title: "PROOFLINE"')) fail(`apps/${app}/app/layout.tsx: dynamic surface fallback title must be PROOFLINE.`);
+  if (!layout.includes('icon: "/icon.svg"')) fail(`apps/${app}/app/layout.tsx: PROOFLINE browser icon metadata is missing.`);
+  if (!existsSync(join(root, `apps/${app}/app/icon.svg`))) fail(`apps/${app}/app/icon.svg: shared PROOFLINE browser icon is missing.`);
+}
+const workspaceLocaleLayout = read("apps/web/app/[locale]/layout.tsx");
+if (!workspaceLocaleLayout.includes('export async function generateMetadata')) fail("apps/web/app/[locale]/layout.tsx: tenant-aware metadata is missing.");
+if (!workspaceLocaleLayout.includes('`${organizationName} — PROOFLINE`')) fail("apps/web/app/[locale]/layout.tsx: Workspace title must resolve to {Cliente} — PROOFLINE.");
+const respondTokenPage = read("apps/respond/app/[locale]/[token]/page.tsx");
+if (!respondTokenPage.includes('export async function generateMetadata')) fail("apps/respond/app/[locale]/[token]/page.tsx: assessment-aware metadata is missing.");
+if (!respondTokenPage.includes('[organizationName, assessmentTitle].filter(Boolean).join(" · ")')) fail("apps/respond/app/[locale]/[token]/page.tsx: Respond title must combine client and assessment context.");
+if (!respondTokenPage.includes('`${context} — PROOFLINE`')) fail("apps/respond/app/[locale]/[token]/page.tsx: Respond title must resolve to {Cliente} · {Assessment} — PROOFLINE.");
 
 // The VS Code distribution must not reintroduce external launchers.
 const forbidden = walk(".").filter((f) => /\.(bat|ps1)$/i.test(f));

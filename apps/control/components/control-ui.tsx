@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Icon, type ProoflineIconName } from "@proofline/ui";
 
 export function PageIntro({ title, text, action }: { title: string; text?: string; action?: ReactNode }) {
   return <div className="control-page-intro"><div><h1>{title}</h1>{text ? <p>{text}</p> : null}</div>{action ? <div>{action}</div> : null}</div>;
@@ -15,7 +16,8 @@ export function Panel({ title, children, action, className = "" }: { title?: str
 export function Status({ value }: { value: string }) {
   const normalized = value.toUpperCase();
   const tone = ["ACTIVE","PAID","COMPLETED","APPROVED","DISTRIBUTED","HEALTHY","CLOSED","RESOLVED","PROVISIONED"].includes(normalized) ? "good" : ["FAILED","PAST_DUE","SUSPENDED","UNCOLLECTIBLE","URGENT","ESCALATED","DISABLED"].includes(normalized) ? "danger" : ["PENDING","PROCESSING","TRIAL","OPEN","ASSIGNED","IN_PROGRESS","WAITING","DRAFT","REVIEW","READY","ATTENTION","PENDING_VERIFICATION","PENDING_ACTIVATION","CONTRACT_PENDING","DEMO_SCHEDULED","EVALUATION","PROPOSAL"].includes(normalized) ? "warn" : "neutral";
-  return <span className={`control-status ${tone}`}>{value.replaceAll("_", " ")}</span>;
+  const icon: ProoflineIconName = tone === "good" ? "check-circle" : tone === "danger" ? "alert" : tone === "warn" ? "clock" : "activity";
+  return <span className={`control-status ${tone}`}><Icon name={icon} size={13} strokeWidth={2}/>{value.replaceAll("_", " ")}</span>;
 }
 
 export function Empty({ children }: { children: ReactNode }) { return <div className="control-empty">{children}</div>; }

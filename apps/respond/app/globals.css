@@ -20,3 +20,29 @@ p { text-wrap: pretty; }
 .respond-brand-controls .respond-submit .btn-accent{background:var(--assessment-brand);color:var(--assessment-brand-on);border-color:transparent}
 .respond-brand-controls .respond-question .input:focus,.respond-brand-controls .respond-question .textarea:focus,.respond-brand-controls .respond-question .select:focus{outline:2px solid color-mix(in srgb,var(--assessment-brand) 45%,transparent);border-color:var(--assessment-brand)}
 @media(max-width:620px){.participant-brand-name{max-width:110px}.participant-brand img{max-width:88px}}
+
+/* C2.3 · participant surface polish */
+.respond-shell{max-width:860px;padding:40px 18px 84px}.respond-intro h1{font-size:clamp(32px,4.7vw,48px);line-height:1.04;margin:8px 0 10px}.respond-intro p{font-size:14px;line-height:1.55;max-width:760px}.respond-notice{margin:22px 0;padding:18px;border-radius:15px;background:var(--bg-solid)}.respond-notice-head{display:flex;align-items:center;gap:9px;margin-bottom:8px}.respond-notice-head .proofline-icon{color:var(--accent)}.respond-notice-head h2{margin:0;font-size:17px}.respond-notice>p{font-size:12px;line-height:1.55}.respond-notice label{margin-top:13px;padding-top:13px;border-top:1px solid var(--border)}.respond-notice label strong{font-size:12px}.respond-notice small{font-size:10.5px;line-height:1.45}.respond-progress{margin:17px 0}.respond-progress i{height:6px}.respond-question,.respond-info{padding:20px;border-radius:15px;background:var(--bg-solid)}.respond-question-head{grid-template-columns:30px 1fr auto}.respond-question-head>span{width:29px;height:29px;border-radius:9px;font-size:11px}.respond-question-head h2{font-size:16px;line-height:1.42;margin:1px 0 3px}.respond-question-head small{font-size:10px}.respond-question-head>b{font-size:9px}.respond-scale label span{width:36px;height:36px}.respond-choice-grid label,.respond-choice-list label{padding:10px 12px;border-radius:10px}.respond-submit{margin-top:20px;padding-top:5px}.respond-submit span{font-size:10.5px}.respond-complete{max-width:700px;padding:78px 18px}.respond-complete section{padding:32px;border-radius:17px;background:var(--bg-solid)}.respond-complete-icon{width:52px;height:52px;margin:0 auto 14px;border-radius:15px;display:grid;place-items:center;background:var(--signal-soft);color:var(--signal)}
+
+/* C2.3.2 — participant spacing contract */
+.respond-shell{display:grid;gap:20px}
+.respond-intro{display:grid;gap:12px}
+.respond-intro h1,.respond-intro p{margin:0}
+.respond-notice{margin:0;padding:20px}
+.respond-progress{margin:0}
+.respond-questions{gap:20px}
+.respond-question,.respond-info{padding:20px}
+.respond-choice-grid,.respond-choice-list,
+.respond-scale,.respond-range,.respond-dual,.respond-matrix,.respond-ranking,.respond-allocation{margin-top:20px}
+.respond-ranking,.respond-allocation{gap:20px}
+.respond-submit{margin-top:20px;padding-top:0}
+.respond-error{margin-top:20px}
+.respond-complete{display:grid;gap:20px}
+.respond-complete section{margin-top:0;padding:36px}
+
+
+/* C2.3.3 — Respond exact sibling rhythm */
+.respond-shell,.respond-questions,.respond-ranking,.respond-allocation,.respond-complete{gap:20px}
+.respond-notice{margin:0;padding:20px}
+.respond-question,.respond-info{padding:20px}
+.respond-progress,.respond-scale,.respond-range,.respond-dual,.respond-matrix,.respond-ranking,.respond-allocation,.respond-submit,.respond-error{margin-top:20px;margin-bottom:0}

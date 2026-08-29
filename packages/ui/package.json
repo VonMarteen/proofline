@@ -23,5 +23,8 @@
   "exports": {
     ".": "./src/index.tsx",
     "./client": "./src/client.tsx"
+  },
+  "dependencies": {
+    "lucide-react": "0.562.0"
   }
 }

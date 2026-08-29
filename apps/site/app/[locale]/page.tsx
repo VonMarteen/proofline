@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { normalizeLocale } from "@proofline/i18n";
+import { Icon, type ProoflineIconName } from "@proofline/ui";
 import { copy } from "../../lib/copy";
 import { EvidencePreview } from "../../components/evidence-preview";
 import { CtaBand } from "../../components/cta-band";
@@ -9,156 +11,124 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
   const c = copy[locale];
   const es = locale === "es";
 
-  const workflow = es ? [
-    {
-      title: "Empieza por la decisión",
-      text: "Declara qué necesitas poder responder, qué decisión debería habilitar el estudio y a qué población afecta. Proofline conserva ese objetivo como referencia para revisar el cuestionario, la recogida y la salida final.",
-    },
-    {
-      title: "Revisa antes de lanzar",
-      text: "Importa tu cuestionario o parte de un framework y comprueba si realmente cubre el objetivo. La revisión señala redundancias, ambigüedades, escalas inconsistentes, carga innecesaria y riesgos de privacidad antes de recoger respuestas.",
-    },
-    {
-      title: "Recoge con control",
-      text: "Gestiona invitaciones, avisos versionados, confidencialidad, cohortes y seguimiento desde un mismo flujo. La identidad puede mantenerse separada de la respuesta cuando el modo del assessment lo requiere.",
-    },
-    {
-      title: "Recibe una lectura defendible",
-      text: "La salida prioriza qué puede afirmarse respecto al objetivo y permite profundizar después en tendencias, diferencias entre grupos, comentarios y limitaciones. La dirección obtiene claridad sin perder el camino hacia la evidencia.",
-    },
+  const capabilities: Array<{ icon: ProoflineIconName; title: string; text: string; className: string }> = es ? [
+    { icon: "clipboard-check", title: "Diseña antes de preguntar", text: "Objetivo, cuestionario y población quedan conectados desde el principio para detectar huecos antes de lanzar.", className: "bento-primary" },
+    { icon: "governance", title: "Privacidad operativa", text: "Confidencialidad, cohortes y avisos versionados forman parte del flujo, no de una revisión final.", className: "bento-trust" },
+    { icon: "sparkles", title: "IA con límites claros", text: "Asiste en revisión y síntesis sin convertir inferencias en hechos ni esconder la evidencia debajo.", className: "bento-ai" },
+    { icon: "reports", title: "Respuesta ejecutiva primero", text: "La dirección recibe una lectura clara y quien necesite profundidad puede bajar hasta métricas, comentarios y reglas.", className: "bento-report" },
+    { icon: "history", title: "Trazabilidad de punta a punta", text: "Versiones, decisiones y salidas conservan contexto suficiente para explicar cómo se llegó al resultado.", className: "bento-history" },
   ] : [
-    {
-      title: "Start with the decision",
-      text: "Declare what you need to answer, which decision the study should enable and which population it concerns. Proofline preserves that objective as the reference point for reviewing the questionnaire, collection and final output.",
-    },
-    {
-      title: "Review before launch",
-      text: "Import your questionnaire or start from a framework and check whether it actually covers the objective. The review flags redundancy, ambiguity, inconsistent scales, unnecessary burden and privacy risks before responses are collected.",
-    },
-    {
-      title: "Collect with control",
-      text: "Manage invitations, versioned notices, confidentiality, cohorts and follow-up in one flow. Identity can remain separated from response data when the assessment mode requires it.",
-    },
-    {
-      title: "Get a defensible reading",
-      text: "The output prioritises what can be said about the objective and then lets you drill into trends, group differences, comments and limitations. Leadership gets clarity without losing the path back to evidence.",
-    },
+    { icon: "clipboard-check", title: "Design before asking", text: "Objective, questionnaire and population stay connected from the start so gaps surface before launch.", className: "bento-primary" },
+    { icon: "governance", title: "Operational privacy", text: "Confidentiality, cohorts and versioned notices live in the workflow, not in a final review.", className: "bento-trust" },
+    { icon: "sparkles", title: "AI with explicit boundaries", text: "Supports review and synthesis without turning inference into fact or hiding the evidence underneath.", className: "bento-ai" },
+    { icon: "reports", title: "Executive answer first", text: "Leadership gets a clear reading while specialists can drill into metrics, comments and rules.", className: "bento-report" },
+    { icon: "history", title: "End-to-end traceability", text: "Versions, decisions and outputs retain enough context to explain how the result was reached.", className: "bento-history" },
   ];
 
+
   return <>
-    <section className="hero site-hero">
-      <div className="container site-hero-grid">
+    <section className="site-home-hero">
+      <div className="site-hero-glow site-hero-glow-a" aria-hidden="true" />
+      <div className="site-hero-glow site-hero-glow-b" aria-hidden="true" />
+      <div className="container site-hero-shell">
         <div className="site-hero-copy">
-          <p className="hero-kicker">{c.hero.kicker}</p>
           <h1>{c.hero.title}</h1>
           <p className="hero-lead">{c.hero.text}</p>
-          <div className="hero-actions">
-            <a className="btn btn-accent" href={`/${locale}/product`}>{c.hero.primary}</a>
-            <a className="btn" href={`/${locale}/library`}>{c.hero.secondary}</a>
-          </div>
-          <div className="hero-proof-points" aria-label={es ? "Principios de Proofline" : "Proofline principles"}>
-            <span>{es ? "Revisión antes de lanzar" : "Pre-launch review"}</span>
-            <span>{es ? "Privacidad desde el diseño" : "Privacy by design"}</span>
-            <span>{es ? "Resultados trazables" : "Traceable results"}</span>
+          <div className="hero-actions site-hero-actions">
+            <Link className="btn btn-accent site-hero-primary" href={`/${locale}/product`}>{c.hero.primary}<Icon name="arrow-right" size={16} /></Link>
+            <Link className="btn site-hero-secondary" href={`/${locale}/contact`}>{es ? "Ver una demo" : "See a demo"}</Link>
           </div>
         </div>
-        <EvidencePreview locale={locale} />
-      </div>
-    </section>
-
-    <section className="section editorial-section">
-      <div className="container editorial-split">
-        <div>
-          <h2>{es ? "No es otra herramienta de encuestas." : "It is not another survey tool."}</h2>
-        </div>
-        <div className="editorial-copy">
-          <p>{es
-            ? "Proofline está pensado para situaciones en las que la organización ya tiene una pregunta relevante y necesita llegar a una respuesta con método, sin convertir el proceso en un proyecto de análisis interminable."
-            : "Proofline is designed for situations where the organization already has an important question and needs a methodical answer without turning the process into an endless analysis project."}</p>
-          <p>{es
-            ? "La plataforma conecta diseño del assessment, recogida, análisis, privacidad y reporting dentro de un mismo sistema de evidencia. Cada etapa conserva contexto suficiente para que el resultado final pueda explicarse, revisarse y reutilizarse en futuras oleadas."
-            : "The platform connects assessment design, collection, analysis, privacy and reporting within a single evidence system. Each stage preserves enough context for the final result to be explained, reviewed and reused in future waves."}</p>
-          <a className="text-link" href={`/${locale}/product`}>{es ? "Ver cómo funciona el ciclo completo" : "See how the full cycle works"} →</a>
+        <div className="site-product-visual">
+          <EvidencePreview locale={locale} />
         </div>
       </div>
     </section>
 
-    <section className="section section-tinted">
+    <section className="section home-positioning">
+      <div className="container home-positioning-grid">
+        <div className="home-positioning-title">
+          <h2>{es ? "No necesitas más encuestas. Necesitas una respuesta defendible." : "You do not need more surveys. You need a defensible answer."}</h2>
+        </div>
+        <div className="home-positioning-copy">
+          <p>{es
+            ? "Proofline conecta el trabajo que normalmente queda repartido entre formularios, hojas de cálculo, consultoría, análisis y presentaciones. El valor no está en recoger respuestas: está en preservar el hilo entre la pregunta original y la decisión final."
+            : "Proofline connects work that normally lives across forms, spreadsheets, consulting, analysis and presentations. The value is not collecting responses; it is preserving the thread between the original question and the final decision."}</p>
+          <Link className="text-link editorial-link" href={`/${locale}/product`}>{es ? "Cómo funciona Proofline" : "How Proofline works"}<Icon name="arrow-right" size={15} /></Link>
+        </div>
+      </div>
+    </section>
+
+    <section className="section home-bento-section">
       <div className="container">
-        <div className="content-heading">
-          <h2>{es ? "De la pregunta al resultado, sin perder el hilo." : "From question to result without losing the thread."}</h2>
-          <p>{es ? "Un proceso continuo donde objetivo, método, privacidad y evidencia permanecen conectados." : "A continuous process where objective, method, privacy and evidence remain connected."}</p>
+        <div className="home-section-heading">
+          <h2>{es ? "Todo lo que convierte un assessment en inteligencia organizacional." : "Everything that turns an assessment into organizational intelligence."}</h2>
+          <p>{es ? "Un mismo hilo conecta diseño, privacidad, análisis y reporting para que el resultado conserve contexto y evidencia." : "One continuous thread connects design, privacy, analysis and reporting so the result keeps its context and evidence."}</p>
         </div>
-        <div className="workflow-grid">
-          {workflow.map((item) => <article className="workflow-card" key={item.title}>
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
+        <div className="commercial-bento">
+          {capabilities.map(item => <article className={`commercial-bento-card ${item.className}`} key={item.title}>
+            <div className="bento-card-copy">
+              <div className="bento-title-row"><span className="bento-icon"><Icon name={item.icon} size={18} /></span><h3>{item.title}</h3></div>
+              <p>{item.text}</p>
+            </div>
+            {item.className === "bento-primary" ? <div className="bento-mini-ui" aria-hidden="true">
+              <div><span>Objective coverage</span><strong>92%</strong></div>
+              <div className="bento-mini-track"><i /></div>
+              <div className="bento-mini-row"><span>Privacy</span><b>Ready</b></div>
+              <div className="bento-mini-row"><span>Question load</span><b>Good</b></div>
+            </div> : null}
           </article>)}
         </div>
       </div>
     </section>
 
-    <section className="section">
-      <div className="container outcome-grid">
-        <div className="outcome-copy">
-          <h2>{es ? "Primero la respuesta. Después, toda la profundidad que necesites." : "The answer first. Then all the depth you need."}</h2>
-          <p>{es
-            ? "Un directivo no debería tener que navegar veinte gráficos para entender qué está ocurriendo. Proofline empieza por una lectura ejecutiva y conserva debajo la profundidad suficiente para que analistas, People o consultores puedan comprobar cómo se llegó a ella."
-            : "A decision-maker should not need to navigate twenty charts to understand what is happening. Proofline starts with an executive reading and keeps enough depth underneath for analysts, People teams or consultants to verify how it was reached."}</p>
+    <section className="section home-outcome-section">
+      <div className="container home-outcome-showcase">
+        <div className="outcome-showcase-copy">
+          <h2>{es ? "Una respuesta para dirección. Toda la evidencia para quien la necesita." : "One answer for leadership. All the evidence for those who need it."}</h2>
+          <p>{es ? "Proofline evita dos extremos: el dashboard interminable y el PDF opaco. Empieza por la lectura ejecutiva y mantiene debajo el camino hacia la evidencia." : "Proofline avoids two extremes: the endless dashboard and the opaque PDF. It starts with the executive reading and keeps the path to evidence underneath."}</p>
+          <Link className="btn" href={`/${locale}/product`}>{es ? "Explorar reporting" : "Explore reporting"}<Icon name="arrow-right" size={15} /></Link>
         </div>
-        <div className="outcome-layers">
-          <div className="outcome-layer"><div><strong>{es ? "Respuesta" : "Answer"}</strong><p>{es ? "Una conclusión directa respecto al objetivo original: qué puede afirmarse, qué no y con qué nivel de evidencia. Está pensada para que dirección entienda el resultado sin tener que reconstruir el análisis." : "A direct conclusion against the original objective: what can be said, what cannot and with what level of evidence. Designed so leadership can understand the result without reconstructing the analysis."}</p></div></div>
-          <div className="outcome-layer"><div><strong>{es ? "Insights" : "Insights"}</strong><p>{es ? "La señal se descompone en diferencias entre grupos, dimensiones, tendencias y temas recurrentes. Aquí aparece dónde conviene mirar con más atención y qué merece una siguiente pregunta." : "The signal is broken down into group differences, dimensions, trends and recurring themes. This layer shows where to look more closely and what deserves a follow-up question."}</p></div></div>
-          <div className="outcome-layer"><div><strong>{es ? "Evidencia" : "Evidence"}</strong><p>{es ? "Distribuciones, comparaciones, comentarios, reglas de scoring, población y limitaciones quedan disponibles para revisar la lectura, documentarla y sostener decisiones posteriores." : "Distributions, comparisons, comments, scoring rules, population and limitations remain available to review the reading, document it and support subsequent decisions."}</p></div></div>
+        <div className="outcome-stack" aria-label={es ? "Capas de reporting" : "Reporting layers"}>
+          <article className="outcome-stack-card outcome-stack-answer"><div><strong>{es ? "Respuesta" : "Answer"}</strong><p>{es ? "Qué puedes afirmar, qué no y con qué nivel de evidencia." : "What you can claim, what you cannot and with what level of evidence."}</p></div><Icon name="approved" size={18} /></article>
+          <article className="outcome-stack-card outcome-stack-insights"><div><strong>Insights</strong><p>{es ? "Dónde aparecen diferencias, tendencias y temas recurrentes." : "Where differences, trends and recurring themes appear."}</p></div><Icon name="sparkles" size={18} /></article>
+          <article className="outcome-stack-card outcome-stack-evidence"><div><strong>{es ? "Evidencia" : "Evidence"}</strong><p>{es ? "Distribuciones, cohortes, comentarios, scoring y limitaciones." : "Distributions, cohorts, comments, scoring and limitations."}</p></div><Icon name="reports" size={18} /></article>
         </div>
       </div>
     </section>
 
-    <section className="section section-tinted">
+    <section className="section home-modes-section">
       <div className="container">
-        <div className="content-heading two-column-heading">
-          <h2>{es ? "Una plataforma, dos formas de trabajar." : "One platform, two ways to work."}</h2>
-          <p>{es ? "La misma base metodológica y de confianza, adaptada a quién opera el servicio." : "The same methodological and trust foundation, adapted to whoever operates the service."}</p>
+        <div className="home-section-heading">
+          <h2>{es ? "Para equipos internos y para quienes convierten metodología en servicio." : "For internal teams and for those turning methodology into a service."}</h2>
         </div>
-        <div className="mode-grid">
-          <article className="mode-panel">
-            <div className="mode-title"><span>{es ? "Equipos internos" : "Internal teams"}</span><h3>Proofline Direct</h3></div>
-            <p>{es ? "Para organizaciones que quieren diseñar y ejecutar sus propios assessments con un proceso guiado, gobernado y repetible." : "For organizations that want to design and run their own assessments through a guided, governed and repeatable process."}</p>
-            <ul>
-              <li>{es ? "Assessment Check antes del lanzamiento" : "Assessment Check before launch"}</li>
-              <li>{es ? "Resultados ejecutivos y evidencia navegable" : "Executive results and navigable evidence"}</li>
-              <li>{es ? "Roles, privacidad y distribución controlada" : "Roles, privacy and controlled distribution"}</li>
-            </ul>
-            <a className="text-link" href={`/${locale}/solutions#direct`}>{es ? "Conocer Direct" : "Explore Direct"} →</a>
+        <div className="commercial-mode-grid">
+          <article className="commercial-mode-card">
+            <h3>Proofline Direct</h3>
+            <p>{es ? "Diseña, lanza y repite assessments con un proceso guiado que mantiene método, privacidad y reporting conectados." : "Design, launch and repeat assessments through a guided process that keeps method, privacy and reporting connected."}</p>
+            <Link href={`/${locale}/solutions#direct`} className="text-link">{es ? "Conocer Direct" : "Explore Direct"}<Icon name="arrow-right" size={15} /></Link>
           </article>
-          <article className="mode-panel">
-            <div className="mode-title"><span>{es ? "Operación multi-cliente" : "Multi-client operation"}</span><h3>Proofline Professional</h3></div>
-            <p>{es ? "Para consultoras y partners que quieren convertir una metodología propia en una operación consistente, trazable y escalable sin multiplicar trabajo manual." : "For consultancies and partners turning proprietary methodology into a consistent, traceable and scalable operation without multiplying manual work."}</p>
-            <ul>
-              <li>{es ? "Clientes, bibliotecas y frameworks privados" : "Clients, libraries and private frameworks"}</li>
-              <li>{es ? "Reporting por audiencia y marca" : "Audience- and brand-specific reporting"}</li>
-              <li>{es ? "Gobernanza y operación repetible" : "Governance and repeatable operation"}</li>
-            </ul>
-            <a className="text-link" href={`/${locale}/solutions#professional`}>{es ? "Conocer Professional" : "Explore Professional"} →</a>
+          <article className="commercial-mode-card commercial-mode-card-accent">
+            <h3>Proofline Professional</h3>
+            <p>{es ? "Opera múltiples clientes, frameworks y audiencias sin multiplicar hojas de cálculo, versiones ni trabajo manual." : "Operate multiple clients, frameworks and audiences without multiplying spreadsheets, versions or manual work."}</p>
+            <Link href={`/${locale}/solutions#professional`} className="text-link">{es ? "Conocer Professional" : "Explore Professional"}<Icon name="arrow-right" size={15} /></Link>
           </article>
         </div>
       </div>
     </section>
 
-    <section className="section">
-      <div className="container trust-home-grid">
-        <div>
-          <h2>{es ? "La confianza no aparece al final del informe." : "Trust does not appear at the end of the report."}</h2>
-          <p>{es
-            ? "Se diseña desde el principio: qué datos se necesitan, para qué, quién puede acceder, cómo se separa la identidad, qué puede mostrarse por cohortes y qué evidencia legal debe conservarse."
-            : "It is designed from the start: which data are needed, why, who can access them, how identity is separated, what can be shown by cohort and which legal evidence should be retained."}</p>
-          <a className="btn" href={`/${locale}/trust`}>{es ? "Explorar el Trust Center" : "Explore the Trust Center"}</a>
+    <section className="section home-trust-section">
+      <div className="container home-trust-panel">
+        <div className="home-trust-copy">
+          <h2>{es ? "La confianza no se añade al final del informe." : "Trust is not added at the end of the report."}</h2>
+          <p>{es ? "Qué datos se necesitan, para qué, quién puede acceder y qué se puede mostrar por cohortes se decide dentro del producto y queda trazable." : "Which data are needed, why, who can access them and what can be shown by cohort are decided inside the product and remain traceable."}</p>
+          <Link className="btn btn-ghost trust-panel-link" href={`/${locale}/trust`}>{es ? "Explorar Trust Center" : "Explore Trust Center"}<Icon name="arrow-right" size={15} /></Link>
         </div>
-        <div className="trust-principles">
-          <div><strong>{es ? "Datos mínimos" : "Minimum data"}</strong><span>{es ? "Cada campo necesita un propósito declarado y una política de retención coherente." : "Every field needs a declared purpose and coherent retention policy."}</span></div>
-          <div><strong>{es ? "Identidad separada" : "Separated identity"}</strong><span>{es ? "Identidad y respuesta pueden permanecer en dominios distintos para reducir exposición innecesaria." : "Identity and response can remain in separate domains to reduce unnecessary exposure."}</span></div>
-          <div><strong>{es ? "IA especializada" : "Specialised AI"}</strong><span>{es ? "La IA apoya revisión, síntesis e interpretación dentro de funciones explícitas y revisables." : "AI supports review, synthesis and interpretation within explicit, reviewable functions."}</span></div>
-          <div><strong>{es ? "Evidencia trazable" : "Traceable evidence"}</strong><span>{es ? "Versiones, accesos y decisiones relevantes pueden conservar contexto suficiente para una revisión posterior." : "Versions, access and relevant decisions can retain enough context for later review."}</span></div>
+        <div className="home-trust-list">
+          <div><Icon name="lock" size={17} /><span><strong>{es ? "Datos mínimos" : "Minimum data"}</strong><small>{es ? "Cada campo necesita propósito." : "Every field needs a purpose."}</small></span></div>
+          <div><Icon name="people" size={17} /><span><strong>{es ? "Identidad separada" : "Separated identity"}</strong><small>{es ? "Menos exposición innecesaria." : "Less unnecessary exposure."}</small></span></div>
+          <div><Icon name="history" size={17} /><span><strong>{es ? "Evidencia versionada" : "Versioned evidence"}</strong><small>{es ? "Contexto para revisión posterior." : "Context for later review."}</small></span></div>
+          <div><Icon name="sparkles" size={17} /><span><strong>{es ? "IA gobernada" : "Governed AI"}</strong><small>{es ? "Funciones explícitas y revisables." : "Explicit, reviewable functions."}</small></span></div>
         </div>
       </div>
     </section>
@@ -166,9 +136,9 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
     <CtaBand
       locale={locale}
       title={es ? "Si la pregunta importa, el proceso también." : "If the question matters, so does the process."}
-      text={es ? "Cuéntanos qué necesitas poder responder y te mostramos cómo se estructuraría en Proofline." : "Tell us what you need to answer and we will show you how it would be structured in Proofline."}
+      text={es ? "Cuéntanos qué necesitas poder responder. Te mostramos cómo Proofline preserva el hilo desde el diseño hasta la decisión." : "Tell us what you need to answer. We will show how Proofline preserves the thread from design to decision."}
       secondaryHref={`/${locale}/library`}
-      secondaryLabel={es ? "Ver assessments" : "View assessments"}
+      secondaryLabel={es ? "Explorar assessments" : "Explore assessments"}
     />
   </>;
 }

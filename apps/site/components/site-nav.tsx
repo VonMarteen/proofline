@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Locale } from "@proofline/i18n";
 import { copy } from "../lib/copy";
@@ -20,7 +21,7 @@ export function SiteNav({ locale }: { locale: Locale }) {
       <nav className="site-nav" aria-label={locale === "es" ? "Navegación principal" : "Primary navigation"}>
         {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          return <a key={item.href} className={active ? "active" : ""} href={item.href}>{item.label}</a>;
+          return <Link key={item.href} className={active ? "active" : ""} href={item.href}>{item.label}</Link>;
         })}
       </nav>
       <details className="site-mobile-menu">
@@ -28,7 +29,7 @@ export function SiteNav({ locale }: { locale: Locale }) {
         <nav aria-label={locale === "es" ? "Navegación móvil" : "Mobile navigation"}>
           {items.map((item) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            return <a key={item.href} className={active ? "active" : ""} href={item.href}>{item.label}</a>;
+            return <Link key={item.href} className={active ? "active" : ""} href={item.href}>{item.label}</Link>;
           })}
         </nav>
       </details>

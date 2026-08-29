@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Icon } from "@proofline/ui";
 import { requestProoflineConfirmation } from "@proofline/ui/client";
 
 export function AssessmentDeleteButton({id,locale,enabled}:{id:string;locale:"es"|"en";enabled:boolean}){
@@ -17,5 +18,5 @@ export function AssessmentDeleteButton({id,locale,enabled}:{id:string;locale:"es
       router.push(`/${locale}/assessments`);router.refresh();
     }catch(e){setError(e instanceof Error?e.message:String(e));setBusy(false)}
   }
-  return <div className="assessment-delete-control"><button type="button" className="btn btn-danger-quiet" disabled={busy} onClick={remove}>{busy?(es?"Eliminando…":"Deleting…"):(es?"Eliminar assessment":"Delete assessment")}</button>{error?<div className="workspace-alert danger">{error}</div>:null}</div>;
+  return <div className="assessment-delete-control"><button type="button" className="btn btn-danger-quiet" disabled={busy} onClick={remove}><Icon name="delete" size={15}/>{busy?(es?"Eliminando…":"Deleting…"):(es?"Eliminar assessment":"Delete assessment")}</button>{error?<div className="workspace-alert danger">{error}</div>:null}</div>;
 }

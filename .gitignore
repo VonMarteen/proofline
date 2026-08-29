@@ -17,3 +17,14 @@ local-data/
 # Build / tooling caches
 .turbo/
 **/.turbo/
+
+# PROOFLINE local runtime artifacts
+.proofline-pids.json
+bootstrap-error.txt
+
+# Local generated patch documentation
+/APLICAR_PATCH_*.md
+/VALIDACION_v*.md
+
+# TypeScript incremental build cache
+*.tsbuildinfo
