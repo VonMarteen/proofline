@@ -35,7 +35,8 @@
     "auth:bootstrap-local": "pnpm --filter @proofline/api auth:bootstrap-local",
     "dev:control-api": "pnpm --filter @proofline/api dev:control",
     "demo:support-fixtures": "pnpm --filter @proofline/api demo:support-fixtures",
-    "dev:support": "pnpm --filter @proofline/support dev"
+    "dev:support": "pnpm --filter @proofline/support dev",
+    "demo:functional-fixtures": "pnpm --filter @proofline/api demo:functional-fixtures"
   },
   "devDependencies": {
     "turbo": "2.10.10",

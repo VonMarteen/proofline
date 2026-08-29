@@ -44,3 +44,22 @@ export async function updateCommercialStage(formData: FormData) {const id=String
 export async function createEvaluationWorkspace(formData: FormData) {const id=String(formData.get("id")??""),locale=String(formData.get("locale")??"es");if(!id)return;await controlPost(`/v1/control/sales/${encodeURIComponent(id)}/evaluation`);revalidatePath(`/${locale}/sales`);revalidatePath(`/${locale}/organizations`)}
 export async function provisionCustomer(formData: FormData) {const id=String(formData.get("id")??""),locale=String(formData.get("locale")??"es");if(!id)return;await controlPost(`/v1/control/sales/${encodeURIComponent(id)}/provision`);revalidatePath(`/${locale}/sales`);revalidatePath(`/${locale}/organizations`)}
 export async function createInternalUser(formData: FormData) {const locale=String(formData.get("locale")??"es"),email=String(formData.get("email")??""),displayName=String(formData.get("displayName")??""),role=String(formData.get("role")??"");if(!email||!displayName||!role)return;await controlPost(`/v1/control/internal-users`,{email,displayName,role});revalidatePath(`/${locale}/security`)}
+
+export async function configureCommercialPayment(formData: FormData) {
+  const id=String(formData.get("id")??""),locale=String(formData.get("locale")??"es"),provider=String(formData.get("provider")??""),status=String(formData.get("paymentStatus")??"READY"),maskedLabel=String(formData.get("maskedLabel")??""),brand=String(formData.get("brand")??""),last4=String(formData.get("last4")??""),paymentTermsDays=Number(formData.get("paymentTermsDays")??0)||0;
+  if(!id||!provider)return;
+  await controlPost(`/v1/control/sales/${encodeURIComponent(id)}/payment-setup`,{provider,status,maskedLabel:maskedLabel||undefined,brand:brand||undefined,last4:last4||undefined,paymentTermsDays});
+  revalidatePath(`/${locale}/sales`);
+}
+export async function activatePaymentMethod(formData: FormData) {
+  const organizationId=String(formData.get("organizationId")??""),methodId=String(formData.get("methodId")??""),locale=String(formData.get("locale")??"es");
+  if(!organizationId||!methodId)return;
+  await controlPost(`/v1/control/organizations/${encodeURIComponent(organizationId)}/payment-methods/${encodeURIComponent(methodId)}/activate`);
+  revalidatePath(`/${locale}/organizations/${organizationId}`);revalidatePath(`/${locale}/billing`);
+}
+export async function recordPaymentTransaction(formData: FormData) {
+  const organizationId=String(formData.get("organizationId")??""),locale=String(formData.get("locale")??"es"),provider=String(formData.get("provider")??"BANK_TRANSFER"),kind=String(formData.get("kind")??"TRANSFER"),status=String(formData.get("status")??"RECONCILED"),paymentMethodId=String(formData.get("paymentMethodId")??"")||undefined,amountCents=Math.round(Number(formData.get("amount")??0)*100),bankReference=String(formData.get("bankReference")??"")||undefined,externalReference=String(formData.get("externalReference")??"")||undefined;
+  if(!organizationId||!Number.isInteger(amountCents)||amountCents<0)return;
+  await controlPost(`/v1/control/organizations/${encodeURIComponent(organizationId)}/payment-transactions`,{provider,kind,status,paymentMethodId,amountCents,currency:"EUR",bankReference,externalReference});
+  revalidatePath(`/${locale}/organizations/${organizationId}`);revalidatePath(`/${locale}/billing`);
+}

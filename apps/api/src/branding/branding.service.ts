@@ -81,7 +81,8 @@ export class BrandingService {
         logo = { fileName: record.fileName, mimeType: record.mimeType, dataUrl: `data:${record.mimeType};base64,${bytes.toString("base64")}`, contentHash: record.contentHash };
       }
     }
-    return { logoDocumentId: base.logoDocumentId ?? null, enabled: Boolean(base.enabled), primaryColor: validated.primaryColor, backgroundColor: validated.backgroundColor, surfaceColor: validated.surfaceColor, textColor: validated.textColor, onPrimaryColor: validated.onPrimaryColor, logoAltText: base.logoAltText, logo, checks: validated.checks, updatedBy: base.updatedBy, updatedAt: base.updatedAt, policy: BRANDING_POLICY };
+    const configured = Boolean(row?.enabled && row.logoDocumentId && row.updatedBy && row.updatedAt);
+    return { logoDocumentId: base.logoDocumentId ?? null, enabled: Boolean(base.enabled), configured, launchEligible: configured, primaryColor: validated.primaryColor, backgroundColor: validated.backgroundColor, surfaceColor: validated.surfaceColor, textColor: validated.textColor, onPrimaryColor: validated.onPrimaryColor, logoAltText: base.logoAltText, logo, checks: validated.checks, updatedBy: base.updatedBy, updatedAt: base.updatedAt, policy: BRANDING_POLICY };
   }
 
   async fromSnapshot(organizationId: string, snapshot: any) {
@@ -92,7 +93,8 @@ export class BrandingService {
       const record = await this.db.documentRecord.findFirst({ where: { id: String(snapshot.logoDocumentId), organizationId, recordClass: "BRAND_ASSET" }, include: { blob: true } });
       if (record?.blob) { const bytes = decryptBytes(record.blob.bytes); logo = { fileName: record.fileName, mimeType: record.mimeType, dataUrl: `data:${record.mimeType};base64,${bytes.toString("base64")}`, contentHash: record.contentHash }; }
     }
-    return { logoDocumentId: snapshot.logoDocumentId ?? null, enabled: Boolean(snapshot.enabled), primaryColor: validated.primaryColor, backgroundColor: validated.backgroundColor, surfaceColor: validated.surfaceColor, textColor: validated.textColor, onPrimaryColor: validated.onPrimaryColor, logoAltText: snapshot.logoAltText ?? null, logo, checks: validated.checks, updatedBy: snapshot.updatedBy ?? null, updatedAt: snapshot.updatedAt ?? null, policy: BRANDING_POLICY };
+    const configured = Boolean(snapshot.enabled && snapshot.logoDocumentId && snapshot.updatedBy);
+    return { logoDocumentId: snapshot.logoDocumentId ?? null, enabled: Boolean(snapshot.enabled), configured, launchEligible: configured, primaryColor: validated.primaryColor, backgroundColor: validated.backgroundColor, surfaceColor: validated.surfaceColor, textColor: validated.textColor, onPrimaryColor: validated.onPrimaryColor, logoAltText: snapshot.logoAltText ?? null, logo, checks: validated.checks, updatedBy: snapshot.updatedBy ?? null, updatedAt: snapshot.updatedAt ?? null, policy: BRANDING_POLICY };
   }
 
   async update(organizationId: string, actorId: string, input: BrandingInput) {

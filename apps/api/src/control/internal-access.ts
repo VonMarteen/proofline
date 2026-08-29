@@ -3,8 +3,8 @@ import { identityFrom, type HeaderRequest } from "../auth/dev-auth.js";
 
 export const internalRoleCapabilities: Record<string, string[]> = {
   INTERNAL_PLATFORM_OWNER: ["*"],
-  INTERNAL_OPERATIONS: ["control.overview","organizations.read","users.read","assessments.read","reports.read","support.read","support.manage","sales.read","sales.manage","communications.read","operations.read","operations.manage","audit.read","marketplace.read","security.read"],
-  INTERNAL_FINANCE: ["control.overview","organizations.read","billing.read","usage.read","sales.read","audit.read"],
+  INTERNAL_OPERATIONS: ["control.overview","organizations.read","users.read","assessments.read","reports.read","support.read","support.manage","sales.read","sales.manage","communications.read","operations.read","operations.manage","audit.read","marketplace.read","security.read","billing.manage"],
+  INTERNAL_FINANCE: ["control.overview","organizations.read","billing.read","billing.manage","usage.read","sales.read","audit.read"],
   INTERNAL_TRUST: ["control.overview","organizations.read","users.read","support.read","legal.read","privacy.read","security.read","audit.read","legal.manage"],
   INTERNAL_SUPPORT: ["support.read","support.manage"],
   INTERNAL_ANALYST: ["control.overview","organizations.read","assessments.read","reports.read","usage.read","marketplace.read"],

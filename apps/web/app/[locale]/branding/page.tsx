@@ -21,6 +21,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
         </div>
         <div className="workspace-head-context"><span>{es ? "Organización" : "Organization"}</span><strong>{data.organization.name}</strong></div>
       </section>
+      {!data.configured ? <section className="workspace-alert"><div><strong>{es ? "Requisito de lanzamiento pendiente" : "Launch requirement pending"}</strong><span>{es ? "La identidad visual debe guardarse explícitamente e incluir un logo antes de publicar cualquier assessment. Después, la previsualización de cada assessment deberá aprobarse." : "Visual identity must be explicitly saved and include a logo before any assessment can be published. Each assessment preview must then be approved."}</span></div></section> : null}
       {allowed ? (
         <BrandingEditor locale={locale} initial={data} organizationName={data.organization.name} />
       ) : (

@@ -188,22 +188,28 @@ export class ControlService {
 
   async billing(req: HeaderRequest) {
     requireInternalCapability(req, "billing.read");
-    const [plans, subscriptions, invoices, entitlements] = await Promise.all([
+    const [plans, subscriptions, invoices, entitlements, paymentMethods, paymentTransactions] = await Promise.all([
       this.db.plan.findMany({ orderBy: { monthlyAmountCents: "asc" } }),
       this.db.subscription.findMany({ include: { organization: true, plan: true }, orderBy: { createdAt: "desc" } }),
       this.db.billingInvoice.findMany({ include: { organization: true, documentRecord: true }, orderBy: { issuedAt: "desc" } }),
       this.db.entitlement.findMany({ include: { organization: true }, orderBy: [{ organizationId: "asc" }, { key: "asc" }] }),
+      this.db.paymentMethod.findMany({ select: { id:true,organizationId:true,provider:true,type:true,status:true,isDefault:true,maskedLabel:true,brand:true,last4:true,paymentTermsDays:true,createdAt:true,activatedAt:true,organization:{select:{name:true}} }, orderBy: { createdAt: "desc" } }),
+      this.db.paymentTransaction.findMany({ include: { organization: true }, orderBy: { occurredAt: "desc" }, take: 250 }),
     ]);
     return {
       plans,
       subscriptions,
       invoices,
       entitlements,
+      paymentMethods,
+      paymentTransactions,
       totals: {
         openCents: sum(invoices.filter(i => i.status === "OPEN").map(i => i.amountCents + i.taxCents)),
         paidCents: sum(invoices.filter(i => i.status === "PAID").map(i => i.amountCents + i.taxCents)),
         activeSubscriptions: subscriptions.filter(s => s.status === "ACTIVE" || s.status === "TRIAL").length,
         pastDueSubscriptions: subscriptions.filter(s => s.status === "PAST_DUE").length,
+        activePaymentMethods: paymentMethods.filter(m => m.status === "ACTIVE").length,
+        pendingPaymentMethods: paymentMethods.filter(m => m.status === "PENDING").length,
       },
     };
   }

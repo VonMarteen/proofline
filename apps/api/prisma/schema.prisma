@@ -256,6 +256,50 @@ enum CommercialStage {
   PROVISIONED
 }
 
+enum PaymentProvider {
+  REDSYS
+  PAYPAL
+  BANK_TRANSFER
+}
+
+enum PaymentMethodType {
+  CARD
+  PAYPAL
+  BANK_TRANSFER
+}
+
+enum PaymentMethodStatus {
+  PENDING
+  ACTIVE
+  FAILED
+  REVOKED
+  REPLACED
+}
+
+enum PaymentTransactionKind {
+  CHARGE
+  REFUND
+  TRANSFER
+}
+
+enum PaymentTransactionStatus {
+  PENDING
+  AUTHORIZED
+  CAPTURED
+  FAILED
+  REFUNDED
+  AWAITING_TRANSFER
+  RECONCILED
+  CANCELED
+}
+
+enum CommercialPaymentStatus {
+  NOT_CONFIGURED
+  PENDING_PROVIDER
+  READY
+  VERIFIED
+}
+
 model Organization {
   id             String   @id @default(cuid())
   name           String
@@ -286,6 +330,9 @@ model Organization {
   branding          OrganizationBranding?
   commercialRequests CommercialRequest[]
   accountChangeRequests AccountChangeRequest[]
+  paymentMethods       PaymentMethod[]
+  paymentMethodEvents  PaymentMethodEvent[]
+  paymentTransactions  PaymentTransaction[]
 }
 
 
@@ -502,6 +549,7 @@ model Subscription {
   createdAt      DateTime            @default(now())
   organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   plan           Plan               @relation(fields: [planId], references: [id])
+  paymentTransactions PaymentTransaction[]
   @@index([organizationId, status])
 }
 
@@ -533,7 +581,81 @@ model BillingInvoice {
   documentRecordId String?     @unique
   organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   documentRecord DocumentRecord? @relation(fields: [documentRecordId], references: [id], onDelete: SetNull)
+  paymentTransactions PaymentTransaction[]
   @@index([organizationId, status])
+}
+
+model PaymentMethod {
+  id                      String              @id @default(cuid())
+  organizationId          String
+  provider                PaymentProvider
+  type                    PaymentMethodType
+  status                  PaymentMethodStatus @default(PENDING)
+  isDefault               Boolean             @default(false)
+  externalReference       String?
+  maskedLabel             String?
+  brand                   String?
+  last4                   String?
+  expiresMonth            Int?
+  expiresYear             Int?
+  bankReference           String?
+  paymentTermsDays        Int                 @default(0)
+  createdByType           String              @default("USER")
+  createdBy               String
+  createdAt               DateTime            @default(now())
+  activatedAt             DateTime?
+  replacedAt              DateTime?
+  revokedAt               DateTime?
+  organization            Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  events                  PaymentMethodEvent[] @relation("PaymentMethodEvents")
+  previousEvents          PaymentMethodEvent[] @relation("PreviousPaymentMethodEvents")
+  transactions            PaymentTransaction[]
+  @@index([organizationId, status, isDefault])
+  @@index([provider, externalReference])
+}
+
+model PaymentMethodEvent {
+  id                      String         @id @default(cuid())
+  organizationId          String
+  paymentMethodId         String?
+  previousPaymentMethodId String?
+  eventType               String
+  actorType               String
+  actorId                 String
+  metadata                Json
+  createdAt               DateTime       @default(now())
+  organization            Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  paymentMethod           PaymentMethod? @relation("PaymentMethodEvents", fields: [paymentMethodId], references: [id], onDelete: SetNull)
+  previousPaymentMethod   PaymentMethod? @relation("PreviousPaymentMethodEvents", fields: [previousPaymentMethodId], references: [id], onDelete: SetNull)
+  @@index([organizationId, createdAt])
+  @@index([paymentMethodId, createdAt])
+}
+
+model PaymentTransaction {
+  id                String                   @id @default(cuid())
+  organizationId    String
+  subscriptionId    String?
+  invoiceId         String?
+  paymentMethodId   String?
+  provider          PaymentProvider
+  kind              PaymentTransactionKind
+  status            PaymentTransactionStatus @default(PENDING)
+  amountCents       Int
+  currency          String                   @default("EUR")
+  externalReference String?
+  bankReference     String?
+  failureCode       String?
+  metadata          Json?
+  occurredAt        DateTime                 @default(now())
+  settledAt         DateTime?
+  createdAt         DateTime                 @default(now())
+  organization      Organization             @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subscription      Subscription?             @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  invoice           BillingInvoice?           @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  paymentMethod     PaymentMethod?            @relation(fields: [paymentMethodId], references: [id], onDelete: SetNull)
+  @@index([organizationId, occurredAt])
+  @@index([status, occurredAt])
+  @@index([provider, externalReference])
 }
 
 model Framework {
@@ -605,7 +727,22 @@ model Assessment {
   assessmentAccesses AssessmentAccess[]
   imports            AssessmentImport[]
   versions           AssessmentVersion[]
+  visualApprovals    AssessmentVisualApproval[]
   @@index([organizationId, status])
+}
+
+model AssessmentVisualApproval {
+  id            String     @id @default(cuid())
+  assessmentId  String
+  contentHash   String
+  approvedBy    String
+  approvedAt    DateTime   @default(now())
+  revokedAt     DateTime?
+  revokedReason String?
+  metadata      Json?
+  assessment    Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  @@index([assessmentId, approvedAt])
+  @@index([assessmentId, contentHash, revokedAt])
 }
 
 model AssessmentVersion {
@@ -1120,6 +1257,11 @@ model CommercialRequest {
   planCode              String?
   useCase               String?
   locale                String          @default("es")
+  paymentProvider       PaymentProvider?
+  paymentStatus         CommercialPaymentStatus @default(NOT_CONFIGURED)
+  paymentTermsDays      Int?
+  paymentSetup          Json?
+  paymentReadyAt        DateTime?
   evaluationExpiresAt   DateTime?
   lostReason            String?
   createdAt             DateTime        @default(now())

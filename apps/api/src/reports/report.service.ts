@@ -15,7 +15,8 @@ export class ReportService {
         participants: true,
         analysisRuns: { where: { status: "COMPLETED" }, orderBy: { createdAt: "desc" }, take: 1 },
         frameworkVersion: true,
-        organization: true,
+        versions: { orderBy: { version: "desc" }, take: 20 },
+        organization: { include: { branding: true } },
       },
     });
     if (!a) throw new NotFoundException("Assessment not found");
@@ -42,8 +43,12 @@ export class ReportService {
         ]
       : summaries(actual, a.questions);
 
+    const launchedBranding = ((a.versions.find(v=>v.version===a.launchedVersion)?.snapshot as any)?.branding ?? null) as any;
+    const currentBranding = a.organization.branding;
+    const branding = launchedBranding ?? (currentBranding ? { enabled: currentBranding.enabled, configured: Boolean(currentBranding.enabled&&currentBranding.logoDocumentId&&currentBranding.updatedBy), primaryColor: currentBranding.primaryColor, backgroundColor: currentBranding.backgroundColor, surfaceColor: currentBranding.surfaceColor, textColor: currentBranding.textColor, logoDocumentId: currentBranding.logoDocumentId, logoAltText: currentBranding.logoAltText } : undefined);
     return {
       organization: { name: a.organization.name, legalName: a.organization.legalName, country: a.organization.country },
+      branding,
       title: a.title,
       objective: a.objective,
       kind: "EXECUTIVE",

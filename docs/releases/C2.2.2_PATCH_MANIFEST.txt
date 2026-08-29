@@ -1,0 +1,41 @@
+PROOFLINE v0.2.6-C2.2.1 -> v0.2.6-C2.2.2
+Functional Payment + Assessment Launch Governance
+
+Overlay files:
+.env.example
+VERSION.txt
+apps/api/package.json
+apps/api/prisma/demo-support-fixtures.ts
+apps/api/prisma/schema.prisma
+apps/api/src/app.module.ts
+apps/api/src/assessments/assessments.controller.ts
+apps/api/src/assessments/assessments.service.ts
+apps/api/src/branding/branding.service.ts
+apps/api/src/commercial/commercial.controller.ts
+apps/api/src/commercial/commercial.service.ts
+apps/api/src/control-app.module.ts
+apps/api/src/control-runtime-check.ts
+apps/api/src/control/control.service.ts
+apps/api/src/control/internal-access.ts
+apps/api/src/payments/payment-providers.ts
+apps/api/src/payments/payment.controller.ts
+apps/api/src/payments/payment.service.ts
+apps/api/src/reports/pdf.ts
+apps/api/src/reports/report.service.ts
+apps/api/src/runtime-check.ts
+apps/control/app/[locale]/billing/page.tsx
+apps/control/app/[locale]/organizations/[id]/page.tsx
+apps/control/app/[locale]/sales/page.tsx
+apps/control/app/actions.ts
+apps/site/app/[locale]/start/page.tsx
+apps/site/components/start-form.tsx
+apps/web/app/[locale]/assessments/[id]/page.tsx
+apps/web/app/[locale]/assessments/[id]/preview/page.tsx
+apps/web/app/[locale]/billing/page.tsx
+apps/web/app/[locale]/branding/page.tsx
+apps/web/app/[locale]/page.tsx
+apps/web/components/assessment-actions.tsx
+apps/web/components/payment-method-manager.tsx
+apps/web/components/visual-preview-approval.tsx
+docs/releases/C2.2.2_FUNCTIONAL_PAYMENT_LAUNCH_GOVERNANCE.md
+package.json

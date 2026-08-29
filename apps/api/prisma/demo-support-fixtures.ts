@@ -49,6 +49,15 @@ async function ensureOrg(input: { name: string; slug: string; legalName: string;
   return { org, owner };
 }
 
+async function ensurePaymentMethod(orgId: string, input: { provider: "REDSYS" | "PAYPAL" | "BANK_TRANSFER"; maskedLabel: string; brand?: string; last4?: string; paymentTermsDays?: number; bankReference?: string }) {
+  const existing = await db.paymentMethod.findFirst({ where: { organizationId: orgId, provider: input.provider, status: "ACTIVE" } });
+  if (existing) return existing;
+  await db.paymentMethod.updateMany({ where: { organizationId: orgId, isDefault: true, status: "ACTIVE" }, data: { status: "REPLACED", isDefault: false, replacedAt: new Date() } });
+  const method = await db.paymentMethod.create({ data: { organizationId: orgId, provider: input.provider, type: input.provider === "REDSYS" ? "CARD" : input.provider === "PAYPAL" ? "PAYPAL" : "BANK_TRANSFER", status: "ACTIVE", isDefault: true, maskedLabel: input.maskedLabel, brand: input.brand ?? null, last4: input.last4 ?? null, paymentTermsDays: input.paymentTermsDays ?? 0, bankReference: input.bankReference ?? null, createdByType: "SYSTEM", createdBy: "demo-functional-fixture", activatedAt: new Date() } });
+  await db.paymentMethodEvent.create({ data: { organizationId: orgId, paymentMethodId: method.id, eventType: "DEMO_METHOD_ACTIVATED", actorType: "SYSTEM", actorId: "demo-functional-fixture", metadata: { provider: input.provider, safeFixture: true } } });
+  return method;
+}
+
 async function ensureAssessment(orgId: string, input: { title: string; objective: string; status: "ACTIVE" | "CLOSED" }) {
   let assessment = await db.assessment.findFirst({ where: { organizationId: orgId, title: input.title } });
   if (!assessment) assessment = await db.assessment.create({ data: { organizationId: orgId, title: input.title, objective: input.objective, status: input.status, locale: "es", privacyMode: "CONFIDENTIAL", minCohortSize: 5, readinessScore: 92, launchedAt: daysAgo(input.status === "ACTIVE" ? 8 : 28), closedAt: input.status === "CLOSED" ? daysAgo(3) : null, launchedVersion: 1 } });
@@ -141,6 +150,7 @@ async function main() {
   const nova = await ensureOrg({ name: "Nova Retail Iberia", slug: "nova-retail-iberia", legalName: "Nova Retail Iberia, S.L.", taxId: "B-21870451", country: "España", billingEmail: "finance@nova.local", ownerEmail: "ines.owner@nova.local", ownerName: "Inés Romero" });
   const novaAssessment = await ensureAssessment(nova.org.id, { title: "Clima, Liderazgo & Prioridades 2026", objective: "Detectar dónde la claridad de prioridades y el liderazgo están favoreciendo o frenando la ejecución entre tiendas, operaciones y oficinas centrales.", status: "ACTIVE" });
   await ensureParticipants(novaAssessment.id, "nova-retail-iberia", 7, 2, 3);
+  await ensurePaymentMethod(nova.org.id, { provider: "REDSYS", maskedLabel: "Visa corporativa •••• 4821", brand: "Visa", last4: "4821" });
 
   const orbis = await ensureOrg({ name: "Orbis Health Iberia", slug: "orbis-health-iberia", legalName: "Orbis Health Iberia, S.A.", taxId: "A-77310428", country: "España", billingEmail: "billing@orbis.local", ownerEmail: "marcos.owner@orbis.local", ownerName: "Marcos Vidal" });
   const orbisAssessment = await ensureAssessment(orbis.org.id, { title: "Colaboración, Confianza & Ejecución 2026", objective: "Evaluar cómo la confianza, la coordinación entre áreas y la disciplina de ejecución afectan a la experiencia de los equipos y a la entrega operativa.", status: "CLOSED" });
@@ -149,13 +159,16 @@ async function main() {
     { name: "Marcos Vidal", email: "marcos.owner@orbis.local", role: "Executive Sponsor" },
     { name: "Laura Méndez", email: "direccion.personas@orbis.local", role: "People Director" },
   ]);
+  await ensurePaymentMethod(orbis.org.id, { provider: "BANK_TRANSFER", maskedLabel: "Transferencia SEPA", paymentTermsDays: 30, bankReference: "ORBIT-2026" });
+  const acme = await db.organization.findUnique({ where: { slug: "acme-europe" } });
+  if (acme) await ensurePaymentMethod(acme.id, { provider: "PAYPAL", maskedLabel: "Cuenta PayPal corporativa" });
 
   await ensureTicket({ orgId: nova.org.id, requesterId: nova.owner.id, subject: "No podemos añadir un nuevo Assessment Manager", description: "Al intentar invitar a una responsable regional como Assessment Manager la pantalla vuelve al listado sin completar el alta.", category: "ACCESS", priority: "HIGH", status: "OPEN", slaDueAt: hoursFromNow(1), messages: [] });
   const orbisBillingTicket = await ensureTicket({ orgId: orbis.org.id, requesterId: orbis.owner.id, assigneeId: support.id, subject: "Validar cambio del email de facturación", description: "Necesitamos que las próximas facturas y avisos contractuales se envíen al nuevo buzón central de administración.", category: "ACCOUNT_CHANGE", priority: "NORMAL", status: "IN_PROGRESS", slaDueAt: hoursFromNow(3), messages: [{ internal: true, visibility: "INTERNAL", body: "He comprobado que el solicitante es Owner. Falta validar el nuevo buzón con Finanzas." }, { internal: true, visibility: "CUSTOMER", body: "Estamos validando el cambio con el equipo de facturación. Te confirmaremos desde este mismo ticket." }] });
   if (!await db.accountChangeRequest.findUnique({ where: { supportTicketId: orbisBillingTicket.id } })) await db.accountChangeRequest.create({ data: { organizationId: orbis.org.id, requestedByUserId: orbis.owner.id, supportTicketId: orbisBillingTicket.id, type: "BILLING_EMAIL", status: "IN_REVIEW", summary: "Cambiar el email de facturación y avisos contractuales al nuevo buzón central.", requestedData: { requestedValue: "administracion@orbis.local" }, reviewedBy: "sofia.support@proofline.local", reviewedAt: new Date() } });
   await ensureTicket({ orgId: nova.org.id, requesterId: nova.owner.id, assigneeId: support.id, subject: "Consulta sobre destinatarios del informe ejecutivo", description: "Queríamos confirmar si el PDF se envía sólo a los destinatarios configurados antes del cierre del assessment.", category: "FUNCTIONAL", priority: "LOW", status: "CLOSED", slaDueAt: daysAgo(1), messages: [{ internal: true, visibility: "CUSTOMER", body: "Sí. La distribución utiliza exclusivamente los Result Recipients activos del assessment y queda auditada por entrega." }] });
 
-  console.log("C2.1 demo fixtures ready");
+  console.log("C2.2.2 functional demo fixtures ready");
   console.log("Support Console: sofia.support@proofline.local / proofline-support-demo");
   console.log("Nova Workspace: ines.owner@nova.local / proofline-demo · ACTIVE assessment");
   console.log("Orbis Workspace: marcos.owner@orbis.local / proofline-demo · CLOSED assessment + report emails queued");

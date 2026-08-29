@@ -14,6 +14,7 @@ import { ImportService } from "./imports/import.service.js";
 import { PrismaService } from "./database/prisma.service.js";
 import { requireCapability } from "./auth/access-control.js";
 import { sha256 } from "./security/crypto.js";
+import { PaymentService } from "./payments/payment.service.js";
 import type { HeaderRequest } from "./auth/dev-auth.js";
 
 applyLocalDefaults();
@@ -33,7 +34,7 @@ let tempImportedAssessmentId:string|undefined;
 let tempImportSourceRecordId:string|undefined;
 let tempDeleteAssessmentId:string|undefined;
 try{
-  const health=app.get(HealthController),dashboard=app.get(DashboardController),respond=app.get(RespondController),legal=app.get(LegalController),assessments=app.get(AssessmentsController),workspace=app.get(WorkspaceController),internal=app.get(InternalController),reports=app.get(ReportService),imports=app.get(ImportService),db=app.get(PrismaService);
+  const health=app.get(HealthController),dashboard=app.get(DashboardController),respond=app.get(RespondController),legal=app.get(LegalController),assessments=app.get(AssessmentsController),workspace=app.get(WorkspaceController),internal=app.get(InternalController),reports=app.get(ReportService),imports=app.get(ImportService),payments=app.get(PaymentService),db=app.get(PrismaService);
   const ready=await health.health();if(!ready?.ok||ready.database!=="ready")throw new Error("HealthController did not report database ready");
   const dash=await dashboard.get("es",ownerReq);if(!(dash as any)?.organization?.slug||!Array.isArray((dash as any)?.activeAssessments)||typeof(dash as any)?.summary?.teamMembers!=="number")throw new Error("DashboardController did not return B2 workspace data");
   const team=await workspace.team(ownerReq);if(!Array.isArray((team as any)?.members)||(team as any).members.length===0)throw new Error("WorkspaceController did not return seeded team");
@@ -87,6 +88,7 @@ try{
   const workspaceOrganizationId=String((dash as any).organization.id);
   if((assessmentList as any[]).some(a=>a.organizationId!==workspaceOrganizationId))throw new Error("Workspace assessment list leaked data across organizations");
   const active=(assessmentList as any[]).find(a=>a.status==="ACTIVE")??assessmentList[0];
+  const launchGate=await assessments.cl(ownerReq,active.id) as any;if(typeof launchGate?.brandingConfigured!=="boolean"||typeof launchGate?.visualPreviewApproved!=="boolean"||typeof launchGate?.subscriptionReady!=="boolean"||typeof launchGate?.entitlementsReady!=="boolean"||!Array.isArray(launchGate?.missing))throw new Error("Assessment launch-governance gates are incomplete");
   let executionDeleteDenied=false;try{await assessments.removeAssessment(ownerReq,active.id)}catch{executionDeleteDenied=true}if(!executionDeleteDenied)throw new Error("Assessment with execution history was unexpectedly deletable");
   const analystMembership=await db.membership.findFirst({where:{organizationId:workspaceOrganizationId,user:{email:"luis@acme.local"}},include:{assessmentAccesses:{where:{assessment:{organizationId:workspaceOrganizationId}}}}});
   if(!analystMembership)throw new Error("Runtime analyst membership is missing");
@@ -95,6 +97,7 @@ try{
   if(!Array.isArray(analystList)||analystList.some((a:any)=>a.organizationId!==workspaceOrganizationId||!analystAllowedIds.has(a.id))||analystList.length!==analystAllowedIds.size)throw new Error("Analyst assessment scope is not enforced");
   let denied=false;try{await workspace.billing(analystReq)}catch{denied=true}if(!denied)throw new Error("Analyst unexpectedly accessed billing");
   const billing=await workspace.billing(billingReq);if(!(billing as any)?.visible)throw new Error("Billing Admin could not access billing");
+  const paymentSummary=await payments.workspaceSummary(billingReq) as any;if(!Array.isArray(paymentSummary?.methods)||!Array.isArray(paymentSummary?.history)||!Array.isArray(paymentSummary?.transactions)||!Array.isArray(paymentSummary?.providers)||!paymentSummary.providers.includes("REDSYS")||!paymentSummary.providers.includes("PAYPAL")||!paymentSummary.providers.includes("BANK_TRANSFER"))throw new Error("Workspace payment foundation is incomplete");
   denied=false;try{await assessments.list(billingReq)}catch{denied=true}if(!denied)throw new Error("Billing Admin unexpectedly accessed assessments");
   denied=false;try{await requireCapability(db,managerReq,"assessment.approve",active.id)}catch{denied=true}if(!denied)throw new Error("Assessment Manager unexpectedly received approval capability");
 
@@ -115,7 +118,7 @@ try{
 
   const demo=await respond.get("demo-token-2026","es");if(!(demo as any)?.id||!Array.isArray((demo as any)?.questions))throw new Error("RespondController did not resolve demo participant");
   const docs=await legal.publicDocs();if(!Array.isArray(docs)||docs.length===0)throw new Error("LegalController did not return seeded legal documents");
-  console.log(`[OK] Critical runtime C2 client plane · Workspace + Respond · delete=safe · import=${importedAssessment.questions.length}q · libraryClone=${created.questions.length}q · participant=completed · ledger=billable · report=PDF+approved+${distribution.queued} queued · frameworks=${frameworks.length}`);
+  console.log(`[OK] Critical runtime C2 client plane · Workspace + Respond · delete=safe · import=${importedAssessment.questions.length}q · libraryClone=${created.questions.length}q · participant=completed · ledger=billable · report=PDF+approved+${distribution.queued} queued · payments=ready · launchGovernance=ready · frameworks=${frameworks.length}`);
 }finally{
   const db=app.get(PrismaService);
   // Remove only artifacts created by this runtime check. Product/seed data remains untouched.

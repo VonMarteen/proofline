@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 export type PdfSnapshot = {
   organization?: { name: string; legalName?: string | null; country?: string | null };
+  branding?: { enabled: boolean; configured?: boolean; primaryColor: string; backgroundColor: string; surfaceColor: string; textColor: string; logoDocumentId?: string | null; logoAltText?: string | null };
   title: string;
   objective: string;
   kind: string;

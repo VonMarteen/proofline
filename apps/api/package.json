@@ -16,7 +16,8 @@
     "runtime:check": "pnpm build && node --enable-source-maps dist/runtime-check.js && node --enable-source-maps dist/control-runtime-check.js",
     "auth:bootstrap-local": "tsx prisma/bootstrap-auth.ts",
     "dev:control": "node --enable-source-maps dist/main-control.js",
-    "demo:support-fixtures": "tsx prisma/demo-support-fixtures.ts"
+    "demo:support-fixtures": "tsx prisma/demo-support-fixtures.ts",
+    "demo:functional-fixtures": "tsx prisma/demo-support-fixtures.ts"
   },
   "dependencies": {
     "@nestjs/common": "11.2.1",

@@ -6,6 +6,7 @@ import { ControlController } from "./control/control.controller.js";
 import { ControlCommercialController } from "./commercial/commercial.controller.js";
 import { ControlHealthController } from "./control/control-health.controller.js";
 import type { HeaderRequest } from "./auth/dev-auth.js";
+import { PaymentService } from "./payments/payment.service.js";
 
 applyLocalDefaults();
 const internalReq: HeaderRequest = { headers: { "x-proofline-user": "owner@armar.local", "x-proofline-role": "INTERNAL_PLATFORM_OWNER" } };
@@ -14,6 +15,7 @@ try {
   const health = app.get(ControlHealthController);
   const control = app.get(ControlController);
   const sales = app.get(ControlCommercialController);
+  const payments = app.get(PaymentService);
   const ready = await health.health();
   if (!ready?.ok || ready.database !== "ready") throw new Error("Control API database readiness is invalid");
   const overview = await control.overview(internalReq) as any;
@@ -35,7 +37,9 @@ try {
   if (!Array.isArray(support?.tickets)) throw new Error("Control support queue is invalid");
   const commercial = await sales.list(internalReq) as any[];
   if (!Array.isArray(commercial)) throw new Error("Control commercial pipeline is invalid");
-  console.log(`[OK] Critical runtime C2 internal plane · orgs=${organizations.length} · users=${users.length} · marketplace=${marketplace.length} · support=${support.tickets.length} · sales=${commercial.length}`);
+  const paymentSummary = await payments.organizationSummary(internalReq, organizations[0]!.id) as any;
+  if (!Array.isArray(paymentSummary?.methods) || !Array.isArray(paymentSummary?.history) || !Array.isArray(paymentSummary?.transactions)) throw new Error("Control payment history view is incomplete");
+  console.log(`[OK] Critical runtime C2 internal plane · orgs=${organizations.length} · users=${users.length} · marketplace=${marketplace.length} · support=${support.tickets.length} · sales=${commercial.length} · payments=ready`);
 } finally {
   await app.close();
 }
