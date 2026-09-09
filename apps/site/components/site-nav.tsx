@@ -1,36 +1,34 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Locale } from "@proofline/i18n";
-import { copy } from "../lib/copy";
 
 export function SiteNav({ locale }: { locale: Locale }) {
   const pathname = usePathname();
-  const c = copy[locale].nav;
+  const es = locale === "es";
   const items = [
-    { href: `/${locale}/product`, label: c.product },
-    { href: `/${locale}/solutions`, label: c.solutions },
-    { href: `/${locale}/library`, label: c.library },
-    { href: `/${locale}/trust`, label: c.trust },
-    { href: `/${locale}/legal`, label: c.legal },
+    { href: `/${locale}/product`, label: es ? "Producto" : "Product" },
+    { href: `/${locale}/solutions`, label: es ? "Soluciones" : "Solutions" },
+    { href: `/${locale}/library`, label: es ? "Frameworks" : "Frameworks" },
+    { href: `/${locale}/trust`, label: es ? "Confianza" : "Trust" },
   ];
 
   return (
     <>
-      <nav className="site-nav" aria-label={locale === "es" ? "Navegación principal" : "Primary navigation"}>
+      <nav className="site-nav pl-editorial-nav" aria-label={es ? "Navegación principal" : "Primary navigation"}>
         {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-          return <Link key={item.href} className={active ? "active" : ""} href={item.href}>{item.label}</Link>;
+          return <a key={item.href} className={active ? "active" : ""} href={item.href}>{item.label}</a>;
         })}
       </nav>
       <details className="site-mobile-menu">
-        <summary>{c.menu}</summary>
-        <nav aria-label={locale === "es" ? "Navegación móvil" : "Mobile navigation"}>
+        <summary>{es ? "Menú" : "Menu"}</summary>
+        <nav aria-label={es ? "Navegación móvil" : "Mobile navigation"}>
           {items.map((item) => {
             const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            return <Link key={item.href} className={active ? "active" : ""} href={item.href}>{item.label}</Link>;
+            return <a key={item.href} className={active ? "active" : ""} href={item.href}>{item.label}</a>;
           })}
+          <a href={`/${locale}/legal`}>{es ? "Legal" : "Legal"}</a>
         </nav>
       </details>
     </>

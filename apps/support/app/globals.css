@@ -77,3 +77,20 @@
 .support-table-wrap td{padding:16px;line-height:1.45}
 .support-login-panel{gap:20px}
 .support-login-form{gap:20px;padding:20px}
+
+/* C2.4.5 — gated support document requests */
+.support-document-toggle{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--border);border-radius:11px;background:color-mix(in srgb,var(--accent-soft) 18%,var(--bg-solid));cursor:pointer}.support-document-toggle input{margin-top:3px}.support-document-toggle span{display:grid;gap:3px}.support-document-toggle strong{font-size:11.5px}.support-document-toggle small{font-size:10px;color:var(--text-soft);line-height:1.45}.support-document-request{border-color:color-mix(in srgb,var(--accent) 30%,var(--border));background:color-mix(in srgb,var(--accent-soft) 20%,var(--bg-elevated))}.support-document-request p{margin:0 0 6px;line-height:1.55}.support-document-request small{color:var(--text-soft)}.support-attachments{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.support-attachment-link{display:inline-flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid var(--border);border-radius:9px;background:var(--bg-solid);color:var(--text);font-size:10.5px;font-weight:800;text-decoration:none}.support-attachment-link:hover{color:var(--accent);border-color:var(--accent)}
+
+/* C2.4.6 — support documents open inside the portal by default */
+.document-viewer-page{gap:20px}.document-viewer-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:20px;border:1px solid var(--border);border-radius:16px;background:var(--bg-elevated)}.document-viewer-toolbar>div{min-width:0;display:grid;gap:7px}.document-viewer-toolbar h1{margin:0;font-size:24px;line-height:1.15}.document-viewer-toolbar p{margin:0;color:var(--text-soft);font-size:11px}.document-viewer-shell{min-height:650px;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#eef1f4}.document-viewer-frame{display:block;width:100%;height:76vh;min-height:650px;border:0;background:#eef1f4}@media(max-width:760px){.document-viewer-toolbar{display:grid}.document-viewer-frame,.document-viewer-shell{min-height:500px;height:68vh}}
+
+/* C2.4.7 — explicit close action for in-portal viewers */
+.document-viewer-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.document-viewer-close{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:10px;background:var(--bg-solid);color:var(--text);font-size:25px;font-weight:500;line-height:1;text-decoration:none;transition:border-color .15s ease,background .15s ease,color .15s ease}
+.document-viewer-close:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.document-viewer-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:760px){.document-viewer-actions{justify-content:flex-start}.document-viewer-close{width:40px;height:40px}}
+
+/* C2.4.7a — viewer actions aligned on one horizontal row */
+.document-viewer-toolbar > .document-viewer-actions{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:nowrap}
+@media(max-width:760px){.document-viewer-toolbar > .document-viewer-actions{justify-content:flex-start;flex-wrap:wrap}}

@@ -1,54 +1,18 @@
 import nodemailer from "nodemailer";
 
-const api = process.env.API_INTERNAL_URL ?? "http://127.0.0.1:4100";
-const analytics = process.env.ANALYTICS_URL ?? "http://127.0.0.1:58100";
-const token = process.env.SERVICE_TOKEN ?? "proofline-local-service-token";
-const sleep = (ms:number)=>new Promise(r=>setTimeout(r,ms));
+const api=process.env.API_INTERNAL_URL??"http://127.0.0.1:4100";
+const analytics=process.env.ANALYTICS_URL??"http://127.0.0.1:58100";
+const token=process.env.SERVICE_TOKEN??"proofline-local-service-token";
+const sleep=(ms:number)=>new Promise(r=>setTimeout(r,ms));
 const serviceHeaders={"x-service-token":token,"content-type":"application/json"};
 
-async function complete(id:string, body:Record<string,unknown>){
- await fetch(`${api}/v1/internal/jobs/${id}/complete`,{method:"POST",headers:serviceHeaders,body:JSON.stringify(body)}).then(async r=>{if(!r.ok) throw new Error(`complete failed ${r.status}: ${await r.text()}`)});
-}
-async function sendEmail(payload:Record<string,unknown>){
- const transporter=nodemailer.createTransport({host:process.env.SMTP_HOST??"127.0.0.1",port:Number(process.env.SMTP_PORT??51025),secure:false});
- const attachments=Array.isArray(payload.attachments)?payload.attachments.map((item:any)=>({filename:String(item.filename),content:Buffer.from(String(item.contentBase64),"base64"),contentType:String(item.contentType??"application/octet-stream")})):undefined;
- const info=await transporter.sendMail({from:process.env.SMTP_FROM??"Proofline <no-reply@proofline.local>",to:String(payload.to),subject:String(payload.subject),text:String(payload.text),attachments});
- return {messageId:info.messageId};
-}
-async function runAnalysis(payload:Record<string,unknown>){
- const assessmentId=String(payload.assessmentId);
- const data=await fetch(`${api}/v1/internal/analysis-payload/${assessmentId}`,{headers:{"x-service-token":token}}).then(async r=>{if(!r.ok)throw new Error(`payload failed ${r.status}`);return r.json()});
- const result=await fetch(`${analytics}/analyze`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)}).then(async r=>{if(!r.ok)throw new Error(`analytics failed ${r.status}: ${await r.text()}`);return r.json()});
- return result;
-}
-async function processJob(job:any){
- try{
-  const payload=(job.payload??{}) as Record<string,unknown>;
-  if(job.type==="RUN_ANALYSIS") return await complete(job.id,{ok:true,result:await runAnalysis(payload)});
-  if(job.type==="SEND_EMAIL") return await complete(job.id,{ok:true,result:await sendEmail(payload)});
-  return await complete(job.id,{ok:false,error:`Unknown job type ${job.type}`});
- }catch(error){
-  const message=error instanceof Error?error.message:"Unknown worker error";
-  console.error(`[worker] ${job.type} failed: ${message}`);
-  await complete(job.id,{ok:false,error:message}).catch(()=>undefined);
- }
-}
-async function processSupportEscalations(){
- const res=await fetch(`${api}/v1/internal/support/escalate-due`,{method:"POST",headers:{"x-service-token":token}});
- if(!res.ok) throw new Error(`support escalation check ${res.status}: ${await res.text()}`);
- return res.json();
-}
-async function loop(){
- console.log(`[worker] Proofline worker online; API=${api}; analytics=${analytics}`);
- let lastSupportCheck=0;
- while(true){
-  try{
-   if(Date.now()-lastSupportCheck>60_000){await processSupportEscalations();lastSupportCheck=Date.now();}
-   const res=await fetch(`${api}/v1/internal/jobs/next`,{headers:{"x-service-token":token}});
-   if(!res.ok) throw new Error(`job poll ${res.status}`);
-   const job=await res.json();
-   if(job) await processJob(job); else await sleep(1500);
-  }catch(error){ console.error(`[worker] poll error: ${error instanceof Error?error.message:String(error)}`); await sleep(3000); }
- }
-}
+async function complete(id:string,body:Record<string,unknown>){await fetch(`${api}/v1/internal/jobs/${id}/complete`,{method:"POST",headers:serviceHeaders,body:JSON.stringify(body)}).then(async r=>{if(!r.ok)throw new Error(`complete failed ${r.status}: ${await r.text()}`)})}
+const htmlEscapes:Record<string,string>={"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"};
+function escapeHtml(value:string){return value.replace(/[&<>"']/g,ch=>htmlEscapes[ch]??ch)}
+function otpPresentation(payload:Record<string,unknown>){const category=String(payload.category??""),text=String(payload.text??""),isOtp=category==="internal_auth_otp"||category==="client_auth_otp";if(!isOtp)return{subject:String(payload.subject),text:String(payload.text??""),html:payload.html?String(payload.html):undefined};const code=text.match(/\b\d{6}\b/)?.[0]??"——",es=!/^Your\b/i.test(text),scope=category==="internal_auth_otp"?(es?"Acceso seguro a PROOFLINE":"Secure access to PROOFLINE"):(es?"Verificación de acceso a PROOFLINE":"PROOFLINE sign-in verification"),subject=es?"PROOFLINE · Código de verificación":"PROOFLINE · Verification code",intro=es?"Usa este código para completar la verificación de tu acceso.":"Use this code to complete your sign-in verification.",expires=es?"El código caduca en 10 minutos y sólo puede utilizarse para este intento de acceso.":"The code expires in 10 minutes and can only be used for this sign-in attempt.",security=es?"No compartas este código. El equipo de PROOFLINE nunca te lo pedirá por teléfono, chat o correo.":"Do not share this code. The PROOFLINE team will never ask you for it by phone, chat or email.",ignore=es?"Si no has iniciado este acceso, puedes ignorar este mensaje.":"If you did not initiate this sign-in, you can ignore this message.";const formattedText=es?`PROOFLINE\n\nCódigo de verificación\n\nUsa este código para completar tu acceso:\n\n${code}\n\nCaduca en 10 minutos y sólo sirve para este intento.\nNo compartas este código con nadie.\n\nSi no has iniciado este acceso, ignora este mensaje.`:`PROOFLINE\n\nVerification code\n\nUse this code to complete your sign-in:\n\n${code}\n\nIt expires in 10 minutes and is valid only for this attempt.\nDo not share this code with anyone.\n\nIf you did not initiate this sign-in, ignore this message.`;const html=`<!doctype html><html><body style="margin:0;background:#0e141b;font-family:Inter,Arial,sans-serif;color:#f2f4f7"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0e141b;padding:36px 16px"><tr><td align="center"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:620px;background:#151d26;border:1px solid #2a3743;border-radius:20px;overflow:hidden"><tr><td style="padding:28px 32px 18px;border-bottom:1px solid #2a3743"><div style="font-size:12px;letter-spacing:.16em;color:#22d3a8;font-weight:800">PROOFLINE</div><div style="margin-top:7px;font-size:13px;color:#a3adc1">${escapeHtml(scope)}</div></td></tr><tr><td style="padding:32px"><h1 style="margin:0 0 12px;font-size:26px;line-height:1.2;color:#f2f4f7">${es?"Confirma tu acceso":"Confirm your sign-in"}</h1><p style="margin:0 0 24px;font-size:15px;line-height:1.65;color:#a3adc1">${escapeHtml(intro)}</p><div style="margin:0 0 24px;padding:22px;text-align:center;border-radius:16px;background:#0e141b;border:1px solid #2d3d49"><div style="font-size:12px;color:#66f0c4;letter-spacing:.08em;text-transform:uppercase">${es?"Código de verificación":"Verification code"}</div><div style="margin-top:10px;font-size:38px;font-weight:800;letter-spacing:.18em;color:#f2f4f7">${escapeHtml(code)}</div></div><p style="margin:0 0 10px;font-size:13px;line-height:1.6;color:#a3adc1">${escapeHtml(expires)}</p><p style="margin:0 0 10px;font-size:13px;line-height:1.6;color:#a3adc1">${escapeHtml(security)}</p><p style="margin:0;font-size:13px;line-height:1.6;color:#a3adc1">${escapeHtml(ignore)}</p></td></tr><tr><td style="padding:18px 32px;border-top:1px solid #2a3743;font-size:11px;color:#7d8995">PROOFLINE · Signal. Structure. Impact. · ARMAR TECHNOLOGIES</td></tr></table></td></tr></table></body></html>`;return{subject,text:formattedText,html}}
+async function sendEmail(payload:Record<string,unknown>){const transporter=nodemailer.createTransport({host:process.env.SMTP_HOST??"127.0.0.1",port:Number(process.env.SMTP_PORT??51025),secure:false});const attachments=Array.isArray(payload.attachments)?payload.attachments.map((item:any)=>({filename:String(item.filename),content:Buffer.from(String(item.contentBase64),"base64"),contentType:String(item.contentType??"application/octet-stream")})):undefined;const presentation=otpPresentation(payload);const info=await transporter.sendMail({from:process.env.SMTP_FROM??"Proofline <no-reply@proofline.local>",to:String(payload.to),subject:presentation.subject,text:presentation.text,html:presentation.html,attachments});return{messageId:info.messageId}}
+async function runAnalysis(payload:Record<string,unknown>){const assessmentId=String(payload.assessmentId);const data=await fetch(`${api}/v1/internal/analysis-payload/${assessmentId}`,{headers:{"x-service-token":token}}).then(async r=>{if(!r.ok)throw new Error(`payload failed ${r.status}`);return r.json()});return fetch(`${analytics}/analyze`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)}).then(async r=>{if(!r.ok)throw new Error(`analytics failed ${r.status}: ${await r.text()}`);return r.json()})}
+async function processJob(job:any){try{const payload=(job.payload??{})as Record<string,unknown>;if(job.type==="RUN_ANALYSIS")return await complete(job.id,{ok:true,result:await runAnalysis(payload)});if(job.type==="SEND_EMAIL")return await complete(job.id,{ok:true,result:await sendEmail(payload)});return await complete(job.id,{ok:false,error:`Unknown job type ${job.type}`})}catch(error){const message=error instanceof Error?error.message:"Unknown worker error";console.error(`[worker] ${job.type} failed: ${message}`);await complete(job.id,{ok:false,error:message}).catch(()=>undefined)}}
+async function processSupportEscalations(){const res=await fetch(`${api}/v1/internal/support/escalate-due`,{method:"POST",headers:{"x-service-token":token}});if(!res.ok)throw new Error(`support escalation check ${res.status}: ${await res.text()}`);return res.json()}
+async function loop(){console.log(`[worker] Proofline worker online; API=${api}; analytics=${analytics}`);let lastSupportCheck=0;while(true){try{if(Date.now()-lastSupportCheck>60_000){await processSupportEscalations();lastSupportCheck=Date.now()}const res=await fetch(`${api}/v1/internal/jobs/next`,{headers:{"x-service-token":token}});if(!res.ok)throw new Error(`job poll ${res.status}`);const job=await res.json();if(job)await processJob(job);else await sleep(1500)}catch(error){console.error(`[worker] poll error: ${error instanceof Error?error.message:String(error)}`);await sleep(3000)}}}
 loop().catch(error=>{console.error(error);process.exit(1)});

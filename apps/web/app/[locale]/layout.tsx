@@ -36,11 +36,7 @@ export default async function Layout({ children, params }: { children: React.Rea
   const organization = branding?.organization ?? dashboard?.organization ?? { id: "unknown", name: "PROOFLINE" };
 
   return (
-    <AppShell
-      locale={locale}
-      identity={identity}
-      organization={{ id: organization.id, name: organization.name, logo: branding?.logo ?? null }}
-    >
+    <AppShell locale={locale} identity={identity} organization={{ id: organization.id, name: organization.name, logo: branding?.logo ?? null }}>
       {children}
     </AppShell>
   );

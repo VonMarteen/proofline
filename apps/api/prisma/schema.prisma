@@ -371,6 +371,8 @@ model User {
   activations     AccountActivation[]
   requestedTickets SupportTicket[] @relation("TicketRequester")
   supportMessages SupportMessage[] @relation("SupportMessageUser")
+  supportReadStates SupportTicketReadState[]
+  supportAttachments SupportAttachment[] @relation("SupportAttachmentUploader")
   accountChangeRequests AccountChangeRequest[]
 }
 
@@ -416,6 +418,7 @@ model InternalUser {
   activations     InternalAccountActivation[]
   assignedTickets SupportTicket[] @relation("TicketAssignee")
   supportMessages SupportMessage[] @relation("SupportMessageInternal")
+  supportDocumentRequests SupportDocumentRequest[] @relation("SupportDocumentRequestInternalUser")
 }
 
 model AuthChallenge {
@@ -1015,6 +1018,7 @@ model DocumentRecord {
   blob            DocumentBlob?
   importSource    AssessmentImport?
   brandingLogo    OrganizationBranding?
+  supportAttachment SupportAttachment?
   @@index([organizationId, recordClass, createdAt])
   @@index([assessmentId, createdAt])
 }
@@ -1181,7 +1185,10 @@ model SupportTicket {
   requester              User?           @relation("TicketRequester", fields: [requesterUserId], references: [id], onDelete: SetNull)
   assignee               InternalUser?   @relation("TicketAssignee", fields: [assigneeInternalUserId], references: [id], onDelete: SetNull)
   messages               SupportMessage[]
+  readStates             SupportTicketReadState[]
   accountChangeRequest   AccountChangeRequest?
+  documentRequests       SupportDocumentRequest[]
+  attachments            SupportAttachment[]
   @@index([status, priority, slaDueAt])
   @@index([organizationId, updatedAt])
   @@index([assigneeInternalUserId, status])
@@ -1198,7 +1205,61 @@ model SupportMessage {
   ticket         SupportTicket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   user           User?                    @relation("SupportMessageUser", fields: [userId], references: [id], onDelete: SetNull)
   internalUser   InternalUser?            @relation("SupportMessageInternal", fields: [internalUserId], references: [id], onDelete: SetNull)
+  documentRequest SupportDocumentRequest? @relation("SupportDocumentRequestMessage")
+  attachments    SupportAttachment[]      @relation("SupportAttachmentMessage")
   @@index([ticketId, createdAt])
+}
+
+
+model SupportDocumentRequest {
+  id                        String       @id @default(cuid())
+  ticketId                  String
+  requestedByInternalUserId String
+  messageId                 String       @unique
+  status                    String       @default("OPEN")
+  instructions              String
+  maxFileSizeBytes          Int          @default(5242880)
+  fulfilledAt               DateTime?
+  cancelledAt               DateTime?
+  createdAt                 DateTime     @default(now())
+  updatedAt                 DateTime     @updatedAt
+  ticket                    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  requestedBy               InternalUser @relation("SupportDocumentRequestInternalUser", fields: [requestedByInternalUserId], references: [id], onDelete: Restrict)
+  message                   SupportMessage @relation("SupportDocumentRequestMessage", fields: [messageId], references: [id], onDelete: Cascade)
+  attachment                SupportAttachment?
+  @@index([ticketId, status, createdAt])
+}
+
+model SupportAttachment {
+  id               String                 @id @default(cuid())
+  ticketId         String
+  requestId        String                 @unique
+  messageId        String?
+  documentRecordId String                 @unique
+  uploadedByUserId String
+  originalFileName String
+  mimeType         String
+  sizeBytes        Int
+  createdAt        DateTime               @default(now())
+  ticket           SupportTicket          @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  request          SupportDocumentRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  message          SupportMessage?        @relation("SupportAttachmentMessage", fields: [messageId], references: [id], onDelete: SetNull)
+  documentRecord   DocumentRecord         @relation(fields: [documentRecordId], references: [id], onDelete: Cascade)
+  uploadedBy       User                   @relation("SupportAttachmentUploader", fields: [uploadedByUserId], references: [id], onDelete: Restrict)
+  @@index([ticketId, createdAt])
+}
+
+model SupportTicketReadState {
+  id         String        @id @default(cuid())
+  ticketId   String
+  userId     String
+  lastReadAt DateTime      @default(now())
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  ticket     SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([ticketId, userId])
+  @@index([userId, lastReadAt])
 }
 
 model AccountChangeRequest {

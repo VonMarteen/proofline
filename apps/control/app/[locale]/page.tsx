@@ -1,52 +1,5 @@
 import { normalizeLocale } from "@proofline/i18n";
 import { controlGet } from "../../lib/api";
-import { Metric, PageIntro, Panel, Status, dateTime, eur } from "../../components/control-ui";
-
-export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale: raw } = await params; const locale = normalizeLocale(raw); const es = locale === "es";
-  const d = await controlGet("/v1/control/overview");
-  const participantPct = d.counts.participants ? Math.round((d.counts.completedParticipants / d.counts.participants) * 100) : 0;
-  return <div className="control-stack">
-    <PageIntro title={es ? "Estado de la plataforma" : "Platform status"} text={es ? "Negocio, clientes, producto y operación en una sola vista. Las respuestas individuales no forman parte de este panel." : "Business, customers, product and operations in one view. Individual answers are never part of this dashboard."}/>
-    <div className="control-metrics control-metrics-4">
-      <Metric label={es ? "Organizaciones" : "Organizations"} value={d.counts.organizations} note={`${d.counts.activeAssessments} ${es ? "assessments activos" : "active assessments"}`}/>
-      <Metric label="MRR" value={eur(d.finance.mrrCents, locale)} note={`ARR ${eur(d.finance.arrCents, locale)}`}/>
-      <Metric label={es ? "Uso facturable del mes" : "Billable usage this month"} value={d.finance.billableUnits.toLocaleString(locale)} note={d.period}/>
-      <Metric label={es ? "Participación completada" : "Completed participation"} value={`${participantPct}%`} note={`${d.counts.completedParticipants}/${d.counts.participants}`}/>
-    </div>
-    <div className="control-grid-2">
-      <Panel title={es ? "Atención operativa" : "Operational attention"}>
-        <div className="control-attention-list">
-          <a href={`/${locale}/operations`}><span>{es ? "Jobs pendientes" : "Pending jobs"}</span><strong>{d.operations.pendingJobs}</strong></a>
-          <a href={`/${locale}/operations`}><span>{es ? "Jobs fallidos" : "Failed jobs"}</span><strong className={d.operations.failedJobs ? "danger-text" : ""}>{d.operations.failedJobs}</strong></a>
-          <a href={`/${locale}/operations`}><span>{es ? "Análisis pendientes" : "Pending analyses"}</span><strong>{d.operations.pendingAnalysis}</strong></a>
-          <a href={`/${locale}/support`}><span>{es ? "Tickets abiertos" : "Open tickets"}</span><strong>{d.counts.openTickets}</strong></a>
-          <a href={`/${locale}/privacy`}><span>{es ? "Retención en próximos 30 días" : "Retention due in 30 days"}</span><strong>{d.counts.retentionDue30d}</strong></a>
-          <a href={`/${locale}/privacy`}><span>{es ? "Legal holds activos" : "Active legal holds"}</span><strong>{d.counts.activeLegalHolds}</strong></a>
-        </div>
-      </Panel>
-      <Panel title={es ? "Salud del sistema" : "System health"}>
-        <div className="control-health-grid">{Object.entries(d.system).map(([key, value]) => <div key={key}><span>{key}</span><Status value={String(value)}/></div>)}</div>
-      </Panel>
-    </div>
-    <div className="control-grid-2">
-      <Panel title={es ? "Facturación" : "Billing"}>
-        <div className="control-row-metrics">
-          <Metric label={es ? "Pendiente de cobro" : "Open invoices"} value={eur(d.finance.openInvoiceCents, locale)} />
-          <Metric label={es ? "Facturas abiertas" : "Open invoices"} value={d.finance.openInvoices} />
-          <Metric label={es ? "Suscripciones past due" : "Past-due subscriptions"} value={d.finance.pastDueSubscriptions} />
-        </div>
-      </Panel>
-      <Panel title={es ? "Producto" : "Product"}>
-        <div className="control-row-metrics">
-          <Metric label={es ? "Assessments activos" : "Active assessments"} value={d.counts.activeAssessments}/>
-          <Metric label={es ? "Assessments cerrados" : "Closed assessments"} value={d.counts.completedAssessments}/>
-          <Metric label={es ? "Informes en borrador" : "Draft reports"} value={d.operations.draftReports}/>
-        </div>
-      </Panel>
-    </div>
-    <Panel title={es ? "Actividad privilegiada reciente" : "Recent privileged activity"}>
-      {d.recentAudit.length ? <div className="control-activity">{d.recentAudit.map((a:any) => <div key={a.id}><div><strong>{a.action}</strong><span>{a.organization ?? a.targetType}</span></div><time>{dateTime(a.createdAt, locale)}</time></div>)}</div> : <p className="control-empty">{es ? "Todavía no hay actividad privilegiada registrada." : "No privileged activity has been recorded yet."}</p>}
-    </Panel>
-  </div>;
-}
+import { Status, dateTime, eur } from "../../components/control-ui";
+import { BackofficeKpi, DataQuality, PeriodSwitch, TrendChart } from "../../components/backoffice-ui";
+export default async function Page({params,searchParams}:{params:Promise<{locale:string}>;searchParams:Promise<{range?:string}>}){const{locale:raw}=await params,{range="30d"}=await searchParams,locale=normalizeLocale(raw),es=locale==="es",d=await controlGet(`/v1/control/backoffice/dashboard?range=${encodeURIComponent(range)}`),maxPlan=Math.max(1,...d.planMix.map((x:any)=>x.mrrCents));return <div className="bo-dashboard"><div className="bo-dashboard-head"><div><h1>{es?"Torre de control":"Command center"}</h1><p>{es?"Negocio, clientes, servicio y operación en una sola vista. Sólo se muestran métricas respaldadas por datos disponibles y permisos efectivos.":"Business, customers, service and operations in one view. Only metrics backed by available data and effective permissions are shown."}</p></div><PeriodSwitch locale={locale} current={range}/></div><div className="bo-kpi-grid"><BackofficeKpi label={es?"Ingresos cobrados":"Collected revenue"} value={d.visibility.finance?eur(d.kpis.revenueCents,locale):"—"} delta={d.visibility.finance?d.comparison.revenuePct:null} icon="billing"/><BackofficeKpi label="MRR" value={d.visibility.finance?eur(d.kpis.mrrCents,locale):"—"} note={d.visibility.finance?`ARR ${eur(d.kpis.arrCents,locale)}`:es?"Sin permiso económico":"No finance access"} icon="gauge"/><BackofficeKpi label={es?"Clientes activos":"Active customers"} value={d.kpis.activeCustomers} delta={d.comparison.newCustomersPct} note={`${d.kpis.newCustomers} ${es?"altas del periodo":"new in period"}`} icon="building"/><BackofficeKpi label={es?"Tickets abiertos":"Open tickets"} value={d.visibility.support?d.kpis.openTickets:"—"} note={d.visibility.support?`${d.kpis.urgentTickets} ${es?"urgentes":"urgent"}`:es?"Sin permiso de soporte":"No support access"} icon="support" tone={d.kpis.urgentTickets?"danger":"default"}/></div><div className="bo-grid-2"><section className="bo-section"><div className="bo-section-head"><div><h2>{es?"Evolución del periodo":"Period trend"}</h2><p>{es?"Ingresos cobrados según facturas pagadas":"Collected revenue from paid invoices"}</p></div>{d.visibility.finance?<strong>{eur(d.kpis.revenueCents,locale)}</strong>:null}</div>{d.visibility.finance?<TrendChart points={d.timeline} locale={locale}/>:<p className="control-empty">{es?"Tu rol no puede acceder a información económica.":"Your role cannot access financial information."}</p>}</section><section className="bo-section"><div className="bo-section-head"><div><h2>{es?"Atención inmediata":"Immediate attention"}</h2><p>{es?"Señales que requieren operación o revisión":"Signals requiring operation or review"}</p></div></div><div className="bo-attention">{d.visibility.finance?<><a href={`/${locale}/subscriptions`} className={d.attention.failedPayments?"critical":""}><span>{es?"Pagos fallidos":"Failed payments"}</span><strong>{d.attention.failedPayments}</strong></a><a href={`/${locale}/subscriptions`}><span>{es?"Suscripciones past due":"Past-due subscriptions"}</span><strong>{d.attention.pastDueSubscriptions}</strong></a></>:null}{d.visibility.support?<><a href={`/${locale}/support`} className={d.attention.urgentTickets?"critical":""}><span>{es?"Tickets urgentes":"Urgent tickets"}</span><strong>{d.attention.urgentTickets}</strong></a><a href={`/${locale}/support`}><span>{es?"SLA en riesgo <24h":"SLA at risk <24h"}</span><strong>{d.attention.slaRisk}</strong></a></>:null}{d.visibility.operations?<><a href={`/${locale}/operations`} className={d.attention.failedJobs?"critical":""}><span>{es?"Jobs fallidos":"Failed jobs"}</span><strong>{d.attention.failedJobs}</strong></a><a href={`/${locale}/operations`}><span>{es?"Análisis fallidos":"Failed analyses"}</span><strong>{d.attention.failedAnalysis}</strong></a></>:null}</div></section></div><div className="bo-grid-equal"><section className="bo-section"><div className="bo-section-head"><div><h2>{es?"Mix por plan":"Plan mix"}</h2><p>{es?"Clientes activos y MRR actual":"Active customers and current MRR"}</p></div></div><div className="bo-mix">{d.planMix.length?d.planMix.map((x:any)=><div className="bo-mix-row" key={x.code}><span>{x.name}</span><div className="bo-mix-track"><i style={{width:`${Math.max(4,Math.round((x.mrrCents/maxPlan)*100))}%`}}/></div><strong>{x.customers}</strong></div>):<p className="control-empty">{es?"Sin suscripciones activas.":"No active subscriptions."}</p>}</div></section><section className="bo-section"><div className="bo-section-head"><div><h2>{es?"Salud del sistema":"System health"}</h2><p>{es?"Estado agregado, sin exponer secretos":"Aggregate status without exposing secrets"}</p></div></div><div className="control-health-grid">{Object.entries(d.system).map(([k,v])=><div key={k}><span>{k}</span><Status value={String(v)}/></div>)}</div></section></div><section className="bo-section"><div className="bo-section-head"><div><h2>{es?"Actividad privilegiada reciente":"Recent privileged activity"}</h2><p>{es?"Acciones sensibles visibles según permisos":"Sensitive actions visible according to permissions"}</p></div><a href={`/${locale}/audit`}>{es?"Ver auditoría":"View audit"}</a></div>{d.recentAudit.length?<div className="control-activity">{d.recentAudit.map((a:any)=><div key={a.id}><div><strong>{a.action}</strong><span>{a.actorId} · {a.organization??a.targetType}</span></div><time>{dateTime(a.createdAt,locale)}</time></div>)}</div>:<p className="control-empty">{es?"Sin actividad disponible para tu rol.":"No activity available for your role."}</p>}</section><section className="bo-section"><div className="bo-section-head"><div><h2>{es?"Calidad y cobertura de datos":"Data quality & coverage"}</h2><p>{es?"Cobertura de las fuentes utilizadas por esta vista":"Coverage of sources used by this view"}</p></div></div><DataQuality quality={d.dataQuality} locale={locale}/></section></div>}

@@ -3,6 +3,7 @@
   "version": "0.2.3",
   "private": true,
   "exports": {
-    "./base.css": "./base.css"
+    "./base.css": "./base.css",
+    "./proofline-brand.css": "./proofline-brand.css"
   }
 }

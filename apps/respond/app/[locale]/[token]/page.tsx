@@ -24,13 +24,7 @@ export default async function Page({ params }: RespondRouteProps) {
   const data = await getAssessment(token, locale);
 
   if (!data) {
-    return (
-      <div className="container" style={{ padding: 60 }}>
-        <h1>Invitation not found</h1>
-        <p className="muted">Use demo-token-2026 or reset the local environment.</p>
-      </div>
-    );
+    return <div className="container" style={{ padding: 60 }}><h1>Invitation not found</h1><p className="muted">Use demo-token-2026 or reset the local environment.</p></div>;
   }
-
   return <RespondForm data={data} token={token} locale={locale} />;
 }

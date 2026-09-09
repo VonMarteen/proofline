@@ -28,3 +28,32 @@ bootstrap-error.txt
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+
+# ============================================================
+# ARMAR / PROOFLINE - local delivery & diagnostic artifacts
+# ============================================================
+
+PROOFLINE_PATCH_*.zip
+PROOFLINE_HOTFIX_*.zip
+PROOFLINE_*DIAGNOSTIC*.zip
+PROOFLINE_SITE_FIX*.zip
+PROOFLINE_SUPPORT_E2E*.zip
+PROOFLINE_FACTURA_EJEMPLO*.pdf
+
+PROOFLINE_PATCH_*/
+_PROOFLINE_*/
+_DIFF/
+
+*.sha256
+
+APLICAR_C2.*.md
+CHANGELOG_C2.*.md
+VALIDACION_C2.*.md
+ANALISIS_C2.*.md
+AUDITORIA_COOKIES_C2.*.md
+MANIFEST_C2.*
+HOTFIX.patch
+LEEME_HOTFIX*
+LEEME_PROOFLINE_WEB_*
+
+scripts/validate-c2.*.mjs

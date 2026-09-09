@@ -1,0 +1,137 @@
+/* PROOFLINE official brand system · Signal. Structure. Impact. */
+:root {
+  --proofline-teal: #22D3A8;
+  --proofline-mint: #66F0C4;
+  --proofline-deep-navy: #0E141B;
+  --proofline-slate: #1B2230;
+  --proofline-off-white: #F2F4F7;
+  --proofline-text-gray: #A3ADC1;
+
+  --bg: #F2F4F7;
+  --bg-elevated: rgba(255,255,255,.92);
+  --bg-solid: #FFFFFF;
+  --surface-muted: #E8EDF1;
+  --text: #0E141B;
+  --text-soft: #657082;
+  --border: rgba(14,20,27,.11);
+  --border-strong: rgba(14,20,27,.20);
+  --accent: #22D3A8;
+  --accent-soft: color-mix(in srgb, #22D3A8 13%, white);
+  --signal: #1CBF9A;
+  --signal-soft: color-mix(in srgb, #66F0C4 19%, white);
+  --shadow: 0 18px 48px rgba(14,20,27,.08);
+}
+
+[data-theme="dark"] {
+  --bg: #0E141B;
+  --bg-elevated: rgba(27,34,48,.88);
+  --bg-solid: #141C25;
+  --surface-muted: #1B2230;
+  --text: #F2F4F7;
+  --text-soft: #A3ADC1;
+  --border: rgba(163,173,193,.14);
+  --border-strong: rgba(163,173,193,.26);
+  --accent: #22D3A8;
+  --accent-soft: rgba(34,211,168,.12);
+  --signal: #66F0C4;
+  --signal-soft: rgba(102,240,196,.12);
+  --shadow: 0 24px 70px rgba(0,0,0,.38);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #0E141B;
+    --bg-elevated: rgba(27,34,48,.88);
+    --bg-solid: #141C25;
+    --surface-muted: #1B2230;
+    --text: #F2F4F7;
+    --text-soft: #A3ADC1;
+    --border: rgba(163,173,193,.14);
+    --border-strong: rgba(163,173,193,.26);
+    --accent: #22D3A8;
+    --accent-soft: rgba(34,211,168,.12);
+    --signal: #66F0C4;
+    --signal-soft: rgba(102,240,196,.12);
+  }
+}
+
+html, body { accent-color: var(--proofline-teal); }
+body {
+  background:
+    radial-gradient(circle at 10% -12%, color-mix(in srgb,var(--proofline-teal) 8%,transparent),transparent 32rem),
+    radial-gradient(circle at 94% 12%, color-mix(in srgb,var(--proofline-mint) 5%,transparent),transparent 30rem),
+    var(--bg);
+}
+::selection { background: var(--proofline-teal); color: var(--proofline-deep-navy); }
+
+/* Official wordmark + mark. The mark asset is tightly framed so it remains legible at UI sizes. */
+.brand {
+  display:inline-flex;
+  align-items:center;
+  gap:11px;
+  color:var(--text);
+  font-weight:790;
+  letter-spacing:-.038em;
+  font-size:20px;
+  line-height:1;
+  white-space:nowrap;
+}
+.brand .brand-symbol { width:34px; height:34px; flex:0 0 34px; display:block; object-fit:contain; filter:drop-shadow(0 3px 10px rgba(34,211,168,.12)); }
+.brand .brand-word { display:inline-block; transform:translateY(-.5px); }
+.brand .brand-tagline { display:none; }
+
+/* Commercial lockup: deliberately more prominent than product chrome. */
+.site-brand-link .brand { font-size:25px; gap:12px; }
+.site-brand-link .brand .brand-symbol { width:43px; height:43px; flex-basis:43px; }
+.site-footer-brand .brand { font-size:23px; gap:11px; }
+.site-footer-brand .brand .brand-symbol { width:38px; height:38px; flex-basis:38px; }
+
+/* Internal applications: clear product identity without competing with the active client/context. */
+.workspace-brand .brand,.control-brand .brand,.support-brand .brand { font-size:18px; gap:9px; }
+.workspace-brand .brand .brand-symbol,.control-brand .brand .brand-symbol,.support-brand .brand .brand-symbol { width:34px; height:34px; flex-basis:34px; }
+
+/* Authentication planes can carry a stronger brand lockup. */
+.login-brand>.brand,.control-login-brand>.brand,.support-login-brand>.brand { font-size:24px; gap:11px; }
+.login-brand>.brand .brand-symbol,.control-login-brand>.brand .brand-symbol,.support-login-brand>.brand .brand-symbol { width:42px; height:42px; flex-basis:42px; }
+
+/* Participant header stays intentionally discreet: customer identity remains the primary context. */
+.participant-brand>.brand { font-size:14px; gap:7px; }
+.participant-brand>.brand .brand-symbol { width:25px; height:25px; flex-basis:25px; }
+
+/* Branded active/focus states stay restrained and enterprise. */
+.btn-accent { background:var(--proofline-teal); color:var(--proofline-deep-navy); border-color:transparent; box-shadow:0 8px 22px rgba(34,211,168,.14); }
+.btn-accent:hover { background:color-mix(in srgb,var(--proofline-teal) 88%,white); box-shadow:0 10px 28px rgba(34,211,168,.20); }
+.btn-primary { background:var(--proofline-deep-navy); color:var(--proofline-off-white); }
+[data-theme="dark"] .btn-primary { background:var(--proofline-off-white); color:var(--proofline-deep-navy); }
+.input:focus,.textarea:focus,.select:focus,input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible {
+  outline:none;
+  border-color:var(--proofline-teal);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--proofline-teal) 18%,transparent);
+}
+.progress>span,.respond-progress b { background:linear-gradient(90deg,var(--proofline-teal),var(--proofline-mint)); }
+.badge.accent { color:#087D65; background:color-mix(in srgb,var(--proofline-teal) 13%,white); }
+[data-theme="dark"] .badge.accent { color:var(--proofline-mint); background:rgba(34,211,168,.12); }
+
+.workspace-nav a.active,.sidebar-nav a.active,.control-nav a.active,.support-sidebar nav a[aria-current="page"] {
+  box-shadow:inset 3px 0 0 var(--proofline-teal);
+}
+.workspace-nav a:hover .proofline-icon,.workspace-nav a.active .proofline-icon,
+.control-nav a:hover .proofline-icon,.control-nav a.active .proofline-icon,
+.support-sidebar nav a:hover .proofline-icon { color:var(--proofline-teal); }
+
+/* Login fields: icon + copy relationship used by all authentication planes. */
+.proofline-field-label { display:flex;align-items:center;gap:7px;color:var(--text);font-size:13px;font-weight:700; }
+.proofline-field-label .proofline-icon { color:var(--proofline-teal); }
+.login-brand,.control-login-brand,.support-login-brand { gap:12px; }
+.login-brand>span,.control-login-brand>span,.support-login-brand>span { color:var(--text-soft); }
+
+/* Product surfaces receive subtle brand depth, not client branding. */
+.topbar,.app-header,.control-header,.support-header { border-color:var(--border); }
+.card,.workspace-section,.control-panel,.support-card,.respond-question,.respond-notice {
+  box-shadow:0 1px 0 rgba(255,255,255,.03) inset,0 1px 3px rgba(14,20,27,.035);
+}
+.proofline-icon { color:currentColor; }
+
+/* The participant's customer branding remains scoped to assessment controls. */
+.respond-brand-controls { --accent:var(--proofline-teal); }
+.respond-brand-controls .participant-brand>.brand { color:var(--text); }

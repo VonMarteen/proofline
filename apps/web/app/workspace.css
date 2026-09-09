@@ -756,3 +756,61 @@
   .workspace-team-layout,
   .workspace-role-grid.role-explainer { gap:20px; }
 }
+
+
+/* C2.4.4 — customer support unread alerts */
+.workspace-support-bell{
+  position:relative;width:36px;height:34px;display:grid;place-items:center;flex:0 0 36px;
+  border:1px solid var(--border);border-radius:10px;background:color-mix(in srgb,var(--bg-solid) 48%,transparent);
+  color:var(--text-soft);transition:border-color .16s ease,background .16s ease,color .16s ease,transform .16s ease;
+}
+.workspace-support-bell:hover{color:var(--text);border-color:var(--border-strong);background:var(--bg-elevated)}
+.workspace-support-bell.has-unread{
+  color:var(--accent);border-color:color-mix(in srgb,var(--accent) 55%,var(--border));
+  background:color-mix(in srgb,var(--accent-soft) 42%,var(--bg-solid));
+}
+.workspace-support-bell-count{
+  position:absolute;top:-7px;right:-7px;min-width:19px;height:19px;padding:0 5px;border:2px solid var(--bg);
+  border-radius:999px;display:grid;place-items:center;background:var(--accent);color:#06110f;font-size:9px;
+  line-height:1;font-weight:900;letter-spacing:-.02em;box-shadow:0 3px 10px rgba(0,0,0,.28);
+}
+.support-head-unread{color:var(--accent);font-size:10px;font-weight:800}
+.support-ticket-row.is-unread{
+  position:relative;background:color-mix(in srgb,var(--accent-soft) 32%,var(--bg-elevated));
+  box-shadow:inset 3px 0 0 var(--accent);
+}
+.support-ticket-row.is-unread:hover{background:color-mix(in srgb,var(--accent-soft) 46%,var(--bg-elevated))}
+.support-ticket-primary{min-width:0}
+.support-ticket-title-line{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0}
+.support-ticket-title-line strong{font-size:14px}
+.support-unread-badge{
+  width:max-content;display:inline-flex;align-items:center;gap:6px;padding:4px 8px;
+  border:1px solid color-mix(in srgb,var(--accent) 38%,transparent);border-radius:999px;
+  background:color-mix(in srgb,var(--accent-soft) 65%,transparent);color:var(--accent);
+  font-size:9px!important;line-height:1;font-weight:850;letter-spacing:.02em;
+}
+.support-unread-badge i{
+  width:6px;height:6px;border-radius:999px;background:var(--accent);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--accent-soft) 75%,transparent);
+}
+.support-ticket-unread-copy{color:var(--text)!important;font-weight:700}
+@media(max-width:850px){.workspace-support-bell{width:34px;height:32px;flex-basis:34px}}
+
+/* C2.4.5 — gated support document requests */
+.support-document-upload{max-width:920px;padding:20px;border:1px solid color-mix(in srgb,var(--accent) 26%,var(--border));border-radius:16px;background:color-mix(in srgb,var(--accent-soft) 24%,var(--bg-elevated));display:grid;gap:16px}.support-document-upload-copy{display:grid;gap:6px}.support-document-upload-copy>strong{font-size:16px}.support-document-upload-copy p{margin:0;line-height:1.55}.support-document-upload-copy small{color:var(--text-soft);font-size:11px}.support-document-upload form{display:grid;gap:12px}.support-document-file{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg-solid)}.support-document-file span{color:var(--text-soft);font-size:11px}.support-attachments{display:flex;flex-wrap:wrap;gap:8px}.support-attachment-link{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid var(--border);border-radius:9px;background:var(--bg-solid);color:var(--text);font-size:11px;font-weight:750;text-decoration:none}.support-attachment-link:hover{border-color:var(--accent);color:var(--accent)}
+
+/* C2.4.6 — secure document preview + invoice archive */
+.document-viewer-page{gap:20px}.document-viewer-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:20px;border:1px solid var(--border);border-radius:16px;background:var(--bg-elevated)}.document-viewer-toolbar>div{min-width:0;display:grid;gap:7px}.document-viewer-toolbar h1{margin:0;font-size:24px;line-height:1.15}.document-viewer-toolbar p{margin:0;color:var(--text-soft);font-size:12px}.document-viewer-shell{min-height:660px;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#eef1f4}.document-viewer-frame{display:block;width:100%;height:76vh;min-height:660px;border:0;background:#eef1f4}.invoice-viewer-shell{background:#eef1f4}.workspace-invoice-table{display:grid;border:1px solid var(--border);border-radius:14px;overflow:hidden}.workspace-invoice-row{display:grid;grid-template-columns:minmax(150px,1.1fr) 110px 110px 115px 115px 125px minmax(190px,1.25fr);gap:12px;align-items:center;padding:15px 16px;border-top:1px solid var(--border);background:var(--bg-elevated);font-size:12px}.workspace-invoice-row:first-child{border-top:0}.workspace-invoice-head{background:var(--surface-muted);color:var(--text-soft);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}.invoice-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}.invoice-status{width:max-content;display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;border:1px solid var(--border);font-size:10px;font-weight:800}.invoice-status.status-paid{color:var(--success)}.invoice-status.status-open{color:var(--warning)}.invoice-status.status-void,.invoice-status.status-uncollectible{color:var(--danger)}
+@media(max-width:1150px){.workspace-invoice-table{overflow:auto}.workspace-invoice-row{min-width:1040px}}
+@media(max-width:760px){.document-viewer-toolbar{display:grid}.document-viewer-frame,.document-viewer-shell{min-height:520px;height:68vh}}
+
+/* C2.4.7 — explicit close action for in-portal viewers */
+.document-viewer-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.document-viewer-close{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:10px;background:var(--bg-solid);color:var(--text);font-size:25px;font-weight:500;line-height:1;text-decoration:none;transition:border-color .15s ease,background .15s ease,color .15s ease}
+.document-viewer-close:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.document-viewer-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:760px){.document-viewer-actions{justify-content:flex-start}.document-viewer-close{width:40px;height:40px}}
+
+/* C2.4.7a — viewer actions aligned on one horizontal row */
+.document-viewer-toolbar > .document-viewer-actions{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:nowrap}
+@media(max-width:760px){.document-viewer-toolbar > .document-viewer-actions{justify-content:flex-start;flex-wrap:wrap}}

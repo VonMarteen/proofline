@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@proofline/design-tokens/base.css";
+@import "@proofline/design-tokens/proofline-brand.css";
 
 h1,h2,h3,h4 { text-wrap: balance; }
 p { text-wrap: pretty; }

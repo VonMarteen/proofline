@@ -3,40 +3,14 @@ import { usePathname } from "next/navigation";
 import type { Locale } from "@proofline/i18n";
 import { Icon, type ProoflineIconName } from "@proofline/ui";
 
-const groups = [
-  { key:"platform",labelEs:"Plataforma",labelEn:"Platform",items:[
-    ["","Resumen","Overview","overview"],
-    ["/organizations","Organizaciones","Organizations","building"],
-    ["/users","Usuarios y accesos","Users & access","user-settings"],
-  ]},
-  { key:"business",labelEs:"Negocio",labelEn:"Business",items:[
-    ["/sales","Ventas y onboarding","Sales & onboarding","handshake"],
-    ["/plans","Planes y capacidades","Plans & entitlements","gauge"],
-    ["/billing","Suscripciones y facturación","Subscriptions & billing","billing"],
-    ["/usage","Uso","Usage","activity"],
-  ]},
-  { key:"product",labelEs:"Producto",labelEn:"Product",items:[
-    ["/assessments","Assessments","Assessments","assessments"],
-    ["/reports","Informes","Reports","reports"],
-    ["/marketplace","Marketplace","Marketplace","library"],
-    ["/communications","Comunicaciones","Communications","communications"],
-  ]},
-  { key:"service",labelEs:"Servicio",labelEn:"Service",items:[
-    ["/support","Soporte","Support","support"],
-    ["/support/history","Histórico de tickets","Ticket history","history"],
-  ]},
-  { key:"trust",labelEs:"Confianza",labelEn:"Trust",items:[
-    ["/legal","Legal & Trust","Legal & Trust","governance"],
-    ["/privacy","Privacidad y retención","Privacy & retention","lock"],
-    ["/security","Seguridad","Security","security"],
-  ]},
-  { key:"operations",labelEs:"Operación",labelEn:"Operations",items:[
-    ["/operations","Operaciones","Operations","activity"],
-    ["/audit","Auditoría","Audit","history"],
-    ["/configuration","Configuración","Configuration","settings"],
-  ]},
+const groups=[
+ {key:"command",labelEs:"Torre de control",labelEn:"Command center",items:[["","Dashboard","Dashboard","overview"],["/business","Negocio","Business","billing"],["/customers","Clientes","Customers","building"],["/subscriptions","Suscripciones / contratos","Subscriptions / contracts","handshake"],["/usage","Uso / actividad","Usage / activity","activity"]]},
+ {key:"service",labelEs:"Servicio",labelEn:"Service",items:[["/support","Soporte","Support","support"],["/support/history","Histórico de tickets","Ticket history","history"],["/notifications","Alertas","Alerts","alert"]]},
+ {key:"operations",labelEs:"Operación",labelEn:"Operations",items:[["/operations","Operaciones","Operations","activity"],["/system","Sistema","System","security"],["/internal-users","Usuarios internos","Internal users","user-settings"],["/audit","Auditoría","Audit","history"],["/configuration","Configuración","Configuration","settings"]]},
+ {key:"proofline",labelEs:"Proofline",labelEn:"Proofline",items:[["/assessments","Assessments","Assessments","assessments"],["/reports","Informes","Reports","reports"],["/marketplace","Marketplace","Marketplace","library"],["/communications","Comunicaciones","Communications","communications"],["/sales","Ventas y onboarding","Sales & onboarding","handshake"],["/plans","Planes y capacidades","Plans & entitlements","gauge"]]},
+ {key:"trust",labelEs:"Gobierno",labelEn:"Governance",items:[["/legal","Legal & Trust","Legal & Trust","governance"],["/privacy","Privacidad y retención","Privacy & retention","lock"],["/security","Seguridad","Security","security"]]},
 ] as const;
-const routeRoles:Record<string,string[]|"ALL">={"":"ALL","/organizations":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_FINANCE","INTERNAL_TRUST","INTERNAL_ANALYST"],"/users":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_TRUST"],"/sales":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_FINANCE"],"/plans":["INTERNAL_PLATFORM_OWNER"],"/billing":["INTERNAL_PLATFORM_OWNER","INTERNAL_FINANCE"],"/usage":["INTERNAL_PLATFORM_OWNER","INTERNAL_FINANCE","INTERNAL_ANALYST"],"/assessments":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_ANALYST"],"/reports":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_ANALYST"],"/marketplace":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_ANALYST"],"/communications":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS"],"/support":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS"],"/support/history":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS"],"/legal":["INTERNAL_PLATFORM_OWNER","INTERNAL_TRUST"],"/privacy":["INTERNAL_PLATFORM_OWNER","INTERNAL_TRUST"],"/security":["INTERNAL_PLATFORM_OWNER","INTERNAL_TRUST","INTERNAL_OPERATIONS"],"/operations":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS"],"/audit":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_FINANCE","INTERNAL_TRUST"],"/configuration":["INTERNAL_PLATFORM_OWNER"]};
-function active(pathname:string,locale:Locale,suffix:string){const href=`/${locale}${suffix}`;if(suffix==="")return pathname===`/${locale}`||pathname===`/${locale}/`;if(suffix==="/support"&&pathname.startsWith(`/${locale}/support/history`))return false;return pathname===href||pathname.startsWith(`${href}/`)}
-function allowed(role:string,suffix:string){const roles=routeRoles[suffix]??[];return roles==="ALL"||roles.includes(role)}
-export function ControlNav({locale,role}:{locale:Locale;role:string}){const pathname=usePathname(),es=locale==="es";return <nav className="control-nav" aria-label={es?"Navegación de Proofline Control":"Proofline Control navigation"}>{groups.map(group=>{const items=group.items.filter(([suffix])=>allowed(role,suffix));if(!items.length)return null;const groupActive=items.some(([suffix])=>active(pathname,locale,suffix));return <section className={`control-nav-group${groupActive?" is-active":""}`} key={group.key}><div className="control-nav-group-title">{es?group.labelEs:group.labelEn}</div><div className="control-nav-group-items">{items.map(([suffix,esLabel,enLabel,icon])=>{const href=`/${locale}${suffix}`,isActive=active(pathname,locale,suffix);return <a key={suffix||"overview"} href={href} className={isActive?"active":""} aria-current={isActive?"page":undefined}><Icon name={icon as ProoflineIconName} size={16}/><span>{es?esLabel:enLabel}</span></a>})}</div></section>})}</nav>}
+const roles:Record<string,string[]|"ALL">={"":"ALL","/business":["INTERNAL_PLATFORM_OWNER","INTERNAL_FINANCE"],"/customers":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_FINANCE","INTERNAL_TRUST","INTERNAL_ANALYST"],"/subscriptions":["INTERNAL_PLATFORM_OWNER","INTERNAL_FINANCE"],"/usage":["INTERNAL_PLATFORM_OWNER","INTERNAL_FINANCE","INTERNAL_ANALYST"],"/support":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS"],"/support/history":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS"],"/notifications":"ALL","/operations":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS"],"/system":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS"],"/internal-users":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_TRUST"],"/audit":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_FINANCE","INTERNAL_TRUST"],"/configuration":["INTERNAL_PLATFORM_OWNER"],"/assessments":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_ANALYST"],"/reports":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_ANALYST"],"/marketplace":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_ANALYST"],"/communications":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS"],"/sales":["INTERNAL_PLATFORM_OWNER","INTERNAL_OPERATIONS","INTERNAL_FINANCE"],"/plans":["INTERNAL_PLATFORM_OWNER"],"/legal":["INTERNAL_PLATFORM_OWNER","INTERNAL_TRUST"],"/privacy":["INTERNAL_PLATFORM_OWNER","INTERNAL_TRUST"],"/security":["INTERNAL_PLATFORM_OWNER","INTERNAL_TRUST","INTERNAL_OPERATIONS"]};
+function isActive(path:string,locale:Locale,suffix:string){const href=`/${locale}${suffix}`;if(!suffix)return path===`/${locale}`||path===`/${locale}/`;if(suffix==="/support"&&path.startsWith(`/${locale}/support/history`))return false;return path===href||path.startsWith(`${href}/`)}
+function allowed(role:string,suffix:string){const r=roles[suffix]??[];return r==="ALL"||r.includes(role)}
+export function ControlNav({locale,role}:{locale:Locale;role:string}){const path=usePathname(),es=locale==="es";return <nav className="control-nav" aria-label={es?"Navegación Backoffice Proofline":"Proofline Backoffice navigation"}>{groups.map(g=>{const items=g.items.filter(([s])=>allowed(role,s));if(!items.length)return null;const active=items.some(([s])=>isActive(path,locale,s));return <section className={`control-nav-group${active?" is-active":""}`} key={g.key}><div className="control-nav-group-title">{es?g.labelEs:g.labelEn}</div><div className="control-nav-group-items">{items.map(([suffix,esLabel,enLabel,icon])=>{const current=isActive(path,locale,suffix);return <a key={suffix||"dashboard"} href={`/${locale}${suffix}`} className={current?"active":""} aria-current={current?"page":undefined}><Icon name={icon as ProoflineIconName} size={16}/><span>{es?esLabel:enLabel}</span></a>})}</div></section>})}<a className="bo-search-nav" href={`/${locale}/search`}><Icon name="activity" size={16}/><span>{es?"Búsqueda global":"Global search"}</span></a></nav>}

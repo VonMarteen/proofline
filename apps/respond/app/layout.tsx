@@ -9,12 +9,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  const cookieStore = await cookies();
-  const preference = cookieStore.get("proofline-theme")?.value;
+  const jar = await cookies();
+  const preference = jar.get("proofline-respond-theme")?.value;
   const theme = preference === "dark" || preference === "light" ? preference : undefined;
-  return (
-    <html lang="es" data-theme={theme} data-theme-preference={preference ?? "system"} suppressHydrationWarning>
-      <body>{children}</body>
-    </html>
-  );
+  return <html lang="es" data-proofline-surface="respond" data-theme={theme} data-theme-preference={preference ?? "system"} suppressHydrationWarning><body>{children}</body></html>;
 }
