@@ -1,16 +1,18 @@
-name: proofline-dev
+name: armar-proofline
 
 services:
   postgres:
+    container_name: proofline-postgres
     image: postgres:18-alpine
     environment:
       POSTGRES_DB: proofline
       POSTGRES_USER: proofline
       POSTGRES_PASSWORD: proofline_local_only
     ports:
-      - "55432:5432"
+      - "4232:5432"
     volumes:
-      - proofline_postgres:/var/lib/postgresql
+      - proofline-postgres-data:/var/lib/postgresql
+    networks: [proofline-net]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U proofline -d proofline"]
       interval: 3s
@@ -18,17 +20,21 @@ services:
       retries: 30
 
   mailpit:
+    container_name: proofline-mailpit
     image: axllent/mailpit:v1.27.8
     ports:
-      - "58025:8025"
-      - "51025:1025"
+      - "4280:8025"
+      - "4225:1025"
+    networks: [proofline-net]
 
   analytics:
+    container_name: proofline-analytics
     build:
       context: ./services/analytics
       dockerfile: Dockerfile.dev
     ports:
-      - "58100:8000"
+      - "4281:8000"
+    networks: [proofline-net]
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 3s
@@ -36,6 +42,7 @@ services:
       retries: 30
 
   minio:
+    container_name: proofline-minio
     image: minio/minio:RELEASE.2025-07-23T15-54-02Z
     profiles: ["files"]
     command: server /data --console-address ":9001"
@@ -43,11 +50,20 @@ services:
       MINIO_ROOT_USER: proofline
       MINIO_ROOT_PASSWORD: proofline_local_secret
     ports:
-      - "59000:9000"
-      - "59001:9001"
+      - "4290:9000"
+      - "4291:9001"
     volumes:
-      - proofline_minio:/data
+      - proofline-minio-data:/data
+    networks: [proofline-net]
+
+networks:
+  proofline-net:
+    name: proofline-net
 
 volumes:
-  proofline_postgres:
-  proofline_minio:
+  # Preserve the existing physical volumes created by the former `proofline-dev`
+  # Compose project. This avoids moving or deleting PostgreSQL / MinIO data.
+  proofline-postgres-data:
+    name: proofline-dev_proofline_postgres
+  proofline-minio-data:
+    name: proofline-dev_proofline_minio

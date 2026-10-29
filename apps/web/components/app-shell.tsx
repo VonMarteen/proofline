@@ -25,7 +25,7 @@ export function AppShell({ locale, children, identity, organization }: { locale:
     <ConfirmActionProvider locale={locale}>
       <div className="shell workspace-shell">
         <aside className="sidebar workspace-sidebar">
-          <Link className="workspace-brand" href={`/${locale}`}><Brand /></Link>
+          <Link className="workspace-brand" href={`/${locale}`}><Brand /><span aria-hidden="true">WORKSPACE</span></Link>
           <div className="workspace-org"><OrganizationIdentity organization={organization} /></div>
           <WorkspaceNav locale={locale} role={identity.role} />
           <div className="workspace-sidebar-footer">
@@ -38,7 +38,7 @@ export function AppShell({ locale, children, identity, organization }: { locale:
         </aside>
         <div className="main workspace-main">
           <header className="app-header workspace-header">
-            <div className="workspace-header-context"><strong>Workspace</strong></div>
+            <div className="workspace-header-context"><strong>Proofline Workspace</strong><span className="workspace-header-sub">{organization.name}</span></div>
             <div className="nav-actions">
               <WorkspaceSupportAlertBell locale={locale} />
               <span className="workspace-role-chip">{identity.role.replaceAll("_", " ")}</span>

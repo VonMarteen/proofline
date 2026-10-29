@@ -1,15 +1,16 @@
 import { normalizeLocale } from "@proofline/i18n";
+import { PaginationBar } from "@proofline/ui";
 import { supportGet } from "../../../lib/api";
 import { Status, dateTime } from "../../../components/support-ticket-ui";
 
-export default async function Page({ params }: { params: Promise<{ locale: string }> }) {
+export default async function Page({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{page?:string;pageSize?:string}> }) {
   const { locale: raw } = await params;
+  const sp=await searchParams;
   const locale = normalizeLocale(raw);
   const es = locale === "es";
-  const d = await supportGet("/v1/control/support");
-  const rows = (d.tickets as any[])
-    .filter(t => ["RESOLVED", "CLOSED"].includes(t.status))
-    .sort((a, b) => new Date(b.resolvedAt ?? b.closedAt ?? b.updatedAt).getTime() - new Date(a.resolvedAt ?? a.closedAt ?? a.updatedAt).getTime());
+  const qs=new URLSearchParams({view:"history",page:sp.page??"1",pageSize:sp.pageSize??"25"});
+  const d = await supportGet(`/v1/control/tables/support?${qs}`);
+  const rows = d.items as any[];
 
   return (
     <div className="support-stack">
@@ -44,6 +45,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
             </table>
           </div>
         ) : <div className="support-empty">{es ? "Aún no hay tickets resueltos visibles para tu histórico." : "There are no resolved tickets visible in your history yet."}</div>}
+        <PaginationBar pagination={d.pagination} basePath={`/${locale}/history`} locale={locale}/>
       </section>
     </div>
   );

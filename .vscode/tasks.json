@@ -122,7 +122,7 @@
     {
       "label": "Proofline: Infra · ARRANCAR",
       "type": "shell",
-      "command": "docker compose -f docker-compose.dev.yml up -d --wait --remove-orphans",
+      "command": "npx -y pnpm@10.15.1 infra:up",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -135,7 +135,7 @@
     {
       "label": "Proofline: Infra · PARAR",
       "type": "shell",
-      "command": "docker compose -f docker-compose.dev.yml down",
+      "command": "npx -y pnpm@10.15.1 infra:down",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -146,9 +146,9 @@
       }
     },
     {
-      "label": "Proofline: Infra · RESET TOTAL",
+      "label": "Proofline: Infra · PREFLIGHT ARMAR",
       "type": "shell",
-      "command": "docker compose -f docker-compose.dev.yml down -v --remove-orphans",
+      "command": "npx -y pnpm@10.15.1 preflight",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -308,9 +308,9 @@
       }
     },
     {
-      "label": "Proofline: DEMO · CARGAR CLIENTES + SOPORTE C2.1",
+      "label": "Proofline: Infra · DETENER LEGACY (sin borrar datos)",
       "type": "shell",
-      "command": "npx -y pnpm@10.15.1 demo:support-fixtures",
+      "command": "npx -y pnpm@10.15.1 infra:legacy:stop",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -318,18 +318,33 @@
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",
-        "clear": true,
-        "focus": true
+        "clear": true
       }
     },
     {
-      "label": "Proofline: DEV · SUPPORT",
+      "label": "Proofline: Infra · NORMALIZAR .env local",
       "type": "shell",
-      "command": "npx -y pnpm@10.15.1 dev:support",
+      "command": "npx -y pnpm@10.15.1 infra:env:normalize",
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Proofline: 6 · PILOT E2E",
+      "type": "shell",
+      "command": "npx -y pnpm@10.15.1 pilot:check",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [
+        "$tsc"
+      ],
       "presentation": {
         "reveal": "always",
         "panel": "dedicated",

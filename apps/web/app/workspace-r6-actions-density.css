@@ -1,0 +1,70 @@
+/* PROOFLINE Workspace R6 — visual/interaction polish only, scoped and reversible.
+   All mutations/permissions/confirmations remain in existing TSX handlers. */
+/* Assessment: explicit actions instead of bare text, with controlled inset and focus. */
+.workspace-content .workspace-assessment-detail-page .builder-question-actions { gap:7px; align-self:center; }
+.workspace-content .workspace-assessment-detail-page .builder-question-actions .ws-r6-action-button,
+.workspace-content .workspace-team-row .ws-r6-team-remove {
+  display:inline-flex; align-items:center; justify-content:center; width:auto;
+  min-height:30px; padding:5px 11px; line-height:1.2; white-space:nowrap;
+  border:1px solid var(--border-strong,var(--border)); border-radius:8px;
+  background:var(--surface-muted); color:var(--text); font-size:11px; font-weight:650;
+  cursor:pointer; transition:background .18s ease,border-color .18s ease,transform .18s ease;
+}
+.workspace-content .workspace-assessment-detail-page .builder-question-actions .ws-r6-action-button:hover,
+.workspace-content .workspace-team-row .ws-r6-team-remove:hover { background:var(--accent-soft); border-color:var(--accent); }
+.workspace-content .workspace-assessment-detail-page .builder-question-actions .ws-r6-action-button.danger,
+.workspace-content .workspace-team-row .ws-r6-team-remove {color:var(--danger); border-color:color-mix(in srgb,var(--danger) 35%,var(--border)); background:color-mix(in srgb,var(--danger) 6%,var(--bg-elevated));}
+.workspace-content .workspace-assessment-detail-page .builder-question-actions .ws-r6-action-button.danger:hover,
+.workspace-content .workspace-team-row .ws-r6-team-remove:hover {background:color-mix(in srgb,var(--danger) 14%,var(--bg-elevated)); border-color:var(--danger);}
+.workspace-content .workspace-assessment-detail-page .builder-question-card {min-height:48px;}
+/* Population: status controls should not touch the upper/lower frame. */
+.workspace-content .workspace-assessment-detail-page .population-person-list label { gap:8px; padding-block:6px; min-height:42px; }
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude { display:inline-flex; align-items:center; justify-content:center; min-width:68px; min-height:28px; padding:5px 9px; border:1px solid var(--border-strong,var(--border)); border-radius:8px; background:var(--surface-muted); color:var(--text); font-size:11px; font-weight:650; line-height:1.1; transition:background .18s ease,border-color .18s ease; }
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude:hover {border-color:var(--accent); background:var(--accent-soft);}
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude.active {background:color-mix(in srgb,var(--danger) 16%,var(--bg-elevated)); border-color:var(--danger); color:var(--danger);}
+/* Team: move section title above both columns; table and invite start on same baseline. */
+.workspace-content .workspace-team-layout { grid-template-columns:minmax(0,1fr) 254px; column-gap:12px; row-gap:10px; align-items:start; }
+.workspace-content .workspace-team-summary { grid-column:1/-1; min-width:0; }
+.workspace-content .workspace-team-summary .workspace-section-head { margin:0; padding:0; }
+.workspace-content .workspace-team-summary h2 {font-size:16px; margin:0 0 4px;}
+.workspace-content .workspace-team-summary p {font-size:11px; line-height:1.5; margin:0;}
+.workspace-content .workspace-team-list { gap:0; min-width:0; }
+.workspace-content .workspace-team-layout .workspace-invite-card {margin:0; min-width:0; align-self:start;}
+.workspace-content .workspace-team-layout .workspace-team-table {margin:0; min-width:0;}
+.workspace-content .workspace-team-row { min-height:45px; }
+.workspace-content .workspace-team-row .ws-r6-team-remove {font-size:10px; min-height:28px; padding:5px 8px;}
+/* Roles: role title and summary share a row; permission disclosure uses smooth overflow animation. */
+.workspace-content .ws-r3-role-list button { align-items:center; min-height:47px; gap:11px; }
+.workspace-content .ws-r3-role-list button > span:first-child {display:grid;grid-template-columns:minmax(80px,.7fr) minmax(0,1.4fr);align-items:center;gap:10px;width:100%;}
+.workspace-content .ws-r3-role-list strong {font-size:11px;}
+.workspace-content .ws-r3-role-list small {max-width:none;white-space:normal;line-height:1.35;font-size:10px;}
+.workspace-content .ws-r3-role-details .ws-r6-permission-panel {display:block; max-height:0; overflow:hidden; visibility:hidden; opacity:0; padding-block:0; border-top:0; margin:0; transition:max-height .28s ease,opacity .2s ease,padding .22s ease,visibility .28s; }
+.workspace-content .ws-r3-role-details .ws-r6-permission-panel.is-open {max-height:320px;visibility:visible;opacity:1;padding-block:11px 12px;}
+.workspace-content .ws-r3-role-details .ws-r6-permission-panel li {margin:4px 0;}
+.workspace-content .ws-r3-role-details .ws-r3-disclosure { min-height:38px; margin-top:8px; }
+/* Billing summary uses SIX genuine KPI values. Avoid fabricated statistics. */
+.workspace-content .billing-kpis:not(.payment-kpis) {grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;}
+.workspace-content .billing-kpis:not(.payment-kpis) article {min-height:88px;padding:10px 11px;gap:3px;min-width:0;align-content:start;}
+.workspace-content .billing-kpis:not(.payment-kpis) article > strong {font-size:clamp(14px,1.35vw,19px);line-height:1.2;white-space:normal;overflow-wrap:anywhere;}
+.workspace-content .billing-kpis:not(.payment-kpis) article > span:not(.ws-r6-billing-icon) {font-size:10px;line-height:1.25;}
+.workspace-content .billing-kpis:not(.payment-kpis) article > small {font-size:9px;line-height:1.35;}
+.workspace-content .billing-kpis:not(.payment-kpis) article > .ws-r6-billing-icon {order:-1;}
+.workspace-content .ws-r6-billing-icon {color:var(--accent);width:21px;height:21px;display:grid;place-items:center;}
+/* Provider dynamic fields: one line for card method, brand, four digits on desktop. */
+.workspace-content .payment-change-card .ws-r6-payment-fields { display:grid; grid-template-columns:minmax(170px,1.2fr) minmax(0,1.7fr); align-items:end; gap:10px; min-width:0;}
+.workspace-content .payment-change-card .ws-r6-payment-fields > label {min-width:0;}
+.workspace-content .payment-change-card .ws-r6-payment-fields > .form-row {display:grid;grid-template-columns:minmax(125px,1fr) minmax(100px,.55fr); gap:10px;min-width:0;align-items:end;}
+.workspace-content .payment-change-card .ws-r6-payment-fields .form-row label {min-width:0;}
+.workspace-content .payment-change-card .ws-r6-payment-fields :is(input,select) {min-width:0;width:100%;min-height:34px;}
+/* Privacy action is a visually identifiable real navigation link. */
+.workspace-content :is(.ws-r3-privacy-head,.privacy-assessment-list > article) {grid-template-columns:minmax(155px,1.4fr) 82px 90px 92px 57px 75px 70px 88px; min-width:785px;}
+.workspace-content .privacy-assessment-list > article > .ws-r6-review-link {display:inline-flex;align-items:center;justify-content:center; gap:4px;min-height:28px;padding:5px 8px;border:1px solid var(--border-strong,var(--border));border-radius:8px;background:var(--surface-muted);font-size:10px;font-weight:650;color:var(--text);text-decoration:none;white-space:nowrap;transition:background .18s,border-color .18s;}
+.workspace-content .privacy-assessment-list > article > .ws-r6-review-link:hover {background:var(--accent-soft);border-color:var(--accent);}
+/* Required accessible visual focus. */
+.workspace-content :is(.ws-r6-action-button,.ws-r6-team-remove,.ws-r6-review-link,.population-person-list button.exclude):focus-visible {outline:2px solid var(--accent);outline-offset:2px;}
+@media(max-width:1360px){.workspace-content .billing-kpis:not(.payment-kpis){grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:1250px){.workspace-content .workspace-team-layout{grid-template-columns:minmax(0,1fr);}.workspace-content .workspace-team-summary{grid-column:auto;}}
+@media(max-width:980px){.workspace-content .payment-change-card .ws-r6-payment-fields{grid-template-columns:minmax(0,1fr);}}
+@media(max-width:740px){.workspace-content .billing-kpis:not(.payment-kpis){grid-template-columns:repeat(2,minmax(0,1fr));}.workspace-content .ws-r3-role-list button > span:first-child {grid-template-columns:minmax(85px,.8fr) minmax(0,1.4fr);}}
+@media(max-width:460px){.workspace-content .billing-kpis:not(.payment-kpis){grid-template-columns:minmax(0,1fr);}.workspace-content .payment-change-card .ws-r6-payment-fields > .form-row{grid-template-columns:minmax(0,1fr);}.workspace-content .ws-r3-role-list button > span:first-child{grid-template-columns:minmax(0,1fr);gap:4px;}}
+@media(prefers-reduced-motion:reduce){.workspace-content :is(.ws-r6-action-button,.ws-r6-team-remove,.ws-r6-review-link,.ws-r6-permission-panel,.population-person-list button.exclude){transition:none!important;}}

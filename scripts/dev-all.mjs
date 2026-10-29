@@ -141,7 +141,7 @@ process.on("exit", () => {
 console.log("[4/4] Levantando API cliente + API interna de Control y esperando readiness...");
 startService("API", "@proofline/api");
 startService("CONTROL_API", "@proofline/api", "dev:control");
-const [apiReady, controlApiReady] = await Promise.all([waitForHttp("http://127.0.0.1:4100/health", 30000), waitForHttp("http://127.0.0.1:4200/health", 30000)]);
+const [apiReady, controlApiReady] = await Promise.all([waitForHttp("http://127.0.0.1:4201/health", 30000), waitForHttp("http://127.0.0.1:4206/health", 30000)]);
 if (!apiReady || !controlApiReady) {
   console.error("[FALLO] Alguna API no está lista. Worker y frontends no se arrancan para evitar errores en cascada.");
   console.error('        La causa real queda visible arriba en las líneas [API] o [CONTROL_API].');
@@ -156,13 +156,13 @@ if (!apiReady || !controlApiReady) {
   startService("SUPPORT", "@proofline/support");
 
   console.log("Servicios solicitados:");
-  console.log("  Comercial     http://localhost:3100/es");
-  console.log("  Workspace     http://localhost:3101/es");
-  console.log("  Participante  http://localhost:3102/es/demo-token-2026");
-  console.log("  Control       http://localhost:3103/es");
-  console.log("  Support       http://localhost:3104/es");
-  console.log("  API cliente   http://127.0.0.1:4100/health");
-  console.log("  Control API   http://127.0.0.1:4200/health");
-  console.log("  Analytics     http://localhost:58100/health");
+  console.log("  Comercial     http://localhost:4200/es");
+  console.log("  Workspace     http://localhost:4202/es");
+  console.log("  Participante  http://localhost:4203/es/demo-token-2026");
+  console.log("  Control       http://localhost:4204/es");
+  console.log("  Support       http://localhost:4205/es");
+  console.log("  API cliente   http://127.0.0.1:4201/health");
+  console.log("  Control API   http://127.0.0.1:4206/health");
+  console.log("  Analytics     http://localhost:4281/health");
   console.log("\nLa terminal permanece abierta mientras Proofline está ejecutándose.\n");
 }

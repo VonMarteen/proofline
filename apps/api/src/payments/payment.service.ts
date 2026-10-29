@@ -5,6 +5,7 @@ import type { HeaderRequest } from "../auth/dev-auth.js";
 import { internalContext, requireInternalCapability } from "../control/internal-access.js";
 import { PrismaService } from "../database/prisma.service.js";
 import { bankTransferInstructions, PAYMENT_PROVIDER_CAPABILITIES } from "./payment-providers.js";
+import { manualPaymentEvidenceError } from "./manual-payment-evidence.js";
 
 export type SafePaymentSetup = {
   provider: "REDSYS" | "PAYPAL" | "BANK_TRANSFER";
@@ -59,6 +60,7 @@ function safeTransactionView(transaction: any) {
     provider: transaction.provider, kind: transaction.kind, status: transaction.status, amountCents: transaction.amountCents, currency: transaction.currency,
     externalReference: transaction.externalReference ? `…${String(transaction.externalReference).slice(-8)}` : null, bankReference: transaction.bankReference, failureCode: transaction.failureCode,
     occurredAt: transaction.occurredAt, settledAt: transaction.settledAt, createdAt: transaction.createdAt,
+    evidenceSource: transaction.metadata && typeof transaction.metadata === "object" ? (transaction.metadata as Record<string, unknown>).evidenceSource ?? ((transaction.metadata as Record<string, unknown>).manual ? "LEGACY_MANUAL_ENTRY" : "UNKNOWN") : "UNKNOWN",
   };
 }
 
@@ -128,6 +130,10 @@ export class PaymentService {
     const safe = sanitizePaymentSetup(input);
     if (safe.provider === "REDSYS" && !safe.last4 && !safe.maskedLabel && !safe.externalReference) throw new BadRequestException("Redsys setup needs a safe masked descriptor, last four digits or an external provider reference");
     if (safe.provider === "PAYPAL" && !safe.maskedLabel && !safe.externalReference) throw new BadRequestException("PayPal setup needs a safe account label or an external provider reference");
+    // P6: no connected Redsys/PayPal adapter or verified webhook in this release.
+    // A manually entered masked descriptor must never be treated as external payment verification.
+    if(input.status==="VERIFIED" && (safe.provider!=="BANK_TRANSFER" || !safe.bankReference))
+      throw new BadRequestException("VERIFIED requires a documented bank transfer reference; card and PayPal provider verification is not connected");
     const status = input.status === "VERIFIED" ? "VERIFIED" : "READY";
     const updated = await this.db.commercialRequest.update({
       where: { id },
@@ -161,14 +167,15 @@ export class PaymentService {
 
   async recordTransaction(req: HeaderRequest, organizationId: string, input: { paymentMethodId?: string | null; subscriptionId?: string | null; invoiceId?: string | null; provider: SafePaymentSetup["provider"]; kind: "CHARGE" | "REFUND" | "TRANSFER"; status: "PENDING" | "AUTHORIZED" | "CAPTURED" | "FAILED" | "REFUNDED" | "AWAITING_TRANSFER" | "RECONCILED" | "CANCELED"; amountCents: number; currency?: string; externalReference?: string | null; bankReference?: string | null; failureCode?: string | null }) {
     const ctx = requireInternalCapability(req, "billing.manage");
-    if (!Number.isInteger(input.amountCents) || input.amountCents < 0) throw new BadRequestException("Invalid transaction amount");
+    const evidenceError = manualPaymentEvidenceError(input);
+    if (evidenceError) throw new BadRequestException(evidenceError);
     const method=input.paymentMethodId?await this.db.paymentMethod.findFirst({ where: { id: input.paymentMethodId, organizationId } }):null;
     if (input.paymentMethodId && !method) throw new BadRequestException("Payment method does not belong to organization");
     if (method && method.provider!==input.provider) throw new BadRequestException("Transaction provider must match the selected payment method");
     if (input.subscriptionId && !(await this.db.subscription.findFirst({where:{id:input.subscriptionId,organizationId}}))) throw new BadRequestException("Subscription does not belong to organization");
     if (input.invoiceId && !(await this.db.billingInvoice.findFirst({where:{id:input.invoiceId,organizationId}}))) throw new BadRequestException("Invoice does not belong to organization");
-    const transaction = await this.db.paymentTransaction.create({ data: { organizationId, paymentMethodId: input.paymentMethodId ?? null, subscriptionId: input.subscriptionId ?? null, invoiceId: input.invoiceId ?? null, provider: input.provider, kind: input.kind, status: input.status, amountCents: input.amountCents, currency: (input.currency || "EUR").slice(0, 3).toUpperCase(), externalReference: input.externalReference?.trim().slice(0, 180) || null, bankReference: input.bankReference?.trim().slice(0, 120) || null, failureCode: input.failureCode?.trim().slice(0, 80) || null, metadata: { recordedBy: ctx.identity.email, manual: true }, settledAt: ["CAPTURED", "REFUNDED", "RECONCILED"].includes(input.status) ? new Date() : null } });
-    await this.audit.record({ organizationId, actorType: "INTERNAL", actorId: ctx.identity.email, action: "PAYMENT_TRANSACTION_RECORDED", targetType: "PaymentTransaction", targetId: transaction.id, metadata: { provider: input.provider, kind: input.kind, status: input.status, amountCents: input.amountCents } });
+    const transaction = await this.db.paymentTransaction.create({ data: { organizationId, paymentMethodId: input.paymentMethodId ?? null, subscriptionId: input.subscriptionId ?? null, invoiceId: input.invoiceId ?? null, provider: input.provider, kind: input.kind, status: input.status, amountCents: input.amountCents, currency: (input.currency || "EUR").slice(0, 3).toUpperCase(), externalReference: input.externalReference?.trim().slice(0, 180) || null, bankReference: input.bankReference?.trim().slice(0, 120) || null, failureCode: input.failureCode?.trim().slice(0, 80) || null, metadata: { recordedBy: ctx.identity.email, manual: true, evidenceSource: input.provider === "BANK_TRANSFER" && input.status === "RECONCILED" ? "BANK_REFERENCE_DECLARED" : "MANUAL_ENTRY_UNVERIFIED" }, settledAt: ["CAPTURED", "REFUNDED", "RECONCILED"].includes(input.status) ? new Date() : null } });
+    await this.audit.record({ organizationId, actorType: "INTERNAL", actorId: ctx.identity.email, action: "PAYMENT_TRANSACTION_RECORDED", targetType: "PaymentTransaction", targetId: transaction.id, metadata: { provider: input.provider, kind: input.kind, status: input.status, amountCents: input.amountCents, evidenceSource: input.provider === "BANK_TRANSFER" && input.status === "RECONCILED" ? "BANK_REFERENCE_DECLARED" : "MANUAL_ENTRY_UNVERIFIED" } });
     return { ok: true, transaction };
   }
 
@@ -182,6 +189,6 @@ export class PaymentService {
       this.db.paymentTransaction.findMany({ where: { organizationId }, orderBy: { occurredAt: "desc" }, take: 100 }),
     ]);
     const current=methods.find(m => m.isDefault && m.status === "ACTIVE") ?? methods.find(m => m.status === "ACTIVE") ?? null;
-    return { current: current?safeMethodView(current):null, methods:methods.map(safeMethodView), history: events, transactions };
+    return { current: current?safeMethodView(current):null, methods:methods.map(safeMethodView), history: events, transactions:transactions.map(safeTransactionView), providerCapabilities:PAYMENT_PROVIDER_CAPABILITIES };
   }
 }

@@ -1,10 +1,14 @@
-import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { createHash } from "node:crypto";
 import { PrismaService } from "../database/prisma.service.js";
 import { AuditService } from "../audit/audit.service.js";
 import { requireCapability } from "../auth/access-control.js";
 import type { HeaderRequest } from "../auth/dev-auth.js";
 import { requireInternalCapability } from "../control/internal-access.js";
+import { parsePagination, paged, clampedPagination } from "../common/pagination.js";
+import { supportFilters } from "../control/p4-filters.js";
+import { canReadAccountChanges, workspaceSupportTicketScope } from "./workspace-support-visibility.js";
+import { canTransitionAccountChange, canTransitionSupportTicket } from "./support-s3-invariants.js";
 
 const DEFAULT_SLA_MS = 4 * 60 * 60_000;
 const SLA_MS: Readonly<Record<string, number>> = { URGENT: 15 * 60_000, HIGH: 60 * 60_000, NORMAL: DEFAULT_SLA_MS, LOW: 24 * 60 * 60_000 };
@@ -56,7 +60,7 @@ export class SupportService {
   private async guardNewTicket(organizationId:string,requesterUserId:string,input:{subject:string;description:string;category:string}){
     const thirtyDaysAgo=new Date(Date.now()-30*86_400_000),twentyMinutesAgo=new Date(Date.now()-20*60_000);
     const [open,recent]=await Promise.all([
-      this.db.supportTicket.findMany({where:{organizationId,requesterUserId,status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]},createdAt:{gte:thirtyDaysAgo}},select:{id:true,subject:true,description:true,category:true,status:true,slaDueAt:true,createdAt:true},orderBy:{updatedAt:"desc"},take:30}),
+      this.db.supportTicket.findMany({where:{organizationId,requesterUserId,status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]},createdAt:{gte:thirtyDaysAgo},...(input.category!=="ACCOUNT_CHANGE"?{AND:[{category:{not:"ACCOUNT_CHANGE" as const}},{accountChangeRequest:{is:null}}]}:{})},select:{id:true,subject:true,description:true,category:true,status:true,slaDueAt:true,createdAt:true},orderBy:{updatedAt:"desc"},take:30}),
       this.db.supportTicket.count({where:{organizationId,requesterUserId,createdAt:{gte:twentyMinutesAgo}}}),
     ]);
     let best:{ticket:(typeof open)[number];score:number}|null=null;
@@ -74,11 +78,31 @@ export class SupportService {
     if(recent>=3)await this.audit.record({organizationId,actorType:"USER",actorId:requesterUserId,action:"SUPPORT_BURST_DETECTED",targetType:"Organization",targetId:organizationId,metadata:{ticketsIn20Minutes:recent+1,incomingSubject:input.subject}});
   }
 
+
+  async workspaceQueuePage(req: HeaderRequest,input:{page?:string;pageSize?:string;q?:string;status?:string}) {
+    const ctx=await requireCapability(this.db,req,"support.use"),pg=parsePagination(input);
+    const search=(input.q??"").trim().slice(0,120);
+    const allowed=["OPEN","ASSIGNED","IN_PROGRESS","WAITING","RESOLVED","ESCALATED","CLOSED"];
+    const where:any=workspaceSupportTicketScope(ctx);
+    if(search)where.OR=[{subject:{contains:search,mode:"insensitive"}},{category:{contains:search,mode:"insensitive"}}];
+    if(input.status&&allowed.includes(input.status))where.status=input.status;
+    const [total,tickets,changes,activeCount,unreadRows]=await Promise.all([
+      this.db.supportTicket.count({where}),
+      this.db.supportTicket.findMany({where,skip:pg.skip,take:pg.take,include:{assignee:{select:{displayName:true}},readStates:{where:{userId:ctx.user.id},select:{lastReadAt:true},take:1},_count:{select:{messages:true}}},orderBy:[{updatedAt:"desc"},{id:"asc"}]}),
+      canReadAccountChanges(ctx)?this.db.accountChangeRequest.findMany({where:{organizationId:ctx.organization.id},include:{supportTicket:{select:{subject:true,status:true}}},orderBy:{createdAt:"desc"},take:25}):Promise.resolve([]),
+      this.db.supportTicket.count({where:{...workspaceSupportTicketScope(ctx),status:{notIn:["RESOLVED","CLOSED"]}}}),
+      this.db.supportTicket.findMany({where:workspaceSupportTicketScope(ctx),select:{lastInternalReplyAt:true,lastCustomerReplyAt:true,readStates:{where:{userId:ctx.user.id},select:{lastReadAt:true},take:1}}}),
+    ]);
+    const items=tickets.map(ticket=>{const{readStates,...safeTicket}=ticket,explicitReadAt=readStates[0]?.lastReadAt?.getTime()??0,customerReplyAt=ticket.lastCustomerReplyAt?.getTime()??0,internalReplyAt=ticket.lastInternalReplyAt?.getTime()??0,unread=internalReplyAt>Math.max(explicitReadAt,customerReplyAt);return{...safeTicket,unread,canReply:canCustomerReply(ticket),waitingFor:canCustomerReply(ticket)?"CUSTOMER":"PROOFLINE"}});
+    const unreadCount=unreadRows.filter(ticket=>(ticket.lastInternalReplyAt?.getTime()??0)>Math.max(ticket.readStates[0]?.lastReadAt?.getTime()??0,ticket.lastCustomerReplyAt?.getTime()??0)).length;
+    return{...paged(items,total,pg.page,pg.pageSize),tickets:items,changes,activeCount,unreadCount,canRequestAccountChange:ctx.capabilities.includes("account.change.request")};
+  }
+
   async workspaceQueue(req: HeaderRequest) {
     const ctx = await requireCapability(this.db, req, "support.use");
     const [tickets, changes] = await Promise.all([
       this.db.supportTicket.findMany({
-        where: { organizationId: ctx.organization.id },
+        where: workspaceSupportTicketScope(ctx),
         include: {
           assignee: { select: { displayName: true } },
           readStates: {
@@ -90,11 +114,11 @@ export class SupportService {
         },
         orderBy: { updatedAt: "desc" },
       }),
-      this.db.accountChangeRequest.findMany({
+      canReadAccountChanges(ctx) ? this.db.accountChangeRequest.findMany({
         where: { organizationId: ctx.organization.id },
         include: { supportTicket: { select: { subject: true, status: true } } },
         orderBy: { createdAt: "desc" },
-      }),
+      }) : Promise.resolve([]),
     ]);
 
     const mappedTickets = tickets.map((ticket) => {
@@ -124,7 +148,7 @@ export class SupportService {
   async workspaceTicket(req: HeaderRequest, id: string) {
     const ctx = await requireCapability(this.db, req, "support.use");
     const ticket = await this.db.supportTicket.findFirst({
-      where: { id, organizationId: ctx.organization.id },
+      where: { id, ...workspaceSupportTicketScope(ctx) },
       include: {
         assignee: { select: { displayName: true } },
         readStates: {
@@ -171,7 +195,7 @@ export class SupportService {
   async markWorkspaceTicketRead(req: HeaderRequest, id: string) {
     const ctx = await requireCapability(this.db, req, "support.use");
     const ticket = await this.db.supportTicket.findFirst({
-      where: { id, organizationId: ctx.organization.id },
+      where: { id, ...workspaceSupportTicketScope(ctx) },
       select: { id: true },
     });
 
@@ -202,25 +226,52 @@ export class SupportService {
     const ctx = await requireCapability(this.db, req, "support.use");
     if (!["TECHNICAL","BILLING","ACCESS","PRIVACY","SECURITY","FUNCTIONAL","OTHER"].includes(input.category)) throw new BadRequestException("Invalid support category");
     if (!["LOW","NORMAL","HIGH","URGENT"].includes(input.priority)) throw new BadRequestException("Invalid support priority");
-    await this.guardNewTicket(ctx.organization.id,ctx.user.id,input);
-    const ticket = await this.db.supportTicket.create({ data: { organizationId: ctx.organization.id, requesterUserId: ctx.user.id, subject: input.subject.trim(), description: input.description.trim(), category: input.category as any, priority: input.priority as any, slaDueAt: dueAtFor(input.priority), lastCustomerReplyAt: new Date(), messages: { create: { userId: ctx.user.id, visibility: "CUSTOMER", body: input.description.trim() } } } });
-    await this.audit.record({ organizationId: ctx.organization.id, actorType: "USER", actorId: ctx.user.email, action: "SUPPORT_TICKET_CREATED", targetType: "SupportTicket", targetId: ticket.id, metadata: { category: input.category, priority: input.priority, slaDueAt: ticket.slaDueAt.toISOString() } });
-    return ticket;
+    await this.guardNewTicket(ctx.organization.id, ctx.user.id, input);
+    // The ticket, its initial CUSTOMER message and audit must commit together.
+    return this.db.$transaction(async tx => {
+      const ticket = await tx.supportTicket.create({ data: {
+        organizationId: ctx.organization.id, requesterUserId: ctx.user.id,
+        subject: input.subject.trim(), description: input.description.trim(),
+        category: input.category as any, priority: input.priority as any,
+        slaDueAt: dueAtFor(input.priority), lastCustomerReplyAt: new Date(),
+        messages: { create: { userId: ctx.user.id, visibility: "CUSTOMER", body: input.description.trim() } },
+      } });
+      await tx.auditEvent.create({ data: {
+        organizationId: ctx.organization.id, actorType: "USER", actorId: ctx.user.email,
+        action: "SUPPORT_TICKET_CREATED", targetType: "SupportTicket", targetId: ticket.id,
+        metadata: { category: input.category, priority: input.priority, slaDueAt: ticket.slaDueAt.toISOString() },
+      } });
+      return ticket;
+    });
   }
   async addWorkspaceMessage(req: HeaderRequest, ticketId: string, body: string) {
     const ctx = await requireCapability(this.db, req, "support.use");
-    const ticket = await this.db.supportTicket.findFirst({ where: { id: ticketId, organizationId: ctx.organization.id } });
+    const ticket = await this.db.supportTicket.findFirst({ where: { id: ticketId, ...workspaceSupportTicketScope(ctx) } });
     if (!ticket) throw new NotFoundException("Support ticket not found");
     if (ticket.status === "CLOSED") throw new BadRequestException("Closed tickets cannot receive new messages");
     if(!canCustomerReply(ticket))throw new BadRequestException({code:"SUPPORT_WAIT_FOR_REPLY",message:"Please wait for a Proofline response before adding another message to this ticket.",ticketId});
-    const now=new Date();
-    await this.db.$transaction([this.db.supportMessage.create({ data: { ticketId, userId: ctx.user.id, visibility: "CUSTOMER", body:body.trim() } }), this.db.supportTicket.update({ where: { id: ticketId }, data: { lastCustomerReplyAt: now, status: "IN_PROGRESS" } })]);
-    await this.audit.record({ organizationId: ctx.organization.id, actorType: "USER", actorId: ctx.user.email, action: "SUPPORT_CUSTOMER_REPLIED", targetType: "SupportTicket", targetId: ticketId, metadata: {} }); return { ok: true };
+    // Claim the exact version seen by the customer before writing the reply.
+    // The message, ticket state and audit either commit together or not at all.
+    const now = new Date();
+    return this.db.$transaction(async tx => {
+      const claimed = await tx.supportTicket.updateMany({
+        where: { id: ticketId, status: ticket.status, updatedAt: ticket.updatedAt,
+          lastCustomerReplyAt: ticket.lastCustomerReplyAt, lastInternalReplyAt: ticket.lastInternalReplyAt },
+        data: { lastCustomerReplyAt: now, status: "IN_PROGRESS" },
+      });
+      if (claimed.count !== 1) throw new ConflictException("Ticket changed concurrently; refresh before replying");
+      await tx.supportMessage.create({ data: { ticketId, userId: ctx.user.id, visibility: "CUSTOMER", body: body.trim() } });
+      await tx.auditEvent.create({ data: {
+        organizationId: ctx.organization.id, actorType: "USER", actorId: ctx.user.email,
+        action: "SUPPORT_CUSTOMER_REPLIED", targetType: "SupportTicket", targetId: ticketId, metadata: {},
+      } });
+      return { ok: true };
+    });
   }
   async uploadWorkspaceDocument(req: HeaderRequest, ticketId: string, input: { requestId: string; fileName: string; mimeType: string; base64: string; note?: string }) {
     const ctx = await requireCapability(this.db, req, "support.use");
     const request = await this.db.supportDocumentRequest.findFirst({
-      where: { id: input.requestId, ticketId, status: "OPEN", ticket: { organizationId: ctx.organization.id } },
+      where: { id: input.requestId, ticketId, status: "OPEN", ticket: workspaceSupportTicketScope(ctx) },
       include: { ticket: true, attachment: true },
     });
     if (!request) throw new BadRequestException({ code: "SUPPORT_DOCUMENT_REQUEST_NOT_OPEN", message: "There is no active document request for this ticket." });
@@ -250,6 +301,17 @@ export class SupportService {
     const locale = ctx.user.locale === "en" ? "en" : "es";
 
     const result = await this.db.$transaction(async tx => {
+      // Single-use document request: claim before storing any bytes or messages.
+      const claimedRequest = await tx.supportDocumentRequest.updateMany({
+        where: { id: request.id, ticketId, status: "OPEN" },
+        data: { status: "FULFILLED", fulfilledAt: now },
+      });
+      if (claimedRequest.count !== 1) throw new ConflictException("Document request already fulfilled or cancelled");
+      const claimedTicket = await tx.supportTicket.updateMany({
+        where: { id: ticketId, status: request.ticket.status, updatedAt: request.ticket.updatedAt },
+        data: { lastCustomerReplyAt: now, status: "IN_PROGRESS" },
+      });
+      if (claimedTicket.count !== 1) throw new ConflictException("Ticket changed concurrently; refresh before uploading");
       const record = await tx.documentRecord.create({
         data: {
           organizationId: ctx.organization.id,
@@ -286,35 +348,13 @@ export class SupportService {
         },
       });
 
-      await tx.supportDocumentRequest.update({
-        where: { id: request.id },
-        data: { status: "FULFILLED", fulfilledAt: now },
-      });
-
-      await tx.supportTicket.update({
-        where: { id: ticketId },
-        data: { lastCustomerReplyAt: now, status: "IN_PROGRESS" },
-      });
-
-      return { attachment, messageId: message.id, documentRecordId: record.id };
-    });
-
-    await this.audit.record({
-      organizationId: ctx.organization.id,
-      actorType: "USER",
-      actorId: ctx.user.email,
-      action: "SUPPORT_DOCUMENT_UPLOADED",
-      targetType: "SupportTicket",
-      targetId: ticketId,
-      metadata: {
-        requestId: request.id,
-        attachmentId: result.attachment.id,
-        documentRecordId: result.documentRecordId,
-        messageId: result.messageId,
-        fileName,
-        mimeType,
-        sizeBytes: bytes.length,
-      },
+      await tx.auditEvent.create({ data: {
+        organizationId: ctx.organization.id, actorType: "USER", actorId: ctx.user.email,
+        action: "SUPPORT_DOCUMENT_UPLOADED", targetType: "SupportTicket", targetId: ticketId,
+        metadata: { requestId: request.id, attachmentId: attachment.id,
+          documentRecordId: record.id, messageId: message.id, fileName, mimeType, sizeBytes: bytes.length },
+      } });
+      return { attachment, messageId: message.id };
     });
 
     return { ok: true, attachmentId: result.attachment.id, messageId: result.messageId };
@@ -323,10 +363,10 @@ export class SupportService {
   async workspaceAttachment(req: HeaderRequest, ticketId: string, attachmentId: string, mode: "view" | "download" = "view") {
     const ctx = await requireCapability(this.db, req, "support.use");
     const attachment = await this.db.supportAttachment.findFirst({
-      where: { id: attachmentId, ticketId, ticket: { organizationId: ctx.organization.id } },
+      where: { id: attachmentId, ticketId, ticket: workspaceSupportTicketScope(ctx) },
       include: { documentRecord: { include: { blob: true } } },
     });
-    if (!attachment?.documentRecord.blob) throw new NotFoundException("Support attachment not found");
+    if (!attachment?.documentRecord.blob || ["BLOCKED", "ANONYMIZED", "DESTROYED"].includes(attachment.documentRecord.status)) throw new NotFoundException("Support attachment not found");
     await this.audit.record({
       organizationId: ctx.organization.id,
       actorType: "USER",
@@ -345,7 +385,7 @@ export class SupportService {
       where: { id: attachmentId },
       include: { documentRecord: { include: { blob: true } }, ticket: { select: { id: true, organizationId: true } } },
     });
-    if (!attachment?.documentRecord.blob) throw new NotFoundException("Support attachment not found");
+    if (!attachment?.documentRecord.blob || ["BLOCKED", "ANONYMIZED", "DESTROYED"].includes(attachment.documentRecord.status)) throw new NotFoundException("Support attachment not found");
     await this.internalTicket(req, attachment.ticketId);
     await this.audit.record({
       organizationId: attachment.ticket.organizationId,
@@ -362,14 +402,88 @@ export class SupportService {
   async requestAccountChange(req: HeaderRequest, input: { type: string; summary: string; requestedData: Record<string, unknown> }) {
     const ctx = await requireCapability(this.db, req, "account.change.request");
     if (!["LEGAL_NAME","TAX_ID","BILLING_EMAIL","CONTRACT_OWNER","PRIMARY_OWNER","OTHER"].includes(input.type)) throw new BadRequestException("Invalid account change type");
-    const existing=await this.db.accountChangeRequest.findFirst({where:{organizationId:ctx.organization.id,type:input.type as any,status:{in:["REQUESTED","IN_REVIEW","NEEDS_INFO","APPROVED"]}},include:{supportTicket:true},orderBy:{createdAt:"desc"}});
-    if(existing)throw new BadRequestException({code:"SUPPORT_DUPLICATE",message:"An open request for this account change already exists.",existingTicketId:existing.supportTicketId,existingSubject:existing.supportTicket.subject,existingStatus:existing.supportTicket.status,etaMinutes:minutesUntil(existing.supportTicket.slaDueAt)});
-    await this.guardNewTicket(ctx.organization.id,ctx.user.id,{subject:`Account change ${input.type}`,description:input.summary,category:"ACCOUNT_CHANGE"});
-    const ticket = await this.db.supportTicket.create({ data: { organizationId: ctx.organization.id, requesterUserId: ctx.user.id, subject: `Account change · ${input.type}`, description: input.summary, category: "ACCOUNT_CHANGE", priority: "NORMAL", slaDueAt: dueAtFor("NORMAL"), lastCustomerReplyAt: new Date(), messages: { create: { userId: ctx.user.id, visibility: "CUSTOMER", body: input.summary } } } });
-    const change = await this.db.accountChangeRequest.create({ data: { organizationId: ctx.organization.id, requestedByUserId: ctx.user.id, supportTicketId: ticket.id, type: input.type as any, summary: input.summary, requestedData: input.requestedData as any } });
-    await this.audit.record({ organizationId: ctx.organization.id, actorType: "USER", actorId: ctx.user.email, action: "ACCOUNT_CHANGE_REQUESTED", targetType: "AccountChangeRequest", targetId: change.id, metadata: { type: input.type, supportTicketId: ticket.id } }); return { ok: true, id: change.id, ticketId: ticket.id };
+    const existing = await this.db.accountChangeRequest.findFirst({ where: {
+      organizationId: ctx.organization.id, type: input.type as any,
+      status: { in: ["REQUESTED","IN_REVIEW","NEEDS_INFO","APPROVED"] },
+    }, include: { supportTicket: true }, orderBy: { createdAt: "desc" } });
+    if (existing) throw new BadRequestException({ code: "SUPPORT_DUPLICATE", message: "An open request for this account change already exists.", existingTicketId: existing.supportTicketId, existingSubject: existing.supportTicket.subject, existingStatus: existing.supportTicket.status, etaMinutes: minutesUntil(existing.supportTicket.slaDueAt) });
+    await this.guardNewTicket(ctx.organization.id, ctx.user.id, { subject: `Account change ${input.type}`, description: input.summary, category: "ACCOUNT_CHANGE" });
+    // Serializable + repeat the predicate read INSIDE the transaction. A preflight
+    // lookup alone cannot prevent two concurrent requests for the same type.
+    try {
+      return await this.db.$transaction(async tx => {
+        const concurrent = await tx.accountChangeRequest.findFirst({ where: {
+          organizationId: ctx.organization.id, type: input.type as any,
+          status: { in: ["REQUESTED", "IN_REVIEW", "NEEDS_INFO", "APPROVED"] },
+        }, include: { supportTicket: true }, orderBy: { createdAt: "desc" } });
+        if (concurrent) throw new BadRequestException({ code: "SUPPORT_DUPLICATE",
+          message: "An open request for this account change already exists.",
+          existingTicketId: concurrent.supportTicketId,
+          existingSubject: concurrent.supportTicket.subject,
+          existingStatus: concurrent.supportTicket.status,
+          etaMinutes: minutesUntil(concurrent.supportTicket.slaDueAt) });
+        const ticket = await tx.supportTicket.create({ data: {
+        organizationId: ctx.organization.id, requesterUserId: ctx.user.id,
+        subject: `Account change · ${input.type}`, description: input.summary,
+        category: "ACCOUNT_CHANGE", priority: "NORMAL", slaDueAt: dueAtFor("NORMAL"),
+        lastCustomerReplyAt: new Date(),
+        messages: { create: { userId: ctx.user.id, visibility: "CUSTOMER", body: input.summary } },
+      } });
+      const change = await tx.accountChangeRequest.create({ data: {
+        organizationId: ctx.organization.id, requestedByUserId: ctx.user.id,
+        supportTicketId: ticket.id, type: input.type as any,
+        summary: input.summary, requestedData: input.requestedData as any,
+      } });
+      await tx.auditEvent.create({ data: {
+        organizationId: ctx.organization.id, actorType: "USER", actorId: ctx.user.email,
+        action: "ACCOUNT_CHANGE_REQUESTED", targetType: "AccountChangeRequest", targetId: change.id,
+        metadata: { type: input.type, supportTicketId: ticket.id },
+      } });
+        return { ok: true, id: change.id, ticketId: ticket.id };
+      }, { isolationLevel: "Serializable", maxWait: 5_000, timeout: 10_000 });
+    } catch (error) {
+      if ((error as { code?: string })?.code === "P2034") {
+        throw new ConflictException({ code: "SUPPORT_CONCURRENT_REQUEST",
+          message: "A concurrent account change was detected; refresh the requests and retry." });
+      }
+      throw error;
+    }
   }
 
+
+  async internalQueuePage(req: HeaderRequest, input:{page?:string;pageSize?:string;view?:string;q?:string;priority?:string;status?:string}) {
+    const ctx=requireInternalCapability(req,"support.read");
+    const agent=await this.db.internalUser.findUnique({where:{email:ctx.identity.email},select:{id:true,role:true,createdAt:true}});
+    if(!agent)throw new ForbiddenException("Internal support identity is not provisioned");
+    const historyScope:any=agent.role==="INTERNAL_SUPPORT"?{OR:[{status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"] as any}},{createdAt:{gte:agent.createdAt}},{assigneeInternalUserId:agent.id},{messages:{some:{internalUserId:agent.id}}}]}:{};
+    const view=input.view??"open",nowDate=new Date();let viewWhere:any={};
+    if(view==="mine")viewWhere={assigneeInternalUserId:agent.id,status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]}};
+    else if(view==="unassigned")viewWhere={assigneeInternalUserId:null,status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]}};
+    else if(view==="overdue")viewWhere={slaDueAt:{lt:nowDate},status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]}};
+    else if(view==="history")viewWhere={status:{in:["RESOLVED","CLOSED"]}};
+    else if(view!=="all")viewWhere={status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]}};
+    // Keep the agent's history scope intact while applying bounded database filters.
+    const {q,priority,status}=supportFilters(input);
+    const filters:any[]=[historyScope,viewWhere];
+    if(q)filters.push({OR:[{id:{contains:q,mode:"insensitive"}},{subject:{contains:q,mode:"insensitive"}},{organization:{name:{contains:q,mode:"insensitive"}}}]});
+    if(priority)filters.push({priority});
+    if(status)filters.push({status});
+    const where:any={AND:filters};
+    const total=await this.db.supportTicket.count({where});
+    const pg=clampedPagination(total,input);
+    const openWhere:any={AND:[historyScope,{status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]}}]};
+    const [tickets,open,unassigned,overdue,resolved,groups]=await Promise.all([
+      this.db.supportTicket.findMany({where,skip:pg.skip,take:pg.take,include:{organization:true,requester:{select:{id:true,displayName:true,email:true}},assignee:{select:{id:true,displayName:true,email:true}},accountChangeRequest:true,_count:{select:{messages:true}}},orderBy:view==="history"?[{closedAt:"desc" as const},{resolvedAt:"desc" as const},{id:"asc" as const}]:[{status:"asc" as const},{priority:"desc" as const},{slaDueAt:"asc" as const},{id:"asc" as const}]}),
+      this.db.supportTicket.count({where:openWhere}),
+      this.db.supportTicket.count({where:{AND:[historyScope,{status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]},assigneeInternalUserId:null}]}}),
+      this.db.supportTicket.count({where:{AND:[historyScope,{status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]},slaDueAt:{lt:nowDate}}]}}),
+      this.db.supportTicket.count({where:{AND:[historyScope,{status:{in:["RESOLVED","CLOSED"]}}]}}),
+      this.db.supportTicket.groupBy({by:["requesterUserId"],where:{AND:[historyScope,{status:{in:["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]},requesterUserId:{not:null}}]},_count:{_all:true}} as any),
+    ]);
+    const counts=new Map<string,number>();for(const g of groups as any[]){if(g.requesterUserId)counts.set(g.requesterUserId,g._count._all)}
+    const now=Date.now(),items=tickets.map(t=>({...t,sla:{overdue:openStatuses.has(t.status)&&t.slaDueAt.getTime()<now,minutesRemaining:Math.round((t.slaDueAt.getTime()-now)/60000)},risk:{possibleSaturation:Boolean(t.requesterUserId&&(counts.get(t.requesterUserId)??0)>=4),requesterOpenTickets:t.requesterUserId?(counts.get(t.requesterUserId)??0):0}}));
+    return{...paged(items,total,pg.page,pg.pageSize),historyVisibleFrom:agent.role==="INTERNAL_SUPPORT"?agent.createdAt:null,metrics:{open,unassigned,overdue,resolved,saturationRisk:[...counts.values()].filter(n=>n>=4).length}};
+  }
 
   async internalQueue(req: HeaderRequest) {
     const ctx = requireInternalCapability(req, "support.read");
@@ -500,22 +614,76 @@ export class SupportService {
   }
   async assignToMe(req: HeaderRequest, ticketId: string) {
     const ctx = requireInternalCapability(req, "support.manage");
-    const [ticket, agent] = await Promise.all([this.db.supportTicket.findUnique({ where: { id: ticketId } }), this.db.internalUser.findUnique({ where: { email: ctx.identity.email } })]);
-    if (!ticket) throw new NotFoundException("Support ticket not found"); if (!agent) throw new ForbiddenException("Internal support identity is not provisioned");
-    const updated = await this.db.supportTicket.update({ where: { id: ticketId }, data: { assigneeInternalUserId: agent.id, assignedAt: new Date(), status: (["OPEN","ESCALATED"] as string[]).includes(ticket.status) ? "ASSIGNED" : ticket.status } });
-    await this.audit.record({ organizationId: ticket.organizationId, actorType: "INTERNAL", actorId: ctx.identity.email, action: "SUPPORT_TICKET_ASSIGNED", targetType: "SupportTicket", targetId: ticketId, metadata: { assignee: agent.email } }); return updated;
+    const [ticket, agent] = await Promise.all([
+      this.db.supportTicket.findUnique({ where: { id: ticketId } }),
+      this.db.internalUser.findUnique({ where: { email: ctx.identity.email } }),
+    ]);
+    if (!ticket) throw new NotFoundException("Support ticket not found");
+    if (!agent) throw new ForbiddenException("Internal support identity is not provisioned");
+    if (ticket.assigneeInternalUserId === agent.id) return ticket; // idempotent repeat
+    if (ticket.assigneeInternalUserId || !openStatuses.has(ticket.status)) {
+      throw new ConflictException("Ticket is already assigned or no longer open; refresh before assigning");
+    }
+    const now = new Date();
+    return this.db.$transaction(async tx => {
+      const claimed = await tx.supportTicket.updateMany({
+        // Compare-and-swap: prevents the last agent from silently stealing a ticket.
+        where: { id: ticketId, assigneeInternalUserId: null, status: ticket.status, updatedAt: ticket.updatedAt },
+        data: {
+          assigneeInternalUserId: agent.id,
+          assignedAt: now,
+          status: (["OPEN", "ESCALATED"] as string[]).includes(ticket.status) ? "ASSIGNED" : ticket.status as any,
+        },
+      });
+      if (claimed.count !== 1) throw new ConflictException("Ticket was modified by another agent; refresh and retry");
+      await tx.auditEvent.create({ data: {
+        organizationId: ticket.organizationId, actorType: "INTERNAL", actorId: ctx.identity.email,
+        action: "SUPPORT_TICKET_ASSIGNED", targetType: "SupportTicket", targetId: ticketId,
+        metadata: { assignee: agent.email, from: ticket.status },
+      } });
+      return tx.supportTicket.findUniqueOrThrow({ where: { id: ticketId } });
+    });
   }
   async updateStatus(req: HeaderRequest, ticketId: string, status: string) {
-    const ctx = requireInternalCapability(req, "support.manage"); if (!["OPEN","ASSIGNED","IN_PROGRESS","WAITING","RESOLVED","ESCALATED","CLOSED"].includes(status)) throw new BadRequestException("Invalid ticket status");
-    const ticket = await this.db.supportTicket.findUnique({ where: { id: ticketId },include:{messages:{where:{visibility:"CUSTOMER"},orderBy:{createdAt:"desc"},take:20}} }); if (!ticket) throw new NotFoundException("Support ticket not found"); const now = new Date();
-    if(["RESOLVED","CLOSED"].includes(status)){
-      const latestCustomer=ticket.messages.find((m:any)=>Boolean(m.userId)),latestInternal=ticket.messages.find((m:any)=>Boolean(m.internalUserId));
-      if(!latestInternal||latestCustomer&&latestInternal.createdAt<latestCustomer.createdAt)throw new BadRequestException({code:"SUPPORT_RESOLUTION_MESSAGE_REQUIRED",message:"Send a customer-visible response before resolving or closing the ticket."});
+    const ctx = requireInternalCapability(req, "support.manage");
+    if (!["OPEN", "ASSIGNED", "IN_PROGRESS", "WAITING", "RESOLVED", "ESCALATED", "CLOSED"].includes(status)) {
+      throw new BadRequestException("Invalid ticket status");
     }
-    const updated = await this.db.supportTicket.update({ where: { id: ticketId }, data: { status: status as any, resolvedAt: status === "RESOLVED" ? now : status==="OPEN"||status==="IN_PROGRESS"?null:ticket.resolvedAt, closedAt: status === "CLOSED" ? now : status!=="CLOSED"?null:ticket.closedAt } });
-    await this.audit.record({ organizationId: ticket.organizationId, actorType: "INTERNAL", actorId: ctx.identity.email, action: "SUPPORT_TICKET_STATUS_CHANGED", targetType: "SupportTicket", targetId: ticketId, metadata: { from: ticket.status, to: status } }); return updated;
+    const ticket = await this.db.supportTicket.findUnique({
+      where: { id: ticketId },
+      include: { messages: { where: { visibility: "CUSTOMER" }, orderBy: { createdAt: "desc" }, take: 20 } },
+    });
+    if (!ticket) throw new NotFoundException("Support ticket not found");
+    if (status === ticket.status) return ticket;
+    if (!canTransitionSupportTicket(ticket.status, status)) {
+      throw new ConflictException("Invalid ticket transition; refresh and choose an allowed state");
+    }
+    if (["RESOLVED", "CLOSED"].includes(status)) {
+      const latestCustomer = ticket.messages.find((m: any) => Boolean(m.userId));
+      const latestInternal = ticket.messages.find((m: any) => Boolean(m.internalUserId));
+      if (!latestInternal || (latestCustomer && latestInternal.createdAt < latestCustomer.createdAt)) {
+        throw new BadRequestException({ code: "SUPPORT_RESOLUTION_MESSAGE_REQUIRED", message: "Send a customer-visible response before resolving or closing the ticket." });
+      }
+    }
+    const now = new Date();
+    return this.db.$transaction(async tx => {
+      const changed = await tx.supportTicket.updateMany({
+        where: { id: ticketId, status: ticket.status as any, updatedAt: ticket.updatedAt },
+        data: {
+          status: status as any,
+          resolvedAt: status === "RESOLVED" ? now : ["OPEN", "IN_PROGRESS"].includes(status) ? null : ticket.resolvedAt,
+          closedAt: status === "CLOSED" ? now : null,
+        },
+      });
+      if (changed.count !== 1) throw new ConflictException("Ticket state changed concurrently; refresh and retry");
+      await tx.auditEvent.create({ data: {
+        organizationId: ticket.organizationId, actorType: "INTERNAL", actorId: ctx.identity.email,
+        action: "SUPPORT_TICKET_STATUS_CHANGED", targetType: "SupportTicket", targetId: ticketId,
+        metadata: { from: ticket.status, to: status },
+      } });
+      return tx.supportTicket.findUniqueOrThrow({ where: { id: ticketId } });
+    });
   }
-
   async addInternalMessage(req: HeaderRequest, ticketId: string, body: string, visibility: string) {
     const ctx = requireInternalCapability(req, "support.manage");
     const [ticket, agent] = await Promise.all([
@@ -537,7 +705,7 @@ export class SupportService {
 
     const safeVisibility = visibility === "INTERNAL" ? "INTERNAL" : "CUSTOMER";
     const now = new Date();
-    const clientBase = (process.env.CLIENT_APP_URL ?? "http://localhost:3101").replace(/\/$/,"");
+    const clientBase = (process.env.CLIENT_APP_URL ?? "http://localhost:4202").replace(/\/$/,"");
     const locale = ticket.organization.defaultLocale === "en" ? "en" : "es";
     const actionUrl = `${clientBase}/${locale}/support/${ticketId}`;
 
@@ -576,6 +744,7 @@ export class SupportService {
                   actionLabel: locale === "es" ? "Abrir ticket" : "Open ticket",
                 }),
                 category: "support_customer_reply",
+                locale,
                 organizationId: ticket.organizationId,
                 ticketId,
               },
@@ -625,12 +794,15 @@ export class SupportService {
     if (!ticket) throw new NotFoundException("Support ticket not found");
     if (!agent) throw new ForbiddenException("Internal support identity is not provisioned");
     if (ticket.status === "CLOSED") throw new BadRequestException("Closed tickets cannot request more information");
+    if (ticket.accountChangeRequest && !canTransitionAccountChange(ticket.accountChangeRequest.status, "NEEDS_INFO")) {
+      throw new ConflictException("Account change is final; cannot request more information");
+    }
 
     const now = new Date();
     const messageBody = requestDocument
       ? `Solicitud de documento\n\n${requestBody}\n\nAdjunta el documento solicitado desde este ticket. Formatos permitidos: PDF, JPG, PNG o WEBP. Máximo 5 MB.`
       : `Solicitud de información adicional\n\n${requestBody}`;
-    const clientBase = (process.env.CLIENT_APP_URL ?? "http://localhost:3101").replace(/\/$/,"");
+    const clientBase = (process.env.CLIENT_APP_URL ?? "http://localhost:4202").replace(/\/$/,"");
     const locale = ticket.organization.defaultLocale === "en" ? "en" : "es";
     const actionUrl = `${clientBase}/${locale}/support/${ticketId}`;
 
@@ -668,15 +840,18 @@ export class SupportService {
       });
 
       if (ticket.accountChangeRequest) {
-        await tx.accountChangeRequest.update({
-          where: { id: ticket.accountChangeRequest.id },
-          data: {
-            status: "NEEDS_INFO",
-            resolutionNote: null,
-            reviewedBy: ctx.identity.email,
-            reviewedAt: now,
+        // Always compare against the observed state, including repeat NEEDS_INFO
+        // requests. Otherwise a concurrent APPLIED could be followed by a new
+        // document request and customer email for an already completed change.
+        const changed = await tx.accountChangeRequest.updateMany({
+          where: {
+            id: ticket.accountChangeRequest.id,
+            status: ticket.accountChangeRequest.status,
+            updatedAt: ticket.accountChangeRequest.updatedAt,
           },
+          data: { status: "NEEDS_INFO", resolutionNote: null, reviewedBy: ctx.identity.email, reviewedAt: now },
         });
+        if (changed.count !== 1) throw new ConflictException("Account change was modified concurrently; refresh and retry");
       }
 
       if (ticket.requester?.email) {
@@ -706,6 +881,7 @@ export class SupportService {
                 actionLabel: requestDocument ? (locale === "es" ? "Adjuntar documento" : "Attach document") : (locale === "es" ? "Responder en el ticket" : "Reply in ticket"),
               }),
               category: "support_information_request",
+              locale,
               organizationId: ticket.organizationId,
               ticketId,
             },
@@ -713,57 +889,37 @@ export class SupportService {
         });
       }
 
+      await tx.auditEvent.create({ data: {
+        organizationId: ticket.organizationId, actorType: "INTERNAL", actorId: ctx.identity.email,
+        action: "SUPPORT_INFORMATION_REQUESTED", targetType: "SupportTicket", targetId: ticketId,
+        metadata: {
+          actorRole: ctx.identity.role, messageId: created.id,
+          accountChangeRequestId: ticket.accountChangeRequest?.id ?? null,
+          workspaceVisible: true, emailQueued: Boolean(ticket.requester?.email),
+          requestDocument, documentRequestId,
+        },
+      } });
+      if (requestDocument && documentRequestId) {
+        await tx.auditEvent.create({ data: {
+          organizationId: ticket.organizationId, actorType: "INTERNAL", actorId: ctx.identity.email,
+          action: "SUPPORT_DOCUMENT_REQUESTED", targetType: "SupportDocumentRequest", targetId: documentRequestId,
+          metadata: { ticketId, messageId: created.id, maxFileSizeBytes: SUPPORT_ATTACHMENT_MAX_BYTES, actorRole: ctx.identity.role },
+        } });
+      }
+      if (ticket.accountChangeRequest && ticket.accountChangeRequest.status !== "NEEDS_INFO") {
+        await tx.auditEvent.create({ data: {
+          organizationId: ticket.organizationId, actorType: "INTERNAL", actorId: ctx.identity.email,
+          action: "ACCOUNT_CHANGE_STATUS_CHANGED", targetType: "AccountChangeRequest", targetId: ticket.accountChangeRequest.id,
+          metadata: {
+            from: ticket.accountChangeRequest.status, to: "NEEDS_INFO",
+            supportTicketId: ticketId, source: "SUPPORT_INFORMATION_REQUESTED",
+          },
+        } });
+      }
       return { created, documentRequestId };
     });
 
     const message = transactionResult.created;
-
-    await this.audit.record({
-      organizationId: ticket.organizationId,
-      actorType: "INTERNAL",
-      actorId: ctx.identity.email,
-      action: "SUPPORT_INFORMATION_REQUESTED",
-      targetType: "SupportTicket",
-      targetId: ticketId,
-      metadata: {
-        actorRole: ctx.identity.role,
-        messageId: message.id,
-        accountChangeRequestId: ticket.accountChangeRequest?.id ?? null,
-        workspaceVisible: true,
-        emailQueued: Boolean(ticket.requester?.email),
-        requestDocument,
-        documentRequestId: transactionResult.documentRequestId,
-      },
-    });
-
-    if (requestDocument && transactionResult.documentRequestId) {
-      await this.audit.record({
-        organizationId: ticket.organizationId,
-        actorType: "INTERNAL",
-        actorId: ctx.identity.email,
-        action: "SUPPORT_DOCUMENT_REQUESTED",
-        targetType: "SupportDocumentRequest",
-        targetId: transactionResult.documentRequestId,
-        metadata: { ticketId, messageId: message.id, maxFileSizeBytes: SUPPORT_ATTACHMENT_MAX_BYTES, actorRole: ctx.identity.role },
-      });
-    }
-
-    if (ticket.accountChangeRequest && ticket.accountChangeRequest.status !== "NEEDS_INFO") {
-      await this.audit.record({
-        organizationId: ticket.organizationId,
-        actorType: "INTERNAL",
-        actorId: ctx.identity.email,
-        action: "ACCOUNT_CHANGE_STATUS_CHANGED",
-        targetType: "AccountChangeRequest",
-        targetId: ticket.accountChangeRequest.id,
-        metadata: {
-          from: ticket.accountChangeRequest.status,
-          to: "NEEDS_INFO",
-          supportTicketId: ticketId,
-          source: "SUPPORT_INFORMATION_REQUESTED",
-        },
-      });
-    }
 
     return { ok: true, messageId: message.id, documentRequestId: transactionResult.documentRequestId };
   }
@@ -775,83 +931,152 @@ export class SupportService {
       throw new BadRequestException("Invalid account change status");
     }
     if (status === "APPLIED") requireInternalCapability(req, "account.change.apply");
-
     const change = await this.db.accountChangeRequest.findUnique({ where: { id } });
     if (!change) throw new NotFoundException("Account change request not found");
-
     const note = resolutionNote?.trim() ?? "";
-
+    const sameStatus = status === change.status;
+    if (!sameStatus && !canTransitionAccountChange(change.status, status)) {
+      throw new ConflictException("Invalid account change transition; refresh before continuing");
+    }
     if (status === "NEEDS_INFO") {
+      // A renewed information request is meaningful even while already NEEDS_INFO.
       if (!note) throw new BadRequestException("Explain what information the customer must provide");
       await this.requestInformation(req, change.supportTicketId, note, requestDocument);
       return this.db.accountChangeRequest.findUnique({ where: { id } });
     }
-
-    const now = new Date();
-
-    if (status === "APPLIED") {
-      const requested =
-        change.requestedData && typeof change.requestedData === "object" && !Array.isArray(change.requestedData)
-          ? change.requestedData as Record<string, unknown>
-          : {};
-      const value = String(requested.requestedValue ?? "").trim();
-
-      if (["LEGAL_NAME", "TAX_ID", "BILLING_EMAIL", "CONTRACT_OWNER", "PRIMARY_OWNER"].includes(change.type) && !value) {
-        throw new BadRequestException("Requested value is required before applying this change");
-      }
-
-      if (change.type === "LEGAL_NAME") await this.db.organization.update({ where: { id: change.organizationId }, data: { legalName: value } });
-      if (change.type === "TAX_ID") await this.db.organization.update({ where: { id: change.organizationId }, data: { taxId: value } });
-      if (change.type === "BILLING_EMAIL") await this.db.organization.update({ where: { id: change.organizationId }, data: { billingEmail: value.toLowerCase() } });
-      if (change.type === "CONTRACT_OWNER") await this.db.organization.update({ where: { id: change.organizationId }, data: { contractOwnerEmail: value.toLowerCase() } });
-      if (change.type === "PRIMARY_OWNER") {
-        const target = await this.db.user.findUnique({ where: { email: value.toLowerCase() }, include: { memberships: true } });
-        const membership = target?.memberships.find(m => m.organizationId === change.organizationId);
-        if (!membership) throw new BadRequestException("The requested Owner must already be a member of the organization");
-        await this.db.$transaction([
-          this.db.membership.updateMany({
-            where: { organizationId: change.organizationId, role: "OWNER", id: { not: membership.id } },
-            data: { role: "ADMIN" },
-          }),
-          this.db.membership.update({ where: { id: membership.id }, data: { role: "OWNER" } }),
-        ]);
-      }
+    if (sameStatus) {
+      if (!note || note === (change.resolutionNote ?? "")) return change; // safe repeat
+      // Preserve editing review notes while actively handling a request.
+      if (["APPLIED", "REJECTED"].includes(status)) throw new ConflictException("Final account changes cannot be edited");
     }
-
-    const updated = await this.db.accountChangeRequest.update({
-      where: { id },
-      data: {
-        status: status as any,
-        resolutionNote: note || null,
-        reviewedBy: ctx.identity.email,
-        reviewedAt: now,
-        appliedAt: status === "APPLIED" ? now : change.appliedAt,
-      },
+    const now = new Date();
+    // Domain mutation, status, and audit must commit or roll back together.
+    return this.db.$transaction(async tx => {
+      const claimed = await tx.accountChangeRequest.updateMany({
+        where: { id, status: change.status as any, updatedAt: change.updatedAt },
+        data: {
+          status: status as any, resolutionNote: note || null,
+          reviewedBy: ctx.identity.email, reviewedAt: now,
+          appliedAt: status === "APPLIED" ? now : change.appliedAt,
+        },
+      });
+      if (claimed.count !== 1) throw new ConflictException("Account change was modified concurrently; refresh and retry");
+      if (status === "APPLIED") {
+        const requested = change.requestedData && typeof change.requestedData === "object" && !Array.isArray(change.requestedData)
+          ? change.requestedData as Record<string, unknown> : {};
+        const value = String(requested.requestedValue ?? "").trim();
+        if (["LEGAL_NAME", "TAX_ID", "BILLING_EMAIL", "CONTRACT_OWNER", "PRIMARY_OWNER"].includes(change.type) && !value) {
+          throw new BadRequestException("Requested value is required before applying this change");
+        }
+        if (change.type === "LEGAL_NAME") await tx.organization.update({ where: { id: change.organizationId }, data: { legalName: value } });
+        if (change.type === "TAX_ID") await tx.organization.update({ where: { id: change.organizationId }, data: { taxId: value } });
+        if (change.type === "BILLING_EMAIL") await tx.organization.update({ where: { id: change.organizationId }, data: { billingEmail: value.toLowerCase() } });
+        if (change.type === "CONTRACT_OWNER") await tx.organization.update({ where: { id: change.organizationId }, data: { contractOwnerEmail: value.toLowerCase() } });
+        if (change.type === "PRIMARY_OWNER") {
+          const target = await tx.user.findUnique({ where: { email: value.toLowerCase() }, include: { memberships: true } });
+          const membership = target?.memberships.find(m => m.organizationId === change.organizationId);
+          if (!membership) throw new BadRequestException("The requested Owner must already be a member of the organization");
+          await tx.membership.updateMany({
+            where: { organizationId: change.organizationId, role: "OWNER", id: { not: membership.id } }, data: { role: "ADMIN" },
+          });
+          await tx.membership.update({ where: { id: membership.id }, data: { role: "OWNER" } });
+        }
+      }
+      await tx.auditEvent.create({ data: {
+        organizationId: change.organizationId, actorType: "INTERNAL", actorId: ctx.identity.email,
+        action: "ACCOUNT_CHANGE_STATUS_CHANGED", targetType: "AccountChangeRequest", targetId: id,
+        metadata: { from: change.status, to: status, applied: status === "APPLIED", supportTicketId: change.supportTicketId, actorRole: ctx.identity.role },
+      } });
+      return tx.accountChangeRequest.findUniqueOrThrow({ where: { id } });
     });
-
-    await this.audit.record({
-      organizationId: change.organizationId,
-      actorType: "INTERNAL",
-      actorId: ctx.identity.email,
-      action: "ACCOUNT_CHANGE_STATUS_CHANGED",
-      targetType: "AccountChangeRequest",
-      targetId: id,
-      metadata: {
-        from: change.status,
-        to: status,
-        applied: status === "APPLIED",
-        supportTicketId: change.supportTicketId,
-        actorRole: ctx.identity.role,
-      },
-    });
-
-    return updated;
   }
   async processSlaEscalations() {
-    const due = await this.db.supportTicket.findMany({ where: { assigneeInternalUserId: null, status: "OPEN", slaDueAt: { lte: new Date() }, escalatedAt: null }, include: { organization: true } });
+    // A worker may run in parallel with another worker or an agent action.
+    // Only the transaction that claims a still-due, still-active ticket may
+    // persist its escalation, audit record and notification outbox entries.
+    const now = new Date();
+    const activeStatuses = ["OPEN", "ASSIGNED", "IN_PROGRESS", "WAITING", "ESCALATED"] as const;
+    const due = await this.db.supportTicket.findMany({
+      where: { status: { in: [...activeStatuses] }, slaDueAt: { lte: now }, escalatedAt: null },
+      include: { organization: { select: { name: true, defaultLocale: true } } },
+      orderBy: [{ slaDueAt: "asc" }, { id: "asc" }],
+      take: 100,
+    });
     if (!due.length) return { escalated: 0 };
-    const recipients = await this.db.internalUser.findMany({ where: { status: "ACTIVE", role: { in: ["INTERNAL_SUPPORT","INTERNAL_OPERATIONS","INTERNAL_PLATFORM_OWNER"] } }, select: { email: true, role: true } });
-    for (const ticket of due) {await this.db.$transaction(async tx => {await tx.supportTicket.update({ where: { id: ticket.id }, data: { status: "ESCALATED", escalatedAt: new Date() } });for (const recipient of recipients) await tx.outboxEvent.create({ data: { type: "SEND_EMAIL", payload: { to: recipient.email, subject: `Proofline Support SLA · ${ticket.organization.name}`, text: `El ticket ${ticket.id} (${ticket.priority}) sigue sin adjudicar: ${ticket.subject}. Requiere atención.`, category: recipient.role === "INTERNAL_PLATFORM_OWNER" ? "support_sla_owner" : "support_sla_escalation" } } });});await this.audit.record({ organizationId: ticket.organizationId, actorType: "SYSTEM", actorId: "support-sla", action: "SUPPORT_TICKET_SLA_ESCALATED", targetType: "SupportTicket", targetId: ticket.id, metadata: { slaDueAt: ticket.slaDueAt.toISOString(), priority: ticket.priority } });}
-    return { escalated: due.length };
+
+    const internalRecipients = await this.db.internalUser.findMany({
+      where: { status: "ACTIVE", role: { in: ["INTERNAL_SUPPORT", "INTERNAL_OPERATIONS", "INTERNAL_PLATFORM_OWNER"] } },
+      select: { email: true, role: true },
+    });
+    // Do not silently mark a ticket escalated when no operational contact can
+    // receive the alert. The next worker check can retry when provisioned.
+    const uniqueRecipients = new Map<string, (typeof internalRecipients)[number]>();
+    for (const recipient of internalRecipients) {
+      const key = recipient.email.trim().toLowerCase();
+      if (!key) continue;
+      const previous = uniqueRecipients.get(key);
+      if (!previous || recipient.role === "INTERNAL_PLATFORM_OWNER") {
+        uniqueRecipients.set(key, recipient);
+      }
+    }
+    if (!uniqueRecipients.size) throw new Error("SUPPORT_SLA_NO_RECIPIENTS: provision an active internal support/operations/owner recipient");
+
+    let escalated = 0;
+    for (const ticket of due) {
+      const didEscalate = await this.db.$transaction(async tx => {
+        const changed = await tx.supportTicket.updateMany({
+          where: {
+            id: ticket.id,
+            escalatedAt: null,
+            slaDueAt: { lte: now },
+            status: ticket.status,
+            assigneeInternalUserId: ticket.assigneeInternalUserId,
+            updatedAt: ticket.updatedAt,
+          },
+          data: {
+            escalatedAt: now,
+            // The SLA escalation should not replace the current agent's
+            // workflow state or discard an assigned agent.
+            ...(ticket.status === "OPEN" && ticket.assigneeInternalUserId === null
+              ? { status: "ESCALATED" as const }
+              : {}),
+          },
+        });
+        if (changed.count !== 1) return false; // Already claimed or no longer due.
+
+        const locale = ticket.organization.defaultLocale === "en" ? "en" : "es";
+        const assigned = ticket.assigneeInternalUserId !== null;
+        const subject = locale === "es"
+          ? `PROOFLINE Soporte · SLA vencido · ${ticket.organization.name}`
+          : `PROOFLINE Support · Overdue SLA · ${ticket.organization.name}`;
+        const body = locale === "es"
+          ? `El ticket ${ticket.id} (${ticket.priority}) ha superado su SLA.\n\n${ticket.subject}\n\n${assigned ? "El ticket tiene un agente asignado y requiere seguimiento." : "El ticket no tiene agente asignado y requiere adjudicación."}`
+          : `Ticket ${ticket.id} (${ticket.priority}) has exceeded its SLA.\n\n${ticket.subject}\n\n${assigned ? "The ticket is assigned and needs follow-up." : "The ticket is unassigned and needs an owner."}`;
+
+        await tx.auditEvent.create({ data: {
+          organizationId: ticket.organizationId,
+          actorType: "SYSTEM", actorId: "support-sla",
+          action: "SUPPORT_TICKET_SLA_ESCALATED", targetType: "SupportTicket", targetId: ticket.id,
+          metadata: {
+            slaDueAt: ticket.slaDueAt.toISOString(), priority: ticket.priority,
+            statusBefore: ticket.status, assigned, assigneeInternalUserId: ticket.assigneeInternalUserId,
+            recipientCount: uniqueRecipients.size,
+          },
+        } });
+        for (const recipient of uniqueRecipients.values()) {
+          await tx.outboxEvent.create({ data: {
+            type: "SEND_EMAIL",
+            payload: {
+              to: recipient.email.trim(), subject, text: body, locale,
+              organizationId: ticket.organizationId, ticketId: ticket.id,
+              category: recipient.role === "INTERNAL_PLATFORM_OWNER" ? "support_sla_owner" : "support_sla_escalation",
+            },
+          } });
+        }
+        return true;
+      });
+      if (didEscalate) escalated += 1;
+    }
+    return { escalated };
   }
 }

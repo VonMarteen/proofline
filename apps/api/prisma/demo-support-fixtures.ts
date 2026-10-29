@@ -3,11 +3,13 @@ import { PrismaClient } from "../src/generated/prisma/client.js";
 import { randomBytes, scryptSync } from "node:crypto";
 import { blindIndex, encryptText, randomPseudonym, sha256 } from "../src/security/crypto.js";
 import { ReportService } from "../src/reports/report.service.js";
+import { AuditService } from "../src/audit/audit.service.js";
 
-const LOCAL_DATABASE_URL = "postgresql://proofline:proofline_local_only@127.0.0.1:55432/proofline?schema=public";
+const LOCAL_DATABASE_URL = "postgresql://proofline:proofline_local_only@127.0.0.1:4232/proofline?schema=public";
 const url = process.env.PROOFLINE_DATABASE_URL ?? LOCAL_DATABASE_URL;
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
-const reports = new ReportService(db as any);
+const audit = new AuditService(db as any);
+const reports = new ReportService(db as any, audit);
 
 function hashPassword(password: string) {
   const salt = randomBytes(16).toString("base64url");
@@ -172,6 +174,6 @@ async function main() {
   console.log("Support Console: sofia.support@proofline.local / proofline-support-demo");
   console.log("Nova Workspace: ines.owner@nova.local / proofline-demo · ACTIVE assessment");
   console.log("Orbis Workspace: marcos.owner@orbis.local / proofline-demo · CLOSED assessment + report emails queued");
-  console.log("Mailpit: http://localhost:58025");
+  console.log("Mailpit: http://localhost:4280");
 }
 main().finally(() => db.$disconnect());

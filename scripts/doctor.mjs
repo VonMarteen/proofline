@@ -18,6 +18,6 @@ const docker = run('docker', ['version', '--format', '{{.Server.Version}}']);
 line(docker.ok, 'Docker Desktop / daemon', docker.ok ? docker.out : 'Abre Docker Desktop y vuelve a ejecutar');
 const compose = run('docker', ['compose', 'version', '--short']);
 line(compose.ok, 'Docker Compose', compose.out);
-console.log('\nPuertos Proofline: 3100 site · 3101 app · 3102 respond · 3103 control · 3104 support · 4100 client api · 4200 control api · 55432 postgres · 58025 mail · 58100 analytics');
+console.log('\nPuertos Proofline: 4200 site · 4201 API · 4202 workspace · 4203 respond · 4204 control · 4205 support · 4206 control API · 4225 SMTP · 4232 PostgreSQL · 4280 Mailpit · 4281 Analytics · 4290/4291 MinIO');
 console.log('\nSi todo sale [OK], ejecuta la tarea: “Proofline: 1 · Preparar local (primera vez)”.\n');
 if (!nodeOk || !npm.ok || !docker.ok || !compose.ok) process.exitCode = 1;

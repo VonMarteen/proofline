@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 export const dynamic="force-dynamic";
-const base=process.env.CONTROL_API_INTERNAL_URL??"http://127.0.0.1:4200",openStatuses=new Set(["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]);
+const base=process.env.CONTROL_API_INTERNAL_URL??"http://127.0.0.1:4206",openStatuses=new Set(["OPEN","ASSIGNED","IN_PROGRESS","WAITING","ESCALATED"]);
 type Ticket={id:string;subject:string;status:string;priority:string;updatedAt:string;lastCustomerReplyAt?:string|null;lastInternalReplyAt?:string|null;escalatedAt?:string|null;organization:{name:string};assignee?:{email?:string|null}|null;sla?:{overdue?:boolean}};
 type Snapshot={status:string;updatedAt:string;customer:string;internal:string;escalated:string;assignee:string};
 const replyTime=(t:Ticket)=>t.lastCustomerReplyAt?new Date(t.lastCustomerReplyAt).getTime():0,internalTime=(t:Ticket)=>t.lastInternalReplyAt?new Date(t.lastInternalReplyAt).getTime():0;

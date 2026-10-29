@@ -1,0 +1,184 @@
+/* PROOFLINE R5 — Assessment detail only. No global or business logic changes.
+   Explicit column layouts for compact questions, population and legal profile. */
+
+/* Five range labels remain in ONE line where the available width supports them. */
+.workspace-content .workspace-assessment-detail-page .question-composer form.assessment-question-form {
+  grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .assessment-range-fields {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,66px)) repeat(2,minmax(0,1fr));
+  gap:7px;
+  min-width:0;
+  align-items:end;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .assessment-range-fields > .assessment-range-numbers,
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .assessment-range-fields > .assessment-range-labels {
+  display:contents;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .assessment-range-fields > .form-row > .label,
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .assessment-range-fields > .form-row > .label:has(input[type=number]),
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .assessment-range-fields > .form-row > .label:not(:has(input[type=number])) {
+  display:grid;
+  gap:4px;
+  min-width:0;
+  width:100%;
+  max-width:none;
+  margin:0;
+  flex:auto;
+  align-content:end;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-range-fields .input {min-width:0;width:100%;}
+
+/* Area label and people count share a line. No change to checkbox semantics. */
+.workspace-content .workspace-assessment-detail-page .population-targets .population-all,
+.workspace-content .workspace-assessment-detail-page .population-targets .population-units label {
+  min-height:37px;
+  padding:5px 9px;
+}
+.workspace-content .workspace-assessment-detail-page .population-targets .population-target-inline {
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+  width:100%;
+  flex:1;
+}
+.workspace-content .workspace-assessment-detail-page .population-targets .population-target-inline strong {
+  flex:1 1 auto;
+  min-width:0;
+  line-height:1.3;
+}
+.workspace-content .workspace-assessment-detail-page .population-targets .population-target-inline small {
+  flex:0 0 auto;
+  text-align:right;
+  white-space:nowrap;
+  color:var(--text-soft);
+}
+
+/* Individual name and role/unit share a line, with visible active exclusion. */
+.workspace-content .workspace-assessment-detail-page .population-person-list label {
+  min-height:36px;
+  padding:4px 7px;
+}
+.workspace-content .workspace-assessment-detail-page .population-person-list .population-person-inline {
+  display:flex;
+  flex-direction:row;
+  justify-content:space-between;
+  align-items:center;
+  gap:9px;
+  flex:1;
+  min-width:0;
+}
+.workspace-content .workspace-assessment-detail-page .population-person-list .population-person-inline strong {
+  flex:1 1 auto;
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.workspace-content .workspace-assessment-detail-page .population-person-list .population-person-inline small {
+  flex:0 1 49%;
+  min-width:0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  text-align:right;
+}
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude {
+  flex:0 0 auto;
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:4px 9px;
+  min-height:27px;
+  color:var(--text-soft);
+  background:var(--bg-solid);
+  transition:background-color .16s ease,color .16s ease,border-color .16s ease,transform .16s ease;
+}
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude:hover {
+  border-color:var(--danger);
+  color:var(--danger);
+}
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude.active {
+  color:var(--danger);
+  border-color:var(--danger);
+  background:color-mix(in srgb,var(--danger) 10%,var(--bg-solid));
+}
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude:focus-visible {
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude:active {transform:scale(.97);}
+@media(prefers-reduced-motion:reduce) {
+  .workspace-content .workspace-assessment-detail-page .population-person-list button.exclude {transition:none;}
+  .workspace-content .workspace-assessment-detail-page .population-person-list button.exclude:active {transform:none;}
+}
+
+/* 7 legal fields in 2 compact rows (3 + 4):
+   Controller, participation and confidentiality;
+   purpose, legal basis, retention and DPO contact. */
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form.assessment-legal-compact-form {
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:9px 12px;
+  align-items:start;
+  padding-top:8px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form.assessment-legal-compact-form > .form-row {
+  display:contents;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form.assessment-legal-compact-form .label {
+  min-width:0;
+  max-width:none;
+  margin:0;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-controller {grid-area:1 / 1 / 2 / 5;}
+.workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-participation {grid-area:1 / 5 / 2 / 9;}
+.workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-confidentiality {grid-area:1 / 9 / 2 / 13;}
+.workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-purpose {grid-area:2 / 1 / 3 / 5;}
+.workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-basis {grid-area:2 / 5 / 3 / 9;}
+.workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-retention {grid-area:2 / 9 / 3 / 11;}
+.workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-contact {grid-area:2 / 11 / 3 / 13;}
+.workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-retention input {max-width:100%;}
+.workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-purpose textarea,
+.workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-basis textarea {
+  min-height:64px;
+  max-height:140px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form.assessment-legal-compact-form > .workspace-checkbox,
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form.assessment-legal-compact-form > .workspace-alert,
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form.assessment-legal-compact-form > .btn.btn-accent {
+  grid-column:1 / -1;
+  grid-row:auto;
+}
+
+/* A narrow viewport never forces the 3+4 grid into unreadable columns. */
+@media(max-width:1200px) {
+  .workspace-content .workspace-assessment-detail-page .question-composer form.assessment-question-form {grid-template-columns:minmax(0,1fr);}
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .builder-primary-row,
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .type-config,
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .advanced-question-config,
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .builder-submit,
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .workspace-alert {grid-column:1;}
+  .workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form.assessment-legal-compact-form {grid-template-columns:repeat(2,minmax(0,1fr));}
+  .workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-controller,
+  .workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-participation,
+  .workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-confidentiality,
+  .workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-purpose,
+  .workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-basis,
+  .workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-retention,
+  .workspace-content .workspace-assessment-detail-page .assessment-legal-compact-form .assessment-legal-contact {grid-area:auto;}
+}
+@media(max-width:650px) {
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .assessment-range-fields {grid-template-columns:repeat(3,minmax(0,1fr));}
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .assessment-range-fields > .assessment-range-labels > .label {grid-column:span 1;}
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .assessment-range-fields > .assessment-range-labels > .label:first-child {grid-column:span 2;}
+  .workspace-content .workspace-assessment-detail-page .population-person-list .population-person-inline {flex-wrap:wrap;gap:1px 6px;}
+  .workspace-content .workspace-assessment-detail-page .population-person-list .population-person-inline small {flex:1 1 100%;text-align:left;}
+  .workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form.assessment-legal-compact-form {grid-template-columns:minmax(0,1fr);}
+}

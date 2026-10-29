@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { workspaceIdentity, workspaceSessionToken } from "./session";
 
-const internal = process.env.API_INTERNAL_URL ?? "http://127.0.0.1:4100";
+const internal = process.env.API_INTERNAL_URL ?? "http://127.0.0.1:4201";
 
 export async function apiGet(path: string) {
   const [token, identity] = await Promise.all([workspaceSessionToken(), workspaceIdentity()]);

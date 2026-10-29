@@ -7,6 +7,7 @@ import { ControlCommercialController } from "./commercial/commercial.controller.
 import { ControlHealthController } from "./control/control-health.controller.js";
 import type { HeaderRequest } from "./auth/dev-auth.js";
 import { PaymentService } from "./payments/payment.service.js";
+import { RetentionLifecycleService } from "./control/retention-lifecycle.service.js";
 
 applyLocalDefaults();
 const internalReq: HeaderRequest = { headers: { "x-proofline-user": "owner@armar.local", "x-proofline-role": "INTERNAL_PLATFORM_OWNER" } };
@@ -16,16 +17,29 @@ try {
   const control = app.get(ControlController);
   const sales = app.get(ControlCommercialController);
   const payments = app.get(PaymentService);
+  const retention = app.get(RetentionLifecycleService);
   const ready = await health.health();
   if (!ready?.ok || ready.database !== "ready") throw new Error("Control API database readiness is invalid");
   const overview = await control.overview(internalReq) as any;
   if (typeof overview?.counts?.organizations !== "number" || typeof overview?.counts?.openTickets !== "number") throw new Error("Control overview is invalid");
+  const systemHealth = await control.systemHealth(internalReq) as any;
+  if (systemHealth?.api?.status !== "healthy") throw new Error("Control API health probe is not healthy");
+  if (systemHealth?.database?.status !== "healthy") throw new Error("Control database health probe is not healthy");
+  if (systemHealth?.analytics?.status !== "healthy") throw new Error("Control analytics health probe is not healthy");
+  if (systemHealth?.mail?.status !== "healthy") throw new Error("Control Mailpit health probe is not healthy");
+  if (!systemHealth?.queue || typeof systemHealth.queue.pending !== "number") throw new Error("Control queue health probe is invalid");
   const organizations = await control.organizations(internalReq) as any[];
   if (!Array.isArray(organizations) || !organizations.length) throw new Error("Control organizations view is empty");
   const users = await control.users(internalReq) as any[];
   if (!Array.isArray(users) || !users.length) throw new Error("Control users view is empty");
   const usage = await control.usage(internalReq) as any;
   if (!usage?.period || !Array.isArray(usage?.events)) throw new Error("Control usage ledger view is invalid");
+  const billing = await control.billing(internalReq) as any;
+  if (!billing?.totals || typeof billing.totals.activeSubscriptions !== "number") throw new Error("Control billing summary contract is invalid");
+  const subscriptionPage = await control.billingSubscriptionsPage(internalReq, "1", "25") as any;
+  if (!Array.isArray(subscriptionPage?.items) || typeof subscriptionPage?.pagination?.total !== "number") throw new Error("Control subscriptions paged contract is invalid");
+  const configuration = await control.configuration(internalReq) as any;
+  if (!Array.isArray(configuration?.plans) || !Array.isArray(configuration?.entitlements)) throw new Error("Control plans/configuration contract is invalid");
   const assessments = await control.assessments(internalReq) as any[];
   if (!Array.isArray(assessments) || !assessments.length) throw new Error("Control assessment operations view is invalid");
   const marketplace = await control.marketplace(internalReq) as any[];
@@ -39,7 +53,9 @@ try {
   if (!Array.isArray(commercial)) throw new Error("Control commercial pipeline is invalid");
   const paymentSummary = await payments.organizationSummary(internalReq, organizations[0]!.id) as any;
   if (!Array.isArray(paymentSummary?.methods) || !Array.isArray(paymentSummary?.history) || !Array.isArray(paymentSummary?.transactions)) throw new Error("Control payment history view is incomplete");
-  console.log(`[OK] Critical runtime C2 internal plane · orgs=${organizations.length} · users=${users.length} · marketplace=${marketplace.length} · support=${support.tickets.length} · sales=${commercial.length} · payments=ready`);
+  const retentionPreview = await retention.preview(internalReq, { organizationId: organizations[0]!.id, limit: 25 }) as any;
+  if (!retentionPreview?.summary || typeof retentionPreview.summary.policies !== "number" || !Array.isArray(retentionPreview.candidates)) throw new Error("Control retention lifecycle dry-run is invalid");
+  console.log(`[OK] Critical runtime C2 internal plane · orgs=${organizations.length} · users=${users.length} · marketplace=${marketplace.length} · support=${support.tickets.length} · sales=${commercial.length} · payments=foundation-declared · health=api+db+analytics+mail+queue · retention=dry-run+holds+policy-gates · billing=summary+paged-subscriptions+plans-contract`);
 } finally {
   await app.close();
 }

@@ -175,7 +175,6 @@ export default async function TrustPage({ params }: { params: Promise<{ locale: 
           text={es
             ? "Proofline integra privacidad, confidencialidad, seguridad, IA y trazabilidad en la propia operación del assessment. El objetivo es que una organización pueda entender qué ocurre con sus datos, gobernar las reglas relevantes y explicarlas con claridad a quienes participan."
             : "Proofline integrates privacy, confidentiality, security, AI and traceability into assessment operations themselves. The aim is for an organization to understand what happens to its data, govern relevant rules and explain them clearly to participants."}
-          aside={<div className="page-intro-note"><strong>{es ? "Transparencia verificable" : "Verifiable transparency"}</strong><span>{es ? "Esta página describe principios de arquitectura y controles previstos. La validación jurídica y técnica definitiva forma parte del paso a producción." : "This page describes architecture principles and planned controls. Final legal and technical validation is part of the production-readiness process."}</span></div>}
         />
       </div>
     </section>
@@ -221,12 +220,17 @@ export default async function TrustPage({ params }: { params: Promise<{ locale: 
               </div>)}
             </div>
           </div>
-          <aside className="trust-verification">
-            <span>{es ? "Control verificable" : "Verifiable control"}</span>
-            <strong>{es ? "Lo que el cliente debería poder revisar" : "What the client should be able to review"}</strong>
-            <p>{item.evidence}</p>
-          </aside>
+
         </article>)}
+      </div>
+      <div className="container trust-evidence-summary">
+        <div>
+          <h2>{es ? "Controles que se pueden revisar." : "Controls that can be reviewed."}</h2>
+          <p>{es ? "La confianza no depende de repetir una promesa en cada apartado, sino de poder comprobar las reglas relevantes cuando haga falta." : "Trust does not depend on repeating a promise in every section, but on being able to inspect the relevant rules when needed."}</p>
+        </div>
+        <ul>
+          {details.map((item) => <li key={`${item.id}-evidence`}>{item.evidence}</li>)}
+        </ul>
       </div>
     </section>
 

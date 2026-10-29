@@ -1,7 +1,8 @@
-import { Brand, Icon } from "@proofline/ui";
+import { Icon } from "@proofline/ui";
 import type { Locale } from "@proofline/i18n";
 import { copy } from "../lib/copy";
 import { CookiePreferencesButton } from "./consent-manager";
+import { SiteBrand } from "./site-brand";
 
 const socialLinks = [
   { label: "LinkedIn", icon: "linkedin" as const },
@@ -17,7 +18,7 @@ export function Footer({ locale }: { locale: Locale }) {
     <footer className="footer site-footer">
       <div className="container site-footer-grid">
         <div className="site-footer-brand">
-          <Brand />
+          <SiteBrand />
           <p>{f.note}</p>
           <div className="site-footer-signature">{f.text}</div>
         </div>

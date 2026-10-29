@@ -45,6 +45,7 @@ export class AuthService {
       subject: audience === "INTERNAL" ? "Proofline · código de acceso interno" : "Proofline · código de acceso",
       text: es ? `Tu código de verificación de Proofline es ${code}. Caduca en ${OTP_MINUTES} minutos. Si no has iniciado este acceso, ignora este mensaje.` : `Your Proofline verification code is ${code}. It expires in ${OTP_MINUTES} minutes. If you did not start this sign-in, ignore this message.`,
       category: audience === "INTERNAL" ? "internal_auth_otp" : "client_auth_otp",
+      locale: es ? "es" : "en",
     } } });
   }
 
@@ -168,17 +169,19 @@ export class AuthService {
   async createActivation(userId: string, email: string, locale: string) {
     const raw = opaqueToken();
     await this.db.accountActivation.create({ data: { userId, tokenHash: sha256(raw), expiresAt: addMs(72 * 3_600_000) } });
-    const base = process.env.CLIENT_APP_URL ?? "http://localhost:3101";
+    const base = process.env.CLIENT_APP_URL ?? "http://localhost:4202";
     const activationUrl = `${base}/activate?token=${encodeURIComponent(raw)}&locale=${locale === "en" ? "en" : "es"}`;
-    await this.db.outboxEvent.create({ data: { type: "SEND_EMAIL", payload: { to: email, subject: "Activa tu acceso a Proofline", text: `Tu organización de Proofline está preparada. Crea tu contraseña desde este enlace (válido durante 72 horas): ${activationUrl}`, category: "client_activation" } } });
+    const es = locale !== "en";
+    await this.db.outboxEvent.create({ data: { type: "SEND_EMAIL", payload: { to: email, subject: es ? "PROOFLINE · Activa tu acceso" : "PROOFLINE · Activate your access", text: es ? `Tu organización de PROOFLINE está preparada. Crea tu contraseña desde este enlace (válido durante 72 horas): ${activationUrl}` : `Your PROOFLINE organization is ready. Create your password from this link (valid for 72 hours): ${activationUrl}`, category: "client_activation", locale: es ? "es" : "en" } } });
     return { activationUrl };
   }
   async createInternalActivation(internalUserId: string, email: string, locale = "es") {
     const raw = opaqueToken();
     await this.db.internalAccountActivation.create({ data: { internalUserId, tokenHash: sha256(raw), expiresAt: addMs(24 * 3_600_000) } });
-    const base = process.env.CONTROL_APP_URL ?? "http://localhost:3103";
+    const base = process.env.CONTROL_APP_URL ?? "http://localhost:4204";
     const activationUrl = `${base}/activate?token=${encodeURIComponent(raw)}&locale=${locale === "en" ? "en" : "es"}`;
-    await this.db.outboxEvent.create({ data: { type: "SEND_EMAIL", payload: { to: email, subject: "Activa tu acceso interno a Proofline Control", text: `Se ha creado tu acceso interno a Proofline Control. Define tu contraseña desde este enlace de un solo uso (válido durante 24 horas): ${activationUrl}`, category: "internal_activation" } } });
+    const es = locale !== "en";
+    await this.db.outboxEvent.create({ data: { type: "SEND_EMAIL", payload: { to: email, subject: es ? "PROOFLINE Control · Activa tu acceso" : "PROOFLINE Control · Activate your access", text: es ? `Se ha creado tu acceso interno a PROOFLINE Control. Define tu contraseña desde este enlace de un solo uso (válido durante 24 horas): ${activationUrl}` : `Your internal PROOFLINE Control access has been created. Set your password using this one-time link (valid for 24 hours): ${activationUrl}`, category: "internal_activation", locale: es ? "es" : "en" } } });
     return { activationUrl };
   }
 }

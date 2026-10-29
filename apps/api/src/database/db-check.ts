@@ -1,7 +1,7 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client.js";
 
-const local = "postgresql://proofline:proofline_local_only@127.0.0.1:55432/proofline?schema=public";
+const local = "postgresql://proofline:proofline_local_only@127.0.0.1:4232/proofline?schema=public";
 const connectionString = process.env.PROOFLINE_DATABASE_URL ?? local;
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 

@@ -17,7 +17,8 @@
     "auth:bootstrap-local": "tsx prisma/bootstrap-auth.ts",
     "dev:control": "node --enable-source-maps dist/main-control.js",
     "demo:support-fixtures": "tsx prisma/demo-support-fixtures.ts",
-    "demo:functional-fixtures": "tsx prisma/demo-support-fixtures.ts"
+    "demo:functional-fixtures": "tsx prisma/demo-support-fixtures.ts",
+    "pilot:check": "pnpm build && node --enable-source-maps dist/pilot-e2e-check.js"
   },
   "dependencies": {
     "@nestjs/common": "11.2.1",

@@ -1,5 +1,7 @@
 import "./globals.css";
 import "./preferences.css";
+import "./support-ux-p1-parity.css";
+import "./suite-shell-parity.css";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 

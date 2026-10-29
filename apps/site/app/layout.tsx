@@ -1,7 +1,12 @@
 import "./globals.css";
 import "./commercial.css";
 import "./commercial-editorial.css";
+import "./commercial-phase1.css";
+import "./commercial-home-v2.css";
+import "./commercial-product-v3.css";
 import "./consent.css";
+import "./commercial-final-v6.css";
+import "./commercial-light-polish.css";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 

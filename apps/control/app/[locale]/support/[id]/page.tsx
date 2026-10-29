@@ -36,19 +36,19 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
 
       <div className="control-compact-actions">
         {!t.assignee ? (
-          <form action={assignSupportTicket}>
+          <form action={assignSupportTicket} data-confirm-title={es?"Adjudicar ticket":"Assign ticket"} data-confirm-message={es?"El ticket quedará asignado a tu usuario.":"The ticket will be assigned to your user."}>
             <input type="hidden" name="id" value={t.id} />
             <input type="hidden" name="locale" value={locale} />
-            <button className="control-button">{es ? "Adjudicarme ticket" : "Assign ticket to me"}</button>
+            <button className="control-button" type="submit">{es ? "Adjudicarme ticket" : "Assign ticket to me"}</button>
           </form>
         ) : null}
-        <form action={updateTicketStatus} className="control-inline-form">
+        <form action={updateTicketStatus} className="control-inline-form" data-confirm-title={es?"Confirmar estado":"Confirm status"}>
           <input type="hidden" name="id" value={t.id} />
           <input type="hidden" name="locale" value={locale} />
           <select className="control-select" name="status" defaultValue={t.status}>
             <option>OPEN</option><option>ASSIGNED</option><option>IN_PROGRESS</option><option>WAITING</option><option>RESOLVED</option><option>ESCALATED</option><option>CLOSED</option>
           </select>
-          <button className="control-button">{es ? "Actualizar estado" : "Update status"}</button>
+          <button className="control-button" type="submit">{es ? "Actualizar estado" : "Update status"}</button>
         </form>
       </div>
 
@@ -60,7 +60,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
               <p>{t.accountChangeRequest.summary}</p>
               <pre className="control-json">{JSON.stringify(t.accountChangeRequest.requestedData, null, 2)}</pre>
             </div>
-            <form action={updateAccountChangeStatus} className="control-change-form">
+            <form action={updateAccountChangeStatus} className="control-change-form" data-confirm-title={es?"Confirmar revisión":"Confirm review"} data-confirm-message={es?"La actualización puede notificar al cliente o habilitar documentos según el estado seleccionado.":"The update may notify the customer or enable documents depending on the selected status."}>
               <input type="hidden" name="id" value={t.accountChangeRequest.id} />
               <input type="hidden" name="ticketId" value={t.id} />
               <input type="hidden" name="locale" value={locale} />
@@ -79,7 +79,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
                 <input type="checkbox" name="requestDocument" />
                 <span><strong>{es ? "Habilitar solicitud de documento" : "Enable document request"}</strong><small>{es ? "Solo se habilitará al cliente para esta solicitud. Máximo 5 MB." : "The customer is enabled only for this request. Maximum 5 MB."}</small></span>
               </label>
-              <button className="control-button">{es ? "Aplicar revisión" : "Apply review"}</button>
+              <button className="control-button" type="submit">{es ? "Aplicar revisión" : "Apply review"}</button>
             </form>
           </div>
         </Panel>
@@ -90,7 +90,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
           <p>{es
             ? "Genera una entrada real en el ticket, la hace visible en el Workspace, pone el ticket en espera del cliente, envía email y registra auditoría."
             : "Creates a real ticket entry, makes it visible in Workspace, waits for the customer, sends email and records audit history."}</p>
-          <form action={requestSupportInformation} className="control-support-reply">
+          <form action={requestSupportInformation} className="control-support-reply" data-confirm-title={es?"Enviar solicitud":"Send request"} data-confirm-message={es?"Se guardará la solicitud y se enviará una notificación real al cliente.":"The request will be saved and a real notification sent to the customer."}>
             <input type="hidden" name="id" value={t.id} />
             <input type="hidden" name="locale" value={locale} />
             <textarea className="control-textarea" name="body" required minLength={3} placeholder={es ? "Indica qué información necesitas…" : "Describe the information required…"} />
@@ -98,7 +98,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
               <input type="checkbox" name="requestDocument" />
               <span><strong>{es ? "Habilitar solicitud de documento" : "Enable document request"}</strong><small>{es ? "El cliente verá Adjuntar documento solo para esta petición. PDF, JPG, PNG o WEBP · máx. 5 MB." : "The customer sees Attach document only for this request. PDF, JPG, PNG or WEBP · max. 5 MB."}</small></span>
             </label>
-            <div><button className="control-button">{es ? "Enviar solicitud al cliente" : "Send request to customer"}</button></div>
+            <div><button className="control-button" type="submit">{es ? "Enviar solicitud al cliente" : "Send request to customer"}</button></div>
           </form>
         </Panel>
       ) : null}
@@ -139,7 +139,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
 
       {t.status !== "CLOSED" ? (
         <Panel title={es ? "Responder o añadir nota" : "Reply or add note"}>
-          <form action={addSupportMessage} className="control-support-reply">
+          <form action={addSupportMessage} className="control-support-reply" data-confirm-title={es?"Enviar mensaje":"Send message"} data-confirm-message={es?"Se guardará el mensaje en el ticket con la visibilidad elegida.":"The message will be saved in the ticket with the chosen visibility."}>
             <input type="hidden" name="id" value={t.id} />
             <input type="hidden" name="locale" value={locale} />
             <textarea className="control-textarea" name="body" required placeholder={es ? "Escribe una respuesta o una nota interna…" : "Write a reply or internal note…"} />
@@ -148,7 +148,7 @@ export default async function Page({ params }: { params: Promise<{ locale: strin
                 <option value="CUSTOMER">{es ? "Respuesta visible para cliente" : "Customer-visible reply"}</option>
                 <option value="INTERNAL">{es ? "Nota interna" : "Internal note"}</option>
               </select>
-              <button className="control-button">{es ? "Enviar mensaje" : "Send message"}</button>
+              <button className="control-button" type="submit">{es ? "Enviar mensaje" : "Send message"}</button>
             </div>
           </form>
         </Panel>

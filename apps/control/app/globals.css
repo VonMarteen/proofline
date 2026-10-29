@@ -197,3 +197,19 @@ p { text-wrap: pretty; }
 .control-metrics{gap:20px}
 .control-login-panel{gap:20px}
 .control-login-form{gap:20px;padding:20px}
+
+/* H4 · retention & lifecycle */
+.control-retention-summary{display:flex;flex-wrap:wrap;gap:10px 18px;margin:0 0 14px;color:var(--text-soft);font-size:12px}.control-retention-summary strong{color:var(--text)}
+.control-row-held{background:color-mix(in srgb,#d9a441 7%,transparent)}
+.control-retention-policy-list{display:grid;gap:10px}.control-retention-policy{display:grid;grid-template-columns:minmax(180px,1.2fr) 86px 120px minmax(180px,1fr) auto;gap:10px;align-items:end;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--bg-elevated)}.control-retention-policy>div{display:grid;gap:3px}.control-retention-policy>div span,.control-retention-policy>div small,.control-retention-policy label>span,.control-hold-form label>span{font-size:11px;color:var(--text-soft)}.control-retention-policy label,.control-hold-form label{display:grid;gap:5px}.control-retention-basis{min-width:0}
+.control-hold-form{display:grid;grid-template-columns:minmax(160px,1fr) minmax(150px,.8fr) 150px minmax(220px,1.4fr) auto;gap:10px;align-items:end;margin-bottom:16px}.control-hold-reason{min-width:0}.control-button.danger{background:color-mix(in srgb,var(--danger) 15%,var(--bg-solid));border-color:color-mix(in srgb,var(--danger) 45%,var(--border));color:var(--danger)}
+@media(max-width:1100px){.control-retention-policy,.control-hold-form{grid-template-columns:1fr 1fr}.control-retention-policy>div,.control-retention-basis,.control-hold-reason{grid-column:1/-1}}
+@media(max-width:700px){.control-retention-policy,.control-hold-form{grid-template-columns:1fr}.control-retention-policy>div,.control-retention-basis,.control-hold-reason{grid-column:auto}}
+
+/* H7.1 · Control route transitions: keep the shell mounted and only skeletonize page content. */
+.control-route-loading{display:grid;gap:18px;min-height:420px}
+.control-route-loading-head{display:flex;align-items:flex-start;justify-content:space-between;padding:2px 0 4px}
+.control-route-loading-head>div{display:grid;gap:10px;width:min(620px,100%)}
+.control-route-loading-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.control-route-loading-card,.control-route-loading-table{border:1px solid var(--border);background:var(--surface);border-radius:13px;padding:15px;display:grid;gap:12px}
+@media(max-width:900px){.control-route-loading-cards{grid-template-columns:1fr}.control-route-loading{min-height:320px}}

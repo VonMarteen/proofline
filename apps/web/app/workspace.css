@@ -452,7 +452,7 @@
 .proofline-confirm-backdrop{position:fixed;inset:0;z-index:10000;display:grid;place-items:center;padding:24px;background:rgba(4,7,12,.56);backdrop-filter:blur(8px)}.proofline-confirm-modal{width:min(460px,calc(100vw - 32px));display:grid;grid-template-columns:42px 1fr;gap:14px;padding:22px;border:1px solid color-mix(in srgb,var(--border) 80%,white 10%);border-radius:20px;background:color-mix(in srgb,var(--bg-elevated) 94%,transparent);box-shadow:0 24px 80px rgba(0,0,0,.34)}.proofline-confirm-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent);font-weight:900}.proofline-confirm-copy h2{margin:1px 0 8px;font-size:19px}.proofline-confirm-copy p{margin:0;color:var(--text-soft);line-height:1.55;font-size:13px}.proofline-confirm-actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:9px;padding-top:8px}.proofline-confirm-actions button{min-height:38px;padding:0 14px;border-radius:10px;border:1px solid var(--border);font-weight:800;cursor:pointer}.proofline-confirm-cancel{background:transparent;color:var(--text)}.proofline-confirm-submit{background:var(--accent);border-color:var(--accent)!important;color:white}.proofline-confirm-submit.danger{background:var(--danger,#c74444);border-color:var(--danger,#c74444)!important}.proofline-confirm-actions button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* C2.3 · visual polish — Lucide, hierarchy, cleaner enterprise surfaces */
-.workspace-sidebar{width:252px;padding:20px 14px;background:color-mix(in srgb,var(--bg-solid) 74%,var(--bg));box-shadow:1px 0 0 rgba(255,255,255,.35) inset}
+.workspace-sidebar{width:252px;padding:20px 14px;background:color-mix(in srgb,var(--bg-solid) 74%,var(--bg));box-shadow:none}
 .workspace-brand{padding:3px 10px 2px}
 .workspace-org{margin:20px 6px 10px;padding:12px;border-radius:12px;background:var(--bg-solid);box-shadow:0 1px 2px rgba(20,24,34,.03)}
 .workspace-tenant{display:flex;align-items:center;gap:10px;min-width:0}.workspace-tenant-logo{width:34px;height:34px;flex:0 0 34px;border-radius:10px;display:grid;place-items:center;overflow:hidden;background:var(--accent-soft);color:var(--accent)}.workspace-tenant-logo img{width:100%;height:100%;object-fit:contain}.workspace-tenant-copy{display:grid;min-width:0}.workspace-tenant-copy strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--text)}.workspace-tenant-copy small{font-size:9px;color:var(--text-soft);text-transform:uppercase;letter-spacing:.07em}
@@ -814,3 +814,214 @@
 /* C2.4.7a — viewer actions aligned on one horizontal row */
 .document-viewer-toolbar > .document-viewer-actions{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:nowrap}
 @media(max-width:760px){.document-viewer-toolbar > .document-viewer-actions{justify-content:flex-start;flex-wrap:wrap}}
+
+/* C2.5.4 — canonical report snapshots + L1–L4 */
+.report-toolbar{display:flex;align-items:end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 0}.report-level-select{display:grid;gap:6px;min-width:230px}.report-level-select>span{font-size:10px;font-weight:800;color:var(--text-soft);text-transform:uppercase;letter-spacing:.06em}.report-contract-note{margin:4px 0 12px;color:var(--text-soft);font-size:11px;line-height:1.5}.report-level-tabs{display:flex;gap:6px;flex-wrap:wrap;padding:6px;border:1px solid var(--border);border-radius:12px;background:var(--bg-elevated);width:max-content;max-width:100%}.report-level-tabs a{padding:8px 10px;border-radius:8px;font-size:11px;font-weight:750;color:var(--text-soft);transition:background .16s ease,color .16s ease,box-shadow .16s ease}.report-level-tabs a:hover{color:var(--text);background:var(--surface-muted)}.report-level-tabs a.active{color:var(--accent);background:var(--accent-soft);box-shadow:0 1px 2px rgba(20,24,34,.04)}.report-level-line{display:flex;justify-content:space-between;gap:14px;align-items:center;margin:10px 0 2px;color:var(--text-soft);font-size:10px}.report-level-line strong{color:var(--accent);font-size:11px}.report-question-table{display:grid;border:1px solid var(--border);border-radius:12px;overflow:hidden}.report-question-table>div{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 13px;border-bottom:1px solid var(--border)}.report-question-table>div:last-child{border-bottom:0}.report-question-table span,.report-question-table em{font-size:9.5px;color:var(--text-soft);font-style:normal}.report-question-table strong{font-size:11px;line-height:1.4;font-weight:700}.report-cohort-summary{display:flex;justify-content:space-between;gap:14px;margin-top:14px;padding:12px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface-muted);font-size:10.5px}.report-cohort-summary span{color:var(--text-soft)}
+@media(max-width:760px){.report-toolbar{align-items:stretch}.report-level-select{min-width:100%}.report-level-tabs{width:100%}.report-level-tabs a{flex:1 1 46%;text-align:center}.report-question-table>div{grid-template-columns:52px 1fr}.report-question-table em{grid-column:2}.report-level-line{align-items:flex-start;flex-direction:column}}
+.report-stored-banner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 14px;border:1px solid color-mix(in srgb,var(--signal) 35%,var(--border));border-radius:11px;background:color-mix(in srgb,var(--signal-soft) 45%,var(--bg-solid));font-size:10.5px}.report-stored-banner strong{color:var(--signal)}.report-stored-banner span{color:var(--text-soft)}@media(max-width:700px){.report-stored-banner{align-items:flex-start;flex-direction:column}}
+
+/* C2.5.5 · Assessment governance */
+.assessment-governance-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(180px,.65fr) minmax(180px,.7fr);gap:14px;align-items:end}
+.assessment-governance-grid .label{margin:0}
+.assessment-governance-card .workspace-card-actions{margin-top:14px}
+@media(max-width:860px){.assessment-governance-grid{grid-template-columns:1fr}}
+
+/* H2B · encrypted directory search + scalable population picker */
+.workspace-filter-form{display:flex;gap:10px;align-items:center;flex:1;min-width:min(100%,520px)}
+.workspace-filter-form .input{min-width:220px;flex:1}
+.directory-units a{border:0;background:transparent;color:var(--text);display:flex;justify-content:space-between;text-align:left;padding:10px;border-radius:10px;cursor:pointer;text-decoration:none}
+.directory-units a:hover,.directory-units a.active{background:var(--surface-muted)}
+.directory-units a span{display:grid;gap:2px}.directory-units a small{color:var(--text-soft);font-size:9px}
+.directory-people>.proofline-pagination{border-top:1px solid var(--border)}
+.population-browser{display:grid;gap:12px;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--bg-solid)}
+.population-browser-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.population-browser-head>div{display:grid;gap:3px}.population-browser-head small{color:var(--text-soft)}
+.population-browser-filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,.35fr);gap:10px}
+.population-browser-pager{display:flex;gap:10px;align-items:center;justify-content:flex-end;flex-wrap:wrap;color:var(--text-soft);font-size:10px}.population-browser-pager label{display:flex;gap:6px;align-items:center}.population-browser-pager .select{min-width:74px}
+@media(max-width:760px){.workspace-filter-form,.population-browser-filters{grid-template-columns:1fr;display:grid;width:100%}.workspace-filter-form .input{min-width:0}.directory-layout{grid-template-columns:1fr}.population-browser-pager{justify-content:flex-start}}
+
+
+/* WS-3 · Control visual parity — Workspace only.
+   This layer does not change @proofline/design-tokens scrollbars or Control.
+   The grid already reserves the sidebar width: do not subtract it twice. */
+@media (min-width:851px) {
+  .workspace-shell{grid-template-columns:230px minmax(0,1fr)}
+  .workspace-main{width:100%;min-width:0}
+  .workspace-sidebar{height:100dvh;overflow:hidden;display:flex;flex-direction:column;padding:10px 10px 12px}
+  .workspace-sidebar>.workspace-brand{flex:0 0 auto;min-height:44px;display:flex;align-items:center;padding:6px 8px;border-bottom:1px solid var(--border)}
+  .workspace-sidebar>.workspace-org{flex:0 0 auto;margin:12px 2px 8px;padding:10px;border-radius:11px}
+  .workspace-sidebar>.workspace-nav{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;align-content:start;margin:7px 0 0;padding:0 12px 0 3px}
+  .workspace-sidebar>.workspace-sidebar-footer{flex:0 0 auto;margin-top:0;padding:12px 6px 0}
+}
+.workspace-main{min-width:0}
+.workspace-header{min-height:54px;padding:10px 24px;z-index:30}
+.workspace-header-context>strong{font-size:13px}
+.workspace-content{width:100%;max-width:none;padding:24px 28px 48px;min-width:0}
+.workspace-page{gap:16px}
+.workspace-page-head,.workspace-detail-head{gap:16px;align-items:flex-start}
+.workspace-page-head h1,.workspace-detail-head h1{font-size:clamp(29px,2.7vw,39px);line-height:1.13;letter-spacing:-.035em;margin:0}
+.workspace-page-head p,.workspace-detail-head p{font-size:13px;line-height:1.5;max-width:850px}
+.workspace-page-head>div:first-child{gap:7px}
+.workspace-kpi-grid{gap:12px}
+.workspace-kpi-card{min-height:80px;padding:13px 15px;justify-content:center;gap:3px;border-radius:12px}
+.workspace-kpi-card>span,.workspace-kpi-card>small{font-size:11px;line-height:1.35}
+.workspace-kpi-card>strong{font-size:clamp(24px,2.4vw,30px);line-height:1.05;margin:4px 0}
+.workspace-section{gap:12px}
+.workspace-section-head h2{font-size:21px;line-height:1.25}
+.workspace-framework-card,.active-assessment-card{padding:16px;border-radius:13px;gap:12px}
+.workspace-page .btn{min-height:36px;padding:7px 12px;font-size:12px;border-radius:9px}
+.workspace-page .btn-small{min-height:32px;padding:5px 10px}
+.workspace-page .input,.workspace-page .select{min-height:36px;border-radius:9px}
+.workspace-page .workspace-toolbar{gap:10px}
+.workspace-page .workspace-filter-form{gap:8px;flex-wrap:wrap}
+.workspace-page .workspace-head-actions{gap:8px}
+.workspace-page .card{border-radius:13px}
+.workspace-report-table{min-width:0}
+.workspace-report-status-note{color:var(--text-soft);font-size:12px;line-height:1.5}
+.workspace-report-evidence{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.workspace-report-evidence span{font-size:11px;color:var(--text-soft)}
+.workspace-report-evidence code{font-size:11px;overflow-wrap:anywhere}
+.workspace-report-delivery-empty{color:var(--text-soft);font-size:12px;margin:0}
+@media(max-width:1180px){.workspace-kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:850px){
+  .workspace-shell{grid-template-columns:1fr}
+  .workspace-main{width:100%;min-width:0}
+  .workspace-sidebar{display:none}
+  .workspace-content{padding:20px 18px 48px}
+  .workspace-header{padding:10px 18px}
+  .workspace-page-head,.workspace-detail-head{flex-direction:column}
+}
+@media(max-width:620px){.workspace-kpi-grid{grid-template-columns:1fr 1fr;gap:10px}.workspace-page-head h1,.workspace-detail-head h1{font-size:29px}}
+@media(max-width:390px){.workspace-kpi-grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.workspace-page .btn{transition:none}}
+
+
+/* WS5-FINAL · Workspace-only categorized navigation.
+   Existing routes, auth gates, active links, and scroll behavior remain untouched. */
+.workspace-nav-group { display:grid;gap:5px;min-width:0;align-content:start; }
+.workspace-nav-group + .workspace-nav-group { border-top:1px solid var(--border);margin-top:6px;padding-top:12px; }
+.workspace-nav-group-title { color:var(--text-soft);font-size:10px;line-height:1.3;font-weight:800;letter-spacing:.07em;padding:3px 10px 5px;text-transform:uppercase; }
+.workspace-nav-group-items { display:grid;gap:3px;min-width:0; }
+.workspace-nav-group-items > a { width:100%;min-width:0; }
+.workspace-nav-group-items > a > span { min-width:0;overflow-wrap:anywhere; }
+.workspace-sidebar > .workspace-nav { row-gap:5px; }
+.workspace-nav-group :is(a:focus-visible) { outline:2px solid var(--accent);outline-offset:2px; }
+/* The same navigation is reused in the existing mobile nav: keep it compact. */
+.workspace-mobile-nav .workspace-nav { gap:7px; }
+.workspace-mobile-nav .workspace-nav-group { gap:3px; }
+.workspace-mobile-nav .workspace-nav-group + .workspace-nav-group { margin-top:2px;padding-top:8px; }
+@media(prefers-reduced-motion:reduce){.workspace-nav-group-items > a{transition:none}}
+
+
+/* WS-UX-R2 · Assessment detail, questionnaire composer and previews ONLY.
+ * Scoped: no shared tokens, theme, sidebar, Control, navigation or scrollbars.
+ * This block supersedes oversized legacy workspace layouts only in these flows.
+ */
+.workspace-assessment-detail-page{gap:14px}
+.workspace-assessment-detail-page .workspace-detail-head{gap:12px}
+.workspace-assessment-detail-page .workspace-detail-head h1{font-size:clamp(25px,2.25vw,34px);line-height:1.18;letter-spacing:-.03em}
+.workspace-assessment-detail-page .assessment-composition.clean-composition{gap:7px;margin:8px 0}
+.workspace-assessment-detail-page .assessment-composition.clean-composition>div{min-height:44px;padding:8px 11px}
+.workspace-assessment-detail-page .assessment-composition.clean-composition strong{font-size:12px}
+.workspace-assessment-detail-page .assessment-health-row>div{padding:8px 11px;min-width:0}
+.workspace-assessment-detail-page .workspace-governance{padding:14px 16px;gap:10px}
+.workspace-assessment-detail-page .workspace-section{gap:10px;padding-top:2px}
+.workspace-assessment-detail-page .workspace-section-head h2{font-size:19px;margin:0}
+.workspace-assessment-detail-page .workspace-section-head p{margin:4px 0 0;line-height:1.45}
+.workspace-assessment-detail-page .builder-shell{gap:10px}
+.workspace-assessment-detail-page .question-composer{padding:14px 16px;gap:10px;border-radius:13px}
+.workspace-assessment-detail-page .composer-head{gap:12px;align-items:center;flex-wrap:wrap}
+.workspace-assessment-detail-page .composer-head h3{font-size:16px;margin:0 0 3px}
+.workspace-assessment-detail-page .composer-head p{font-size:12px;line-height:1.4;max-width:670px}
+.workspace-assessment-detail-page .composer-head .workspace-card-actions{margin:0;gap:7px;flex-wrap:wrap}
+.workspace-assessment-detail-page .question-composer form{gap:10px;justify-items:start;min-width:0}
+.workspace-assessment-detail-page .question-composer form > label.label{width:min(100%,850px);min-width:0}
+.workspace-assessment-detail-page .question-composer form > label.label .textarea{width:100%;min-height:76px;max-height:210px;resize:vertical}
+.workspace-assessment-detail-page .builder-primary-row{width:min(100%,780px);display:grid;grid-template-columns:minmax(240px,290px) minmax(250px,1fr);gap:10px}
+.workspace-assessment-detail-page .builder-primary-row>.label{min-width:0}
+.workspace-assessment-detail-page .builder-primary-row :is(.select,.input){width:100%;min-width:0}
+.workspace-assessment-detail-page .type-config{width:min(100%,850px);padding:0;gap:10px;border:0;border-radius:0;background:transparent}
+.workspace-assessment-detail-page .type-config>label.label:has(input[type=number]){width:min(100%,170px)}
+.workspace-assessment-detail-page .type-config>label.label:has(textarea){width:min(100%,850px)}
+.workspace-assessment-detail-page .type-config textarea{min-height:88px;max-height:200px;resize:vertical}
+.workspace-assessment-detail-page .type-config .form-row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.workspace-assessment-detail-page .type-config .form-row>.label{flex:0 1 240px;min-width:0;max-width:310px}
+.workspace-assessment-detail-page .type-config .form-row>.label:has(input[type=number]){flex:0 1 138px;max-width:160px}
+.workspace-assessment-detail-page .type-config .form-row .input{width:100%;min-width:0}
+.workspace-assessment-detail-page .question-composer .advanced-question-config{width:min(100%,850px);padding:12px;gap:10px}
+.workspace-assessment-detail-page .advanced-question-config .form-row{gap:10px;flex-wrap:wrap}
+.workspace-assessment-detail-page .advanced-question-config .form-row>.label:has(input[type=number]){flex:0 1 120px}
+.workspace-assessment-detail-page .builder-submit{width:auto;min-width:190px;max-width:100%;justify-self:start;padding-inline:17px;min-height:36px;white-space:normal}
+.workspace-assessment-detail-page .question-builder-list{gap:6px}
+.workspace-assessment-detail-page .builder-question-card{padding:9px 11px;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;border-radius:10px;align-items:center}
+.workspace-assessment-detail-page .builder-question-order{gap:3px}
+.workspace-assessment-detail-page .builder-question-order>strong{width:28px;height:28px;border-radius:7px;font-size:12px}
+.workspace-assessment-detail-page .builder-question-order button{padding:1px 4px}
+.workspace-assessment-detail-page .builder-question-content{gap:3px;min-width:0}
+.workspace-assessment-detail-page .builder-question-content>strong{font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.workspace-assessment-detail-page .builder-question-context{font-size:11px;line-height:1.35;margin:0;overflow-wrap:anywhere}
+.workspace-assessment-detail-page .builder-question-actions{gap:6px;align-items:center}
+.workspace-assessment-detail-page .question-inline-editor{gap:10px;margin-top:8px;padding-top:10px}
+.workspace-assessment-detail-page .question-inline-editor .form-row{display:flex;flex-wrap:wrap;gap:10px}
+.workspace-assessment-detail-page .question-inline-editor .form-row>.label{flex:0 1 240px}
+.workspace-assessment-detail-page .population-editor{gap:10px;margin-top:8px}
+.workspace-assessment-detail-page .population-units{gap:6px}
+.workspace-assessment-detail-page .population-units label{padding:8px 10px;border-radius:9px}
+.workspace-assessment-detail-page .population-browser-head{gap:8px}
+.workspace-assessment-detail-page .population-browser-filters{grid-template-columns:minmax(230px,1fr) minmax(150px,240px);gap:8px}
+.workspace-assessment-detail-page .population-person-list{gap:4px;max-height:440px;overflow:auto;overscroll-behavior:contain;padding-right:6px}
+.workspace-assessment-detail-page .population-person-list label{min-height:43px;padding:6px 9px;border-radius:8px;gap:9px}
+.workspace-assessment-detail-page .population-person-list label span{min-width:0;gap:0}
+.workspace-assessment-detail-page .population-person-list label strong{font-size:12px;line-height:1.35}
+.workspace-assessment-detail-page .population-person-list label small{font-size:11px;line-height:1.3}
+.workspace-assessment-detail-page .population-person-list .exclude{min-height:30px;padding:4px 10px;white-space:nowrap}
+.workspace-assessment-detail-page .population-browser-pager{gap:8px;flex-wrap:wrap}
+.workspace-assessment-detail-page .population-editor>.btn.btn-accent{width:auto;justify-self:start;min-height:36px}
+/* Participant simulation: proportionate typography and safe wrapping */
+.preview-page .preview-banner{gap:12px;padding:11px 14px;flex-wrap:wrap}
+.preview-page .participant-preview-shell{max-width:880px;border-radius:16px}
+.preview-page .participant-preview-head{padding:22px 26px 16px}
+.preview-page .participant-preview-head h1{font-size:clamp(24px,2.6vw,32px);line-height:1.2;overflow-wrap:anywhere}
+.preview-page .participant-preview-notice{margin:0 26px 14px;padding:13px}
+.preview-page .participant-preview-questions article{padding:16px 26px}
+.preview-page .participant-preview-questions h2{font-size:clamp(16px,1.6vw,20px);line-height:1.42;overflow-wrap:anywhere}
+.preview-page .preview-likert,.preview-page .preview-options{flex-wrap:wrap;gap:7px}
+.preview-page .preview-likert span,.preview-page .preview-options span{min-width:36px;height:36px}
+.preview-page .participant-preview-footer{padding:15px 26px;flex-wrap:wrap}
+/* Report simulation: labels and values cannot collide with score bars */
+.report-preview-page .report-canvas{width:100%;max-width:1080px;padding:clamp(16px,2.5vw,32px);gap:20px;min-width:0}
+.report-preview-page .report-canvas h1{font-size:clamp(24px,2.7vw,36px);line-height:1.18;overflow-wrap:anywhere}
+.report-preview-page .report-canvas header>p{font-size:13px;line-height:1.5}
+.report-preview-page .report-meta{gap:9px}
+.report-preview-page .report-meta strong{font-size:20px}
+.report-preview-page .report-answer{font-size:clamp(15px,1.5vw,18px);line-height:1.55}
+.report-preview-page .report-dimension-grid{gap:13px}
+.report-preview-page .report-dimension-grid>div{min-width:0}
+.report-preview-page .report-dimension-grid>div>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,max-content);align-items:start;gap:7px 16px;margin-bottom:8px}
+.report-preview-page .report-dimension-grid span{font-size:13px;line-height:1.4;overflow-wrap:anywhere;min-width:0}
+.report-preview-page .report-dimension-grid strong{font-size:12px;text-align:right;line-height:1.4;max-width:370px;white-space:normal;overflow-wrap:anywhere}
+.report-preview-page .report-dimension-grid i{display:block;max-width:100%;overflow:hidden}
+.report-preview-page .report-two-col{gap:14px;min-width:0}
+.report-preview-page .report-question-table>div{gap:8px;min-width:0}
+.report-preview-page .report-question-table strong{overflow-wrap:anywhere}
+@media(max-width:900px){
+ .workspace-assessment-detail-page .builder-primary-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+ .workspace-assessment-detail-page .builder-question-card{grid-template-columns:34px minmax(0,1fr)}
+ .workspace-assessment-detail-page .builder-question-actions{grid-column:2;justify-self:start}
+ .workspace-assessment-detail-page .population-browser-filters{grid-template-columns:minmax(0,1fr) 190px}
+}
+@media(max-width:620px){
+ .workspace-assessment-detail-page .builder-primary-row{grid-template-columns:minmax(0,1fr)}
+ .workspace-assessment-detail-page .builder-primary-row>.label{width:100%}
+ .workspace-assessment-detail-page .question-composer{padding:12px}
+ .workspace-assessment-detail-page .composer-head{display:grid}
+ .workspace-assessment-detail-page .builder-question-card{padding:9px}
+ .workspace-assessment-detail-page .population-browser-filters{grid-template-columns:minmax(0,1fr)}
+ .workspace-assessment-detail-page .population-person-list{max-height:360px}
+ .preview-page .participant-preview-head{padding:16px}
+ .preview-page .participant-preview-notice{margin:0 16px 12px}
+ .preview-page .participant-preview-questions article{padding:14px 16px}
+ .preview-page .participant-preview-footer{padding:14px 16px}
+ .report-preview-page .report-dimension-grid>div>div{grid-template-columns:minmax(0,1fr)}
+ .report-preview-page .report-dimension-grid strong{text-align:left;max-width:100%}
+ .report-preview-page .report-two-col{grid-template-columns:minmax(0,1fr)}
+}

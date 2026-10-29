@@ -22,3 +22,386 @@
 /* C2.4.7a — viewer actions aligned on one horizontal row */
 .document-viewer-toolbar > .document-viewer-actions{display:flex;flex-direction:row;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:nowrap}
 @media(max-width:760px){.document-viewer-toolbar > .document-viewer-actions{justify-content:flex-start;flex-wrap:wrap}}
+
+/* P2/7 — Enterprise table system. Layout-only changes; existing palette retained. */
+.control-table-wrap{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;scrollbar-color:var(--border-strong) transparent;scrollbar-width:thin}
+.control-table,.bo-table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;font-variant-numeric:tabular-nums}
+.control-table thead th,.bo-table thead th{position:sticky;top:0;z-index:1;background:var(--surface-muted);color:var(--text-soft);font-weight:790;font-size:10px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;border-bottom:1px solid var(--border-strong);padding:11px 13px;text-align:left}
+.control-table tbody td,.bo-table tbody td{padding:11px 13px;border-bottom:1px solid var(--border);vertical-align:middle;line-height:1.42}
+.control-table tbody tr:last-child td,.bo-table tbody tr:last-child td{border-bottom:0}
+.control-table tbody tr:hover,.bo-table tbody tr:hover{background:color-mix(in srgb,var(--accent) 4%,var(--bg-solid))}
+.control-table th:first-child,.control-table td:first-child,.bo-table th:first-child,.bo-table td:first-child{padding-left:17px}
+.control-table th:last-child,.control-table td:last-child,.bo-table th:last-child,.bo-table td:last-child{padding-right:17px}
+.control-table td strong,.bo-table td strong{font-weight:760}.control-table td code{overflow-wrap:anywhere}
+.control-table .control-number,.bo-table .control-number{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.control-table-empty{text-align:center!important;padding:38px 20px!important;color:var(--text-soft);font-size:13px;font-weight:550}
+.control-break-value{display:block;min-width:100px;max-width:560px;overflow-wrap:anywhere;white-space:normal}
+.bo-table-filters{margin-bottom:14px;gap:9px;min-width:0}.bo-table-filters input{min-width:190px;flex:1 1 220px}.bo-table-filters select{max-width:100%;min-width:145px}.bo-table-filters button{min-width:80px}
+.control-panel:has(>.control-table-wrap){padding-bottom:0;overflow:hidden}.control-panel:has(>.control-table-wrap)>.control-table-wrap{border-radius:0;border-left:0;border-right:0;border-bottom:0;margin:0 -19px}
+.control-panel:has(>.control-table-wrap)>.bo-table-filters{margin-bottom:16px}
+.control-table-wrap .proofline-pagination{border-top:1px solid var(--border)}
+.bo-section>.control-table-wrap{margin-top:12px}
+@media(max-width:760px){.bo-table-filters{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.bo-table-filters input{min-width:0;grid-column:1/-1}.bo-table-filters select{min-width:0}.bo-table-filters button{grid-column:1/-1}.control-table{min-width:700px}.control-table-wrap{border-radius:10px}}
+@media(prefers-reduced-motion:reduce){.control-table tbody tr,.bo-table tbody tr{transition:none}}
+
+/* P3/7 — Data-grounded dashboard and business charts, existing Proofline palette only. */
+.bo-dashboard{min-width:0}
+.bo-dashboard-head{align-items:flex-start;flex-wrap:wrap}
+.bo-range-filter{display:flex;align-items:flex-end;justify-content:flex-end;gap:10px;flex-wrap:wrap;max-width:100%}
+.bo-custom-range{display:flex;align-items:flex-end;gap:6px;flex-wrap:wrap}
+.bo-custom-range label{display:grid;gap:3px;color:var(--text-soft);font-size:10px;font-weight:700}
+.bo-custom-range input{width:130px;max-width:100%;height:32px;border:1px solid var(--border);border-radius:7px;color:var(--text);background:var(--bg-solid);padding:4px 6px;font:inherit;font-size:12px;color-scheme:normal}
+.bo-custom-range button{height:32px;padding:0 12px;border:1px solid var(--border);border-radius:7px;background:var(--accent-soft);color:var(--text);font-weight:750;cursor:pointer}
+.bo-custom-range button:hover{border-color:var(--accent)}
+.bo-custom-range :is(button,input):focus-visible,.bo-metric-tabs a:focus-visible,.bo-chart-data summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bo-period a[aria-current="page"]{background:var(--accent);color:#07110e}
+.bo-metric-tabs{display:flex;flex-wrap:wrap;gap:5px;margin:12px 0 4px}
+.bo-metric-tabs a{padding:7px 11px;border:1px solid var(--border);border-radius:999px;color:var(--text-soft);font-size:11px;font-weight:750;text-decoration:none}
+.bo-metric-tabs a.active{background:var(--accent-soft);color:var(--text);border-color:var(--accent)}
+.bo-trend-v3{min-height:0;color:var(--accent)}
+.bo-chart-stats{display:flex;align-items:baseline;gap:12px;margin:12px 0 3px}
+.bo-chart-stats strong{font-size:23px;letter-spacing:-.03em;color:var(--text)}
+.bo-chart-stats span{font-size:11px;color:var(--text-soft)}
+.bo-chart-grid{stroke:var(--border);stroke-width:1;stroke-dasharray:3 5}
+.bo-chart-axis-label{font:11px system-ui,sans-serif;fill:var(--text-soft)}
+.bo-chart-fill{fill:color-mix(in srgb,var(--accent) 12%,transparent)}
+.bo-chart-dot{fill:var(--bg-solid);stroke:var(--accent);stroke-width:2}
+.bo-chart-data{color:var(--text-soft);font-size:11px;margin:8px 0 0}
+.bo-chart-data summary{cursor:pointer;padding:8px 4px;font-weight:750}
+.bo-chart-data>.control-table-wrap{max-height:265px;overflow:auto;margin:6px 0 0}
+.bo-chart-data .bo-table{min-width:0;width:100%}
+.bo-chart-data .bo-table td{padding:7px 11px}
+.bo-disclosure{font-size:12px;color:var(--text-soft);line-height:1.6;margin:10px 0 0}
+.bo-coverage{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.bo-coverage>span{display:flex;flex-direction:column;gap:8px;border:1px solid var(--border);padding:13px;border-radius:10px;font-size:11px;color:var(--text-soft)}
+.bo-coverage strong{font-size:20px;color:var(--text)}
+@media(max-width:1150px){.bo-range-filter{justify-content:flex-start}.bo-coverage{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.bo-range-filter{width:100%;justify-content:flex-start}.bo-custom-range{width:100%}.bo-custom-range label{flex:1}.bo-custom-range input{width:100%}.bo-coverage{grid-template-columns:1fr}.bo-chart-stats{flex-direction:column;gap:1px}.bo-trend-v3 svg{min-width:0}.bo-metric-tabs a{font-size:10px;padding:7px 9px}}
+@media(prefers-reduced-motion:reduce){.bo-trend-v3 *{animation:none!important;transition:none!important}}
+
+/* P5/7 — compact evidence cells for Assessments, Reports and Marketplace */
+.p5-progress{display:flex;gap:12px;align-items:baseline;justify-content:space-between;font-variant-numeric:tabular-nums;font-size:12px;white-space:nowrap}
+.p5-progress>span{color:var(--text-soft);font-size:11px;font-weight:700}
+.p5-progress+.control-meter{margin:7px 0 5px;max-width:180px}
+.p5-license{max-width:210px;overflow-wrap:anywhere}
+.control-table td code{font-size:11px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+
+/* P7 · Accessible settings, legal versioning and RBAC operational matrices */
+.control-config-organizations,.control-legal-documents{display:grid;gap:12px;margin-top:14px}
+.control-config-org{display:grid;grid-template-columns:minmax(180px,1fr) minmax(160px,210px) auto;gap:14px;align-items:end;padding:14px;border:1px solid var(--line,rgba(140,150,170,.25));border-radius:12px}
+.control-config-org>div,.control-legal-document>div:first-child{display:grid;gap:4px;min-width:0}
+.control-config-org>div span,.control-legal-document .control-cell-secondary{font-size:.83rem;color:var(--muted,#8891a0)}
+.control-config-org label,.control-legal-draft-form label{display:grid;gap:6px;font-size:.86rem}
+.control-capabilities{max-width:680px;overflow-wrap:anywhere;line-height:1.65}
+.control-legal-document{display:grid;gap:12px;padding:16px;border:1px solid var(--line,rgba(140,150,170,.25));border-radius:12px;min-width:0}
+.control-legal-document td form{display:grid;gap:7px;min-width:200px}
+.control-legal-draft summary{cursor:pointer;font-weight:600;padding:8px 0}
+.control-legal-draft-form{display:grid;grid-template-columns:minmax(100px,.7fr) minmax(100px,.7fr) minmax(180px,2fr);gap:14px;margin-top:12px}
+.control-legal-draft-form .control-legal-content{grid-column:1/-1}
+.control-legal-draft-form textarea{resize:vertical;min-height:140px;width:100%}
+.control-legal-draft-form button{justify-self:start}
+.control-sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@media(max-width:760px){.control-config-org,.control-legal-draft-form{grid-template-columns:1fr}.control-legal-draft-form .control-legal-content{grid-column:auto}.control-config-org button{justify-self:start}}
+
+
+/* CONTROL VISUAL AUDIT 2026-10-19 — Unified pagination placement and field rhythm. */
+.control-table-wrap:has(> .proofline-pagination){position:relative;padding-top:37px;min-width:0}
+.control-table-wrap>.proofline-pagination{justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 14px;min-height:58px}
+.control-table-wrap>.proofline-pagination>.proofline-pagination-summary{position:absolute;right:16px;top:7px;display:flex;align-items:center;gap:6px;min-width:0;padding:0;margin:0;line-height:23px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.control-table-wrap>.proofline-pagination>.proofline-pagination-summary strong{font-size:13px}
+.control-table-wrap>.proofline-pagination>.proofline-pagination-size{order:1;display:flex;justify-content:flex-start;margin-right:auto;gap:8px}
+.control-table-wrap>.proofline-pagination>.proofline-pagination-nav{order:2;display:flex;justify-content:flex-end;margin-left:auto;gap:10px}
+.control-table-wrap>.proofline-pagination :is(select,button){min-height:36px}
+.control-table-wrap>.proofline-pagination :is(select,button,a):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.control-table-wrap .control-table tbody td,.control-table-wrap .bo-table tbody td{padding-top:12px;padding-bottom:12px;line-height:1.45}
+.control-table-wrap .control-table thead th,.control-table-wrap .bo-table thead th{padding-top:12px;padding-bottom:12px}
+.bo-dashboard-head .bo-range-filter{align-items:center;gap:10px}
+.bo-dashboard-head .bo-period{height:40px;min-height:40px;padding:4px;flex-shrink:0}
+.bo-dashboard-head .bo-period>a{height:30px;min-height:30px;display:inline-flex;align-items:center;justify-content:center;min-width:35px}
+.bo-dashboard-head .bo-custom-range{align-items:center;gap:8px}
+.bo-dashboard-head .bo-custom-range label{display:flex;flex-direction:row;align-items:center;gap:6px;margin:0;font-size:11px;line-height:1.2}
+.bo-dashboard-head .bo-custom-range input,.bo-dashboard-head .bo-custom-range button{height:40px;min-height:40px;border-radius:9px}
+.bo-dashboard-head .bo-custom-range input{width:135px;min-width:125px;min-height:40px;padding:0 10px;color-scheme:inherit}
+.bo-dashboard-head .bo-custom-range button{min-width:77px;padding:0 14px}
+.control-internal-user-form{grid-template-columns:repeat(3,minmax(170px,1fr)) auto;column-gap:16px;row-gap:16px;align-items:end}
+.control-internal-user-form label{display:grid;gap:9px;min-width:0;font-size:12px}
+.control-internal-user-form :is(input,select,button){min-height:40px}
+.control-internal-user-form>button{align-self:end;white-space:nowrap;padding-inline:18px}
+.control-grid-2:has(.control-retention-policy-list){grid-template-columns:minmax(0,1fr);gap:18px}
+.control-retention-policy-list{gap:14px}
+.control-retention-policy,.control-hold-form{align-items:end;column-gap:14px;row-gap:14px;min-width:0}
+.control-retention-policy{grid-template-columns:minmax(185px,1.2fr) 100px minmax(145px,.6fr) minmax(220px,1fr) auto;padding:16px}
+.control-retention-policy>div{overflow-wrap:anywhere}
+.control-hold-form{grid-template-columns:minmax(180px,1fr) minmax(190px,.9fr) minmax(190px,.8fr) minmax(235px,1.25fr) auto}
+.control-retention-policy label,.control-hold-form label{gap:8px;min-width:0}
+.control-retention-policy label>span,.control-hold-form label>span{font-size:12px;font-weight:650}
+.control-retention-policy :is(input,select,button),.control-hold-form :is(input,select,button){min-height:40px;max-width:100%;min-width:0}
+.control-retention-policy>button,.control-hold-form>button{min-width:98px;align-self:end;padding-inline:14px}
+.control-retention-policy .control-input,.control-hold-form .control-input{padding:8px 10px}
+.control-retention-policy .control-select,.control-hold-form .control-select{width:100%;padding-inline:10px}
+.control-communications-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+.control-communications-grid>.control-panel{display:flex;flex-direction:column;min-width:0}
+.control-communications-grid>.control-panel>.control-list{max-height:460px;overflow-y:auto;scrollbar-color:var(--border-strong) transparent;scrollbar-width:thin}
+@media(max-width:1300px){.control-retention-policy{grid-template-columns:minmax(0,1fr) 110px minmax(160px,.6fr)}.control-retention-policy>div,.control-retention-basis{grid-column:1/-1}.control-retention-policy>button{justify-self:start}.control-hold-form{grid-template-columns:repeat(2,minmax(0,1fr))}.control-hold-reason{grid-column:1/-1}.control-hold-form>button{justify-self:start}}
+@media(max-width:900px){.control-internal-user-form{grid-template-columns:repeat(2,minmax(0,1fr))}.control-internal-user-form>button{justify-self:start}.control-communications-grid{grid-template-columns:1fr}.bo-dashboard-head .bo-range-filter{justify-content:flex-start}}
+@media(max-width:760px){.control-table-wrap>.proofline-pagination{gap:10px}.control-table-wrap>.proofline-pagination>.proofline-pagination-size,.control-table-wrap>.proofline-pagination>.proofline-pagination-nav{width:100%;flex-basis:100%;justify-content:space-between;margin:0}.bo-dashboard-head .bo-custom-range label{flex:1 1 130px;flex-direction:column;align-items:flex-start}.bo-dashboard-head .bo-custom-range input{width:100%}.bo-dashboard-head .bo-custom-range button{align-self:flex-end}.control-retention-policy,.control-hold-form,.control-internal-user-form{grid-template-columns:minmax(0,1fr)}.control-retention-policy>div,.control-retention-basis,.control-hold-reason{grid-column:auto}.control-retention-policy>button,.control-hold-form>button{justify-self:stretch}}
+
+/* WS5-FINAL · Control card top-edge parity with Workspace.
+   Border COLOR ONLY: no dimensional changes, shadows, layout or scroll rules.
+   Preserve semantic warning/success borders on their KPI variants. */
+.control-main .bo-section,
+.control-main .control-panel,
+.control-main .card,
+.control-main .bo-kpi:not(.danger):not(.good) {
+  border-top-color: var(--border-strong);
+}
+
+/* UI-01 · 19/10/2026 · enterprise density, alignment, responsive consistency.
+   Single additive layer: shared selectors override legacy large-space rules. */
+.control-content{padding:24px 28px 48px;max-width:none}
+.control-stack{gap:16px}
+.control-page-intro{align-items:start;gap:16px;padding:0}
+.control-page-intro h1{font-size:clamp(29px,2.7vw,39px);line-height:1.13;letter-spacing:-.035em}
+.control-page-intro p{margin-top:6px;font-size:13px;line-height:1.5;max-width:850px}
+.control-panel,.bo-section{padding:16px;border-radius:13px}
+.control-panel-head,.bo-section-head{gap:12px;margin-bottom:12px;align-items:start}
+.control-panel-head h2,.bo-section-head h2{font-size:16px;line-height:1.35}
+.control-panel>h3{font-size:15px;margin-bottom:10px}
+.control-metrics,.control-grid-2,.control-grid-3,.control-grid-4{gap:12px}
+.control-metric{min-height:84px;padding:13px 15px;border-radius:12px;justify-content:center}
+.control-metric-value{font-size:clamp(24px,2.4vw,30px);line-height:1.05}
+.control-metric-label{margin-top:5px;font-size:11.5px;line-height:1.35}
+.control-metric-note{margin-top:3px;font-size:11px}
+.control-row-metrics .control-metric{min-height:72px}
+.control-grid-2,.bo-grid-equal,.control-align-start{align-items:start}
+.control-plan{min-height:0}
+.control-plan h3{font-size:15px;margin:0 0 6px}
+.control-price{font-size:25px;margin:4px 0 12px}
+.control-price span{font-size:12px}
+.control-entitlements{display:grid;gap:0;margin:0;padding:0}
+.control-entitlements>div{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--border)}
+.control-entitlements dt{font-size:12px;color:var(--text-soft);text-transform:capitalize}
+.control-entitlements dd{margin:0;font-size:12px;font-weight:680;text-align:right;overflow-wrap:anywhere}
+.control-tech-details{margin-top:10px;font-size:12px}
+.control-tech-details summary{cursor:pointer;color:var(--text-soft);padding:5px 0}
+.control-tech-details[open] .control-json{margin-top:8px}
+.control-plan-create-form{display:grid;grid-template-columns:minmax(185px,1.5fr) repeat(2,minmax(160px,1fr)) minmax(150px,.7fr) auto;align-items:end;gap:12px}
+.control-plan-create-form>label{min-width:0;display:grid;gap:6px;align-content:end;font-size:12px;color:var(--text-soft)}
+.control-plan-create-form :is(input,select){width:100%;min-width:0}
+.control-plan-create-form>button{justify-self:start}
+.bo-kpi-grid{gap:10px}
+.bo-kpi{min-height:105px;padding:12px 14px;gap:4px;border-radius:12px}
+.bo-kpi-icon{width:28px;height:28px}
+.bo-kpi>strong{font-size:22px;line-height:1.15}
+.bo-kpi>span:not(.bo-kpi-icon){font-size:11.5px;line-height:1.35}
+.bo-kpi small{font-size:10.5px}
+.control-system-kpis{grid-template-columns:repeat(5,minmax(0,1fr))}
+.control-system-kpis .bo-kpi{min-height:96px;gap:6px}
+.control-system-kpis .bo-kpi>strong{font-size:12px;line-height:1.2;letter-spacing:normal}
+.control-system-kpis .bo-kpi .control-status{font-size:11px}
+.control-system-kpis .bo-kpi small{font-size:11px}
+.control-list>div,.control-activity>div,.control-health-grid>div{padding:9px 0}
+.control-empty{padding:12px 2px;font-size:12px;line-height:1.5}
+.control-legal-compliance-layout{grid-template-columns:minmax(0,1.6fr) minmax(255px,.65fr);align-items:start}
+.control-legal-profiles{align-self:start}
+.control-legal-profiles .control-list>div{align-items:flex-start;gap:8px}
+.control-legal-profiles .control-list>div>div{min-width:0;overflow-wrap:anywhere}
+.control-legal-profiles .control-list>div>span{white-space:nowrap}
+.control-legal-document{padding:12px;gap:10px}
+.control-legal-documents{gap:10px}
+.control-config-org{padding:10px 12px;gap:12px;align-items:end;grid-template-columns:minmax(180px,1fr) 190px auto}
+.control-config-org label{gap:5px}
+.control-config-org>button{align-self:end}
+.control-communications-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px}
+.control-communications-grid>.control-panel{height:auto;min-height:0;align-self:start}
+.control-communications-grid>.control-panel>.control-list{max-height:none;overflow:visible}
+.control-retention-policy-list{gap:8px}
+.control-retention-policy{padding:11px 12px;gap:10px;grid-template-columns:minmax(165px,1fr) 78px minmax(120px,.65fr) minmax(165px,1fr) auto}
+.control-hold-form{grid-template-columns:minmax(160px,1fr) minmax(170px,1fr) minmax(130px,.7fr) minmax(175px,1.3fr) auto;gap:10px}
+.control-retention-policy>button,.control-hold-form>button{min-width:0}
+.control-retention-policy label,.control-hold-form label{gap:5px}
+.control-retention-policy label>span,.control-hold-form label>span{font-size:11px}
+.control-retention-policy :is(input,select,button),.control-hold-form :is(input,select,button){min-height:36px;height:36px}
+.control-internal-user-form{row-gap:12px;column-gap:12px}
+.control-internal-user-form label{gap:5px}
+.control-internal-user-form :is(input,select,button){min-height:36px;height:36px}
+/* One sizing contract for actionable controls; override earlier 40px and oversized buttons. */
+.control-panel :is(input.control-input,select.control-select,button.control-button,a.control-button),
+.bo-filter-form :is(input:not([type="hidden"]),select,button),.bo-filter-form a.control-button,
+.control-records-toolbar :is(input,select,button),.control-records-footer :is(select,button){box-sizing:border-box;min-height:36px;height:36px;border-radius:8px;font-size:12px;line-height:1.25}
+.control-panel button.control-button,.control-panel a.control-button{display:inline-flex;align-items:center;justify-content:center;padding:0 12px;white-space:nowrap;font-weight:680}
+.control-panel button.control-button.small,.control-panel a.control-button.small{min-height:32px;height:32px;padding:0 10px}
+.bo-filter-form{gap:8px;align-items:center;min-width:0}
+.bo-table-filters{margin-bottom:10px}
+.bo-table-filters input:not([type="hidden"]){min-width:180px;flex:1 1 200px}
+.bo-table-filters select{min-width:135px;max-width:min(250px,100%);flex:0 1 auto}
+.bo-table-filters button,.bo-table-filters a.control-button{min-width:0;flex:0 0 auto;padding:0 12px;font-size:12px;font-weight:700}
+.bo-filter-form button:not(.control-button){border:1px solid color-mix(in srgb,var(--accent) 70%,var(--border));background:var(--accent);color:#081014;cursor:pointer}
+.bo-filter-form button:not(.control-button):hover{filter:brightness(1.06)}
+.bo-filter-form button:focus-visible,.control-button:focus-visible,.control-records-toolbar :is(input,select):focus-visible,.control-records-footer :is(button,select):focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bo-filter-form :is(input:not([type="hidden"]),select),.control-records-toolbar :is(input,select),.control-records-footer select{background:var(--bg-solid);color:var(--text);border:1px solid var(--border);padding-inline:10px}
+.bo-filter-form label{min-width:0;display:grid;gap:5px;font-size:12px;color:var(--text-soft)}
+.bo-filter-form label :is(input,select){max-width:100%}
+.control-records-table{min-width:0}
+.control-records-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 10px}
+.control-records-toolbar input[type="search"]{flex:1 1 210px;min-width:170px;width:auto;max-width:440px}
+.control-records-toolbar select{flex:0 1 auto;min-width:130px;max-width:210px}
+.control-records-toolbar .control-button{padding-inline:12px}
+.control-records-count{margin-left:auto;font-size:12px;color:var(--text-soft);white-space:nowrap;font-variant-numeric:tabular-nums}
+.control-records-count strong{color:var(--text);font-size:13px}
+.control-table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain;border:1px solid var(--border);border-radius:10px 10px 0 0}
+.control-records-table .control-table{font-size:12px}
+.control-records-table .control-table th,.control-records-table .control-table td{padding:10px 11px;line-height:1.4}
+.control-records-table .control-table th{font-size:10px;letter-spacing:.04em;text-transform:uppercase}
+.control-records-footer{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border:1px solid var(--border);border-top:0;border-radius:0 0 10px 10px;padding:10px 12px}
+.control-records-footer>label{display:inline-flex;align-items:center;gap:8px;color:var(--text-soft);font-size:11px}
+.control-records-footer select{min-width:65px;padding-inline:8px}
+.control-records-footer>nav{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--text-soft);font-variant-numeric:tabular-nums}
+.control-records-footer>nav button{padding-inline:10px}
+.control-records-note{margin:7px 1px 0;color:var(--text-soft);font-size:11px;line-height:1.4}
+.control-records-table :is(button,select):disabled{opacity:.42;cursor:not-allowed}
+/* Scrollbars: do not override the canonical transversal system in
+   @proofline/design-tokens/base.css. In Chromium scrollbar-color suppresses
+   themed ::-webkit-scrollbar thumbs, which caused the UI-01 regression. */
+@media(max-width:1500px){.control-legal-compliance-layout{grid-template-columns:minmax(0,1fr)}.control-plan-create-form{grid-template-columns:repeat(2,minmax(190px,1fr))}.control-plan-create-form>button{align-self:end}}
+@media(max-width:1280px){.control-system-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.control-retention-policy{grid-template-columns:minmax(160px,1fr) minmax(65px,.45fr) minmax(130px,.6fr)}.control-retention-policy>div,.control-retention-basis{grid-column:auto}.control-retention-policy>button{justify-self:start}.control-hold-form{grid-template-columns:repeat(2,minmax(0,1fr))}.control-hold-reason{grid-column:auto}.control-hold-form>button{justify-self:start}}
+@media(max-width:960px){.control-content{padding:20px}.control-communications-grid{grid-template-columns:1fr}.control-system-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.control-config-org{grid-template-columns:minmax(0,1fr) minmax(135px,200px) auto}.control-metrics-4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.control-content{padding:16px}.control-system-kpis{grid-template-columns:1fr 1fr}.control-metrics-3{grid-template-columns:repeat(2,minmax(0,1fr))}.control-config-org{grid-template-columns:1fr}.control-config-org>button{justify-self:start}.control-plan-create-form,.control-retention-policy,.control-hold-form{grid-template-columns:1fr}.control-retention-policy>div,.control-retention-basis,.control-hold-reason{grid-column:auto}.control-records-count{margin-left:0;flex-basis:100%;text-align:right}.control-records-footer>nav{width:100%;justify-content:space-between}.control-records-toolbar select{max-width:none}.bo-table-filters input:not([type="hidden"]){min-width:100%;flex-basis:100%}}
+@media(max-width:480px){.control-system-kpis,.control-metrics-3{grid-template-columns:1fr}.control-records-toolbar input[type="search"]{max-width:none;min-width:100%}}
+@media(prefers-reduced-motion:reduce){.control-shell *{scroll-behavior:auto!important;transition-duration:0.01ms!important;animation-duration:0.01ms!important}}
+
+/* Legal version forms remain compact even with a publication explanation field. */
+.control-legal-document td form{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
+.control-legal-document td form input{min-width:140px;flex:1 1 160px}
+.control-legal-document td form button{flex:0 0 auto}
+
+/* UI-01R · dashboard KPIs only: one dense, consistent vertical rhythm.
+   The left icon column shares the same rows with value, label and note,
+   instead of adding an extra row above every KPI. */
+.bo-dashboard>.bo-kpi-grid .bo-kpi{
+  position:relative;display:grid;grid-template-columns:24px minmax(0,1fr);
+  grid-template-rows:auto auto auto;column-gap:10px;row-gap:2px;
+  align-content:center;align-items:center;min-height:78px;padding:10px 13px;
+}
+.bo-dashboard>.bo-kpi-grid .bo-kpi-top{
+  grid-column:1;grid-row:1 / span 3;align-self:center;display:flex;justify-content:center;
+}
+.bo-dashboard>.bo-kpi-grid .bo-kpi-icon{width:24px;height:24px;border-radius:7px}
+.bo-dashboard>.bo-kpi-grid .bo-kpi-icon svg{width:15px;height:15px}
+.bo-dashboard>.bo-kpi-grid .bo-kpi>strong{
+  grid-column:2;grid-row:1;min-width:0;margin:0;font-size:21px;line-height:1.12;
+  overflow-wrap:anywhere;
+}
+.bo-dashboard>.bo-kpi-grid .bo-kpi>span:not(.bo-kpi-icon){grid-column:2;grid-row:2;font-size:11px;line-height:1.3}
+.bo-dashboard>.bo-kpi-grid .bo-kpi>small{grid-column:2;grid-row:3;font-size:10.5px;line-height:1.3}
+.bo-dashboard>.bo-kpi-grid .bo-kpi .bo-delta{
+  position:absolute;top:8px;right:9px;margin:0;padding:2px 5px;font-size:10px;
+}
+.bo-dashboard>.bo-kpi-grid .bo-kpi:has(.bo-delta)>strong{padding-right:46px}
+@media(max-width:480px){.bo-dashboard>.bo-kpi-grid .bo-kpi{min-height:76px}}
+
+/* UX-A2: local metric switch shares existing chart tab visual system; scrollbar and card rules untouched. */
+.bo-metric-tabs button{padding:7px 11px;border:1px solid var(--border);border-radius:999px;color:var(--text-soft);background:transparent;font:inherit;font-size:11px;font-weight:750;cursor:pointer}
+.bo-metric-tabs button.active{background:var(--accent-soft);color:var(--text);border-color:var(--accent)}
+.bo-metric-tabs button:hover{border-color:var(--accent)}
+.bo-metric-tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* UX-A3: scoped filter sizing. Canonical scrollbars and other components remain untouched. */
+.control-uxa3-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.control-uxa3-filters>input:not([type="hidden"]){flex:1 1 210px;min-width:150px;max-width:430px}
+.control-uxa3-filters>select{flex:0 1 auto;min-width:150px;max-width:220px}
+.control-uxa3-filters>a.control-button{display:inline-flex;align-items:center;justify-content:center;padding:0 12px;min-height:36px;height:36px;text-decoration:none}
+@media(max-width:650px){.control-uxa3-filters>input:not([type="hidden"]){min-width:100%;max-width:100%}.control-uxa3-filters>select{flex:1 1 160px}}
+
+/* UX-A4 — scoped enterprise density and progressive disclosure.
+   Preserve the canonical scrollbar implementation and the UI-01R dashboard KPIs. */
+.control-sales-metrics>.control-panel{display:grid;align-content:center;gap:4px;min-height:72px;padding:12px 14px}
+.control-sales-metrics>.control-panel>strong{font-size:24px;line-height:1.1;font-variant-numeric:tabular-nums}
+.control-sales-metrics>.control-panel>.control-cell-secondary{margin-top:0;font-size:11px;line-height:1.4}
+.control-sales-table .control-table{min-width:1000px}
+.control-sales-table .control-table td{vertical-align:top}
+.control-sales-table .control-table td:nth-child(4){min-width:195px}
+.control-sales-table .control-table td:last-child{min-width:240px}
+.control-sales-disclosure{min-width:0;max-width:100%;margin-top:7px;border:1px solid var(--border);border-radius:8px;background:var(--bg-solid)}
+.control-sales-disclosure>summary{display:list-item;list-style-position:inside;min-height:32px;padding:8px 10px;cursor:pointer;font-size:11px;font-weight:700;color:var(--text-soft);line-height:1.45}
+.control-sales-disclosure>summary:hover{color:var(--text);background:var(--surface-muted)}
+.control-sales-disclosure>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+.control-sales-disclosure[open]>summary{border-bottom:1px solid var(--border);color:var(--text)}
+.control-sales-disclosure>form{display:grid;grid-template-columns:minmax(0,1fr);gap:7px;min-width:0;padding:10px}
+.control-sales-disclosure>form :is(select,input:not([type="hidden"])){width:100%;min-width:0;max-width:100%;min-height:34px;height:34px;border:1px solid var(--border);border-radius:8px;padding:0 8px;background:var(--bg-solid);color:var(--text);font-size:11px}
+.control-sales-disclosure>form .control-button{width:fit-content;justify-self:start;max-width:100%;min-height:32px;height:auto;white-space:normal;text-align:center}
+.control-sales-table .control-action-stack{gap:6px}
+.control-sales-table .control-link-strong{display:inline-block;padding:5px 0;font-size:11px}
+.control-internal-management{grid-template-columns:minmax(0,.9fr) minmax(0,1.2fr);align-items:start}
+.control-internal-management>.bo-section{min-width:0}
+.control-internal-management .bo-section h2{font-size:16px;margin:0 0 12px}
+.control-internal-create-form{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;gap:10px}
+.control-internal-create-form>label{min-width:0;display:grid;gap:5px;font-size:12px;color:var(--text-soft)}
+.control-internal-create-form>label :is(input,select){width:100%;min-width:0;height:36px;min-height:36px}
+.control-internal-create-form>button{justify-self:start;min-height:36px;height:36px;padding:0 12px}
+.control-internal-management .bo-role-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.control-internal-management .bo-role{min-width:0;padding:11px 12px}
+.control-internal-management .bo-role h3{overflow-wrap:anywhere}
+.control-internal-management .bo-role p{line-height:1.45;overflow-wrap:anywhere}
+.control-plan-catalog{align-items:start}
+.control-plan-catalog>.control-plan{min-width:0}
+@media(max-width:1200px){.control-internal-management{grid-template-columns:1fr}}
+@media(max-width:760px){.control-internal-management .bo-role-grid{grid-template-columns:1fr}.control-sales-metrics>.control-panel{min-height:70px}}
+.control-role-disclosure{max-width:100%;min-width:0;font-size:11px}
+.control-role-disclosure>summary{width:fit-content;cursor:pointer;color:var(--text);font-size:11.5px;font-weight:680;padding:4px 0}
+.control-role-disclosure>summary:hover{color:var(--accent)}
+.control-role-disclosure>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+.control-role-disclosure[open]>.control-capabilities{display:block;max-width:620px;margin:6px 0 2px;line-height:1.6;color:var(--text-soft);overflow-wrap:anywhere}
+
+/* CQF 1/3 — scoped presentation fixes only. Canonical scrollbars and KPIs untouched. */
+.control-trust-zones{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:10px;align-items:stretch}
+.control-trust-zone{display:flex;flex-direction:column;align-items:flex-start;gap:6px;min-width:0;padding:13px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg-solid)}
+.control-trust-zone>strong{display:block;font-size:12px;line-height:1.4;color:var(--text)}
+.control-trust-zone>.control-trust-value{display:block;font-size:12px;font-weight:650;line-height:1.5;color:var(--text);overflow-wrap:anywhere;max-width:100%}
+.control-trust-zone>small{display:block;font-size:11px;line-height:1.5;color:var(--text-soft);overflow-wrap:anywhere}
+.control-audit-details{max-width:min(100%,480px);min-width:155px}
+.control-audit-details>summary{display:list-item;width:fit-content;cursor:pointer;color:var(--text);font-size:12px;font-weight:650;border-radius:4px;padding:5px 3px}
+.control-audit-details>summary:hover{color:var(--accent)}
+.control-audit-details>summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.control-audit-json{margin:8px 0 0;padding:10px;max-width:min(100%,460px);max-height:260px;overflow:auto;background:var(--surface-muted);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:11px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.control-audit-details[open] summary{margin-bottom:2px}
+/* No new scrollbar rules: inner disclosure inherits the shared design tokens. */
+
+/* CQF-F1: sticky sidebar identity and brand, scroll navigation only.
+   Do not replace PROOFLINE design-tokens scrollbar theme. */
+@media (min-width:901px){
+ .control-sidebar{overflow:hidden;min-height:0}
+ .control-sidebar>.control-brand{flex:0 0 auto}
+ .control-sidebar>.control-nav{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;align-content:start;overscroll-behavior:contain;padding:0 12px 0 3px}
+ .control-sidebar>.control-identity{flex:0 0 auto;margin-top:0}
+}
+@media (max-width:900px){.control-sidebar{overflow:visible}.control-sidebar>.control-nav{overflow:visible;min-height:0}}
+.control-framework-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.control-framework-detail-grid>div{border:1px solid var(--border);border-radius:9px;padding:12px;min-width:0;display:grid;gap:4px}
+.control-framework-detail-grid strong{font-size:12px}.control-framework-detail-grid span{overflow-wrap:anywhere;color:var(--text-soft);font-size:12px}
+.control-detail-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.control-framework-edit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:end}
+.control-framework-edit label{display:grid;gap:5px;font-size:12px;font-weight:700}
+.control-framework-edit textarea{grid-column:1/-1;min-height:100px;resize:vertical}
+.control-framework-edit .control-framework-edit-description{grid-column:1/-1}
+.control-framework-edit>button{justify-self:start}
+.control-legal-text{white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow:auto;margin:7px 0 10px;padding:12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-muted);font-size:12px;line-height:1.6}
+@media(max-width:720px){.control-framework-detail-grid,.control-framework-edit{grid-template-columns:1fr}}
+
+/* CQF-F1 detail pages: no row expansion inside operational tables. */
+.control-version-link{display:inline-flex;align-items:center;min-height:30px;margin-top:5px}
+.control-version-content-title{font-size:15px;margin:18px 0 7px}
+.control-legal-detail-content{max-width:none;max-height:65vh;margin-bottom:0}
+.control-version-publish{display:grid;gap:12px;max-width:680px;align-items:start}
+.control-version-publish>label{display:grid;gap:6px;font-size:12px;font-weight:700}
+.control-version-publish>label :is(textarea,select){width:100%}
+.control-version-publish>button{justify-self:start;min-height:36px}
+
+.control-framework-references{display:grid;gap:14px}
+.control-framework-references>section{border-bottom:1px solid var(--border);padding-bottom:14px;scroll-margin-top:84px}
+.control-framework-references>section:last-child{border-bottom:0;padding-bottom:0}
+.control-framework-references h3{font-size:14px;margin:0 0 8px}
+.control-capability-list{margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:8px;padding:0;list-style:none}
+.control-capability-list li{padding:10px;border:1px solid var(--border);border-radius:8px;overflow-wrap:anywhere;font-size:12px}
+
+

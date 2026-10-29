@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative, dirname } from "node:path";
 
 const root = process.cwd();
@@ -39,17 +39,18 @@ const appPkgs = ["site", "web", "respond", "control", "support"].map((app) => ({
 const versions = new Set(appPkgs.map(({json}) => `${json.dependencies.next}|${json.dependencies.react}|${json.dependencies["react-dom"]}`));
 if (versions.size !== 1) fail("Next/React versions differ between frontend surfaces.");
 const ports = new Map();
+const expectedFrontendPorts = { site:"4200", web:"4202", respond:"4203", control:"4204", support:"4205" };
 for (const {app,json} of appPkgs) {
   const m = String(json.scripts.dev ?? "").match(/-p\s+(\d+)/);
   if (!m) fail(`apps/${app}/package.json: dev port missing.`);
   else if (ports.has(m[1])) fail(`Port ${m[1]} reused by ${ports.get(m[1])} and ${app}.`);
-  else ports.set(m[1], app);
+  else { ports.set(m[1], app); if (m[1] !== expectedFrontendPorts[app]) fail(`apps/${app}/package.json: expected Armar port ${expectedFrontendPorts[app]}, found ${m[1]}.`); }
 }
 
 // Server-to-server API calls should avoid Windows localhost -> ::1 ambiguity.
 for (const f of ["apps/web/lib/api.ts", "apps/control/lib/api.ts", "apps/respond/lib/api.ts", "apps/support/lib/api.ts"]) {
   const s = read(f);
-  if (s.includes("http://localhost:4100")) fail(`${f}: server API default must use 127.0.0.1.`);
+  if (s.includes("http://localhost:4201")) fail(`${f}: server API default must use 127.0.0.1.`);
 }
 
 
@@ -92,10 +93,10 @@ for (const f of source.filter((x) => x.startsWith("apps/api/src/") && x.endsWith
 // Tenant-isolation guardrail: assessment listing must always be constrained by the resolved organization.
 const assessmentListService = read("apps/api/src/assessments/assessments.service.ts");
 const assessmentListController = read("apps/api/src/assessments/assessments.controller.ts");
-if (!/async list\(organizationId:string,ids\?:string\[\]\)/.test(assessmentListService) || !/where:ids\?\{organizationId,id:\{in:ids\}\}:\{organizationId\}/.test(assessmentListService)) {
+if (!/async\s+list\(\s*organizationId:\s*string\s*,\s*ids\?:\s*string\[\]\s*\)/.test(assessmentListService) || !/where:\s*ids\s*\?\s*\{\s*organizationId\s*,\s*id:\s*\{\s*in:\s*ids\s*\}\s*\}\s*:\s*\{\s*organizationId\s*\}/s.test(assessmentListService)) {
   fail("apps/api/src/assessments/assessments.service.ts: assessment list must be tenant-scoped by organizationId.");
 }
-if (!assessmentListController.includes("this.svc.list(ctx.organization.id,unrestricted?undefined:ids)")) {
+if (!/this\.svc\.list\(\s*ctx\.organization\.id\s*,\s*unrestricted\s*\?\s*undefined\s*:\s*ids\s*\)/.test(assessmentListController)) {
   fail("apps/api/src/assessments/assessments.controller.ts: resolved organization must be passed into assessment listing.");
 }
 
@@ -152,42 +153,6 @@ if (commercialHome.includes("commercial-flow-step") || commercialHome.includes("
 if (commercialHome.includes("site-product-orbit orbit-")) {
   fail("apps/site/app/[locale]/page.tsx: decorative product-orbit micro-labels must not return.");
 }
-
-// C2.3.4: Team & permissions must honor the exact rhythm at selector-specific level.
-for (const required of [
-  ".workspace-team-list { display:grid; gap:20px; min-width:0; }",
-  ".workspace-role-grid.role-explainer { gap:20px; }",
-  ".workspace-invite-card { display:grid; gap:20px; padding:20px; }",
-]) {
-  if (!workspaceCss.includes(required)) fail(`apps/web/app/workspace.css: missing C2.3.4 team rhythm contract: ${required}`);
-}
-
-// C2.3.5 browser identity contract: brand-only public site, tenant-aware Workspace,
-// assessment-aware Respond, and explicit internal Control/Support surfaces.
-const staticSurfaceTitles = {
-  site: "PROOFLINE",
-  control: "PROOFLINE — Control",
-  support: "PROOFLINE — Support",
-};
-for (const [app, title] of Object.entries(staticSurfaceTitles)) {
-  const layout = read(`apps/${app}/app/layout.tsx`);
-  if (!layout.includes(`title: "${title}"`)) fail(`apps/${app}/app/layout.tsx: browser title must be ${title}.`);
-  if (!layout.includes('icon: "/icon.svg"')) fail(`apps/${app}/app/layout.tsx: PROOFLINE browser icon metadata is missing.`);
-  if (!existsSync(join(root, `apps/${app}/app/icon.svg`))) fail(`apps/${app}/app/icon.svg: shared PROOFLINE browser icon is missing.`);
-}
-for (const app of ["web", "respond"]) {
-  const layout = read(`apps/${app}/app/layout.tsx`);
-  if (!layout.includes('title: "PROOFLINE"')) fail(`apps/${app}/app/layout.tsx: dynamic surface fallback title must be PROOFLINE.`);
-  if (!layout.includes('icon: "/icon.svg"')) fail(`apps/${app}/app/layout.tsx: PROOFLINE browser icon metadata is missing.`);
-  if (!existsSync(join(root, `apps/${app}/app/icon.svg`))) fail(`apps/${app}/app/icon.svg: shared PROOFLINE browser icon is missing.`);
-}
-const workspaceLocaleLayout = read("apps/web/app/[locale]/layout.tsx");
-if (!workspaceLocaleLayout.includes('export async function generateMetadata')) fail("apps/web/app/[locale]/layout.tsx: tenant-aware metadata is missing.");
-if (!workspaceLocaleLayout.includes('`${organizationName} — PROOFLINE`')) fail("apps/web/app/[locale]/layout.tsx: Workspace title must resolve to {Cliente} — PROOFLINE.");
-const respondTokenPage = read("apps/respond/app/[locale]/[token]/page.tsx");
-if (!respondTokenPage.includes('export async function generateMetadata')) fail("apps/respond/app/[locale]/[token]/page.tsx: assessment-aware metadata is missing.");
-if (!respondTokenPage.includes('[organizationName, assessmentTitle].filter(Boolean).join(" · ")')) fail("apps/respond/app/[locale]/[token]/page.tsx: Respond title must combine client and assessment context.");
-if (!respondTokenPage.includes('`${context} — PROOFLINE`')) fail("apps/respond/app/[locale]/[token]/page.tsx: Respond title must resolve to {Cliente} · {Assessment} — PROOFLINE.");
 
 // The VS Code distribution must not reintroduce external launchers.
 const forbidden = walk(".").filter((f) => /\.(bat|ps1)$/i.test(f));

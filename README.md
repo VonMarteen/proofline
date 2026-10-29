@@ -2,31 +2,30 @@
 
 **Signal & Structure — by ARMAR TECHNOLOGIES**
 
-Estado local: **v0.2.6-C2.1.0**. Desarrollo orientado a Visual Studio Code en Windows.
+Estado local: **v0.2.6-C2.0**. Desarrollo orientado a Visual Studio Code en Windows.
 
 ## Superficies
 
 - `apps/site` — web comercial y entrada Demo / Empezar.
 - `apps/web` — Workspace de organización / partner.
 - `apps/respond` — experiencia aislada del participante.
-- `apps/control` — Proofline Control, backoffice interno privilegiado y supervisión global.
-- `apps/support` — consola interna separada para agentes de soporte, limitada a tickets.
+- `apps/control` — Proofline Control, backoffice interno privilegiado.
 - `apps/api` — código Nest compartido por dos runtimes separados: API cliente y Control API.
 - `apps/worker` — jobs asíncronos, email, analytics y escalado SLA.
 - `services/analytics` — motor analítico Python.
 
 ## Zonas locales
 
-- Site: `http://localhost:3100`
-- Workspace: `http://localhost:3101`
-- Respond: `http://localhost:3102`
-- Control UI: `http://localhost:3103`
-- Support Console: `http://localhost:3104`
-- API cliente/public/respond: `http://127.0.0.1:4100`
-- API interna de Control: `http://127.0.0.1:4200`
-- PostgreSQL: `127.0.0.1:55432`
-- Mailpit: `http://localhost:58025`
-- Analytics: `http://localhost:58100`
+- Site: `http://localhost:4200`
+- Workspace: `http://localhost:4202`
+- Respond: `http://localhost:4203`
+- Control UI: `http://localhost:4204`
+- Support UI: `http://localhost:4205`
+- API cliente/public/respond: `http://127.0.0.1:4201`
+- API interna de Control: `http://127.0.0.1:4206`
+- PostgreSQL: `127.0.0.1:4232`
+- Mailpit: `http://localhost:4280`
+- Analytics: `http://localhost:4281`
 
 La API cliente y la API de Control no montan los mismos controllers de privilegio. Workspace y Control mantienen cookies, sesiones e identidades distintas. En producción, Control puede usar además `CONTROL_DATABASE_URL` para una credencial de base de datos independiente y de privilegio mínimo.
 
@@ -38,7 +37,7 @@ Docker ejecuta PostgreSQL, Mailpit, Analytics y MinIO opcional. Las aplicaciones
 
 Las cinco superficies Next arrancan con **Webpack** porque el entorno Windows del usuario bloquea el binding nativo SWC requerido por Turbopack.
 
-## C2 / C2.1
+## C2
 
 C2 añade:
 
@@ -49,10 +48,12 @@ C2 añade:
 - solicitudes controladas de cambios contractuales;
 - pipeline Demo / Start → Evaluation → Contract → Provisioning;
 - alta automática de organización, suscripción y Owner desde Control;
-- chequeo explícito de separación de trust zones;
-- C2.1 separa la operación diaria de soporte en `apps/support`, deja Control como supervisión y añade histórico auditado;
-- C2.1 incorpora fixtures aditivos de Nova Retail Iberia y Orbis Health Iberia para probar assessments activos, resultados y emails de distribución.
+- chequeo explícito de separación de trust zones.
 
 ## Aplicar sobre un entorno existente
 
-No uses seed ni reset para C2. Para C2.1 sigue exactamente `APLICAR_PATCH_v0.2.6-C2.1.0.md`.
+No uses seed ni reset para C2. Sigue exactamente `APLICAR_PATCH_v0.2.6-C2.0.md`.
+
+## Infraestructura local Armar
+
+La asignación local canónica de puertos, Docker project, red, contenedores y volúmenes está documentada en `ARMAR_INFRASTRUCTURE.md`. Antes del arranque usa `pnpm preflight`.

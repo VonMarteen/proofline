@@ -1,0 +1,61 @@
+/* PROOFLINE SUITE UX SHELL PARITY · 27 October 2026
+   Reference: Control C2.3 remains unchanged; runs after SUPPORT-UX-P1.
+   No changes to tickets, sessions, notifications, forms or routes. */
+@media (min-width:901px) {
+  .support-shell { grid-template-columns:274px minmax(0,1fr); }
+  .support-sidebar {
+    display:flex; position:sticky; height:100vh;
+    padding:20px 13px 17px; gap:20px;
+    background:color-mix(in srgb,var(--bg-solid) 74%,var(--bg));
+  }
+  .support-mobile-nav { display:none; }
+  .support-brand { min-height:0; padding:3px 9px 13px; }
+  .support-brand > span:last-child { font-size:11px; font-weight:700; letter-spacing:.08em; }
+  .support-nav { gap:7px; }
+  .support-nav-group { gap:4px; padding:6px 5px 8px; border-radius:11px; }
+  .support-nav-group + .support-nav-group {
+    margin-top:0; padding-top:11px; border-radius:0; border-top-color:var(--border);
+  }
+  .support-nav-group.is-active {
+    padding:6px 5px 8px; border-radius:11px;
+    background:color-mix(in srgb,var(--accent-soft) 38%,transparent);
+    border-color:color-mix(in srgb,var(--accent) 16%,var(--border));
+  }
+  .support-nav-group.is-active + .support-nav-group { border-top-color:transparent; }
+  .support-nav .support-nav-title,
+  .support-nav-group.is-active > .support-nav-title {
+    padding:0 7px 3px; font-size:9px; font-weight:800;
+    letter-spacing:.075em; line-height:1.2;
+  }
+  .support-nav-group-items { gap:2px; }
+  .support-sidebar .support-nav .support-nav-group-items > a {
+    min-height:36px; padding:8px 9px; gap:9px;
+    font-size:12px; font-weight:580; line-height:1.35;
+  }
+  .support-sidebar .support-nav .support-nav-group-items > a.active {
+    background:color-mix(in srgb,var(--accent-soft) 72%,var(--bg-solid));
+    font-weight:720;
+  }
+  .support-sidebar-bottom { margin-top:auto; padding:14px 7px 0; gap:5px; }
+  .support-sidebar-bottom .support-agent strong { font-size:12px; }
+  .support-sidebar-bottom .support-agent small { font-size:10.5px; }
+  .support-header {
+    box-sizing:border-box; min-height:64px; height:64px; padding:11px 30px;
+    background:color-mix(in srgb,var(--bg) 88%,transparent);
+    backdrop-filter:blur(16px);
+  }
+  .support-header-context { gap:3px; }
+  .support-header-context > strong { font-size:13px; line-height:1.25; }
+  .support-header .support-header-label { font-size:11px!important; line-height:1.2; }
+  .support-header-actions { display:flex; align-items:center; gap:10px; }
+  .support-header-actions .proofline-utility-button,
+  .support-header-actions .support-bell { min-height:36px; height:36px; width:36px; }
+  .support-content { max-width:1680px; width:100%; padding:30px 34px 58px; }
+}
+@media (max-width:900px) {
+  /* Keep SUPPORT-UX-P1 mobile navigation: do not hide actions on smaller viewports. */
+  .support-mobile-nav { display:block; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .support-sidebar .support-nav a { transition:none; }
+}

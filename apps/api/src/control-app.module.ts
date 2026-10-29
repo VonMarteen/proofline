@@ -1,6 +1,8 @@
 import { Module } from "@nestjs/common";
 import { DatabaseModule } from "./database/database.module.js";
 import { ControlHealthController } from "./control/control-health.controller.js";
+import { SystemHealthService } from "./control/system-health.service.js";
+import { RetentionLifecycleService } from "./control/retention-lifecycle.service.js";
 import { ControlController } from "./control/control.controller.js";
 import { ControlService } from "./control/control.service.js";
 import { BackofficeController } from "./control/backoffice.controller.js";
@@ -39,6 +41,8 @@ import { ControlInvoiceDocumentsController } from "./billing/control-invoice-doc
     InvoiceDocumentsService,
     ControlService,
     BackofficeService,
+    SystemHealthService,
+    RetentionLifecycleService,
     InternalDevAuthGuard,
   ],
 })

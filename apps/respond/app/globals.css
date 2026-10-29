@@ -46,3 +46,8 @@ p { text-wrap: pretty; }
 .respond-notice{margin:0;padding:20px}
 .respond-question,.respond-info{padding:20px}
 .respond-progress,.respond-scale,.respond-range,.respond-dual,.respond-matrix,.respond-ranking,.respond-allocation,.respond-submit,.respond-error{margin-top:20px;margin-bottom:0}
+
+/* C2.5.2 · Respond hardening */
+.respond-resume{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--surface);font-size:12px}.respond-resume strong{font-size:12px}.respond-resume span{color:var(--muted)}
+.respond-save-status{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap;min-height:28px;margin:-6px 0 2px;color:var(--muted);font-size:11px}.respond-save-status.is-error{color:#ff9aa6}.respond-save-status button{border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:8px;padding:5px 9px;cursor:pointer}.respond-save-status button:hover{background:var(--surface-strong)}
+@media(max-width:760px){.respond-resume{align-items:flex-start;flex-direction:column;gap:4px}.respond-save-status{justify-content:flex-start}}

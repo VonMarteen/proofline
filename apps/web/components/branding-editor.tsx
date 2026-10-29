@@ -106,7 +106,7 @@ export function BrandingEditor({ locale, initial, organizationName }: { locale: 
 
       <label className="label">{es ? "Texto alternativo del logo" : "Logo alt text"}<input className="input" value={logoAltText} maxLength={180} onChange={e => setAlt(e.target.value)} /></label>
 
-      <div className="branding-colors">
+      <h3 className="ws-r3-color-title">{es ? "Colores corporativos" : "Corporate colors"}</h3><div className="branding-colors">
         <ColorField label={es ? "Acento corporativo" : "Corporate accent"} hint={es ? "Radio, check, foco, progreso y botón de envío" : "Radio, check, focus, progress and submit button"} value={primaryColor} set={setPrimary} />
         <ColorField label={es ? "Selección principal" : "Primary selection"} hint={es ? "Fondo de una opción seleccionada" : "Background of a selected option"} value={backgroundColor} set={setBackground} />
         <ColorField label={es ? "Selección secundaria" : "Secondary selection"} hint={es ? "Estado alternativo o selección suave" : "Alternate or softer selected state"} value={surfaceColor} set={setSurface} />
@@ -145,5 +145,5 @@ export function BrandingEditor({ locale, initial, organizationName }: { locale: 
 }
 
 function ColorField({ label, hint, value, set }: { label: string; hint: string; value: string; set: (v: string) => void }) {
-  return <label className="branding-color-field"><span>{label}</span><small>{hint}</small><div><input type="color" value={hex(value) ?? "#000000"} onChange={e => set(e.target.value.toUpperCase())} /><input className="input" value={value} maxLength={7} onChange={e => set(e.target.value.toUpperCase())} /></div></label>;
+  return <label className="branding-color-field"><span>{label}</span><small>{hint}</small><div className="ws-r3-color-control"><input type="color" aria-label={`${label} – ${hint}`} value={hex(value) ?? "#000000"} onChange={e => set(e.target.value.toUpperCase())} /><input className="input" aria-label={`${label} hexadecimal`} value={value} maxLength={7} onChange={e => set(e.target.value.toUpperCase())} /></div></label>;
 }

@@ -62,7 +62,7 @@ export class PublicController {
       to: "sales@proofline.local",
       subject: `New Proofline lead: ${value.company}`,
       text: `Lead ${value.name} from ${value.company}. Reply to ${value.email}.\n\n${value.message}`,
-      category:"public_lead"
+      category:"public_lead",locale:value.locale
     } } });
     return { ok: true, id: lead.id };
   }

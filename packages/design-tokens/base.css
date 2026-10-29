@@ -205,3 +205,116 @@ code { background: var(--surface-muted); border-radius: 6px; padding: 2px 6px; }
 .section-title-icon{width:32px;height:32px;border:1px solid var(--border);border-radius:9px;display:inline-grid;place-items:center;color:var(--accent);background:color-mix(in srgb,var(--accent-soft) 45%,var(--bg-solid));margin-bottom:8px}
 .btn:focus-visible,a:focus-visible,button:focus-visible{outline:2px solid color-mix(in srgb,var(--accent) 70%,white);outline-offset:2px}
 .btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* C2.5.5 · PROOFLINE transversal scrollbar system
+   One visual language for Site, Workspace, Respond, Control/Superadmin and Support.
+   Chromium/WebKit uses the fully custom treatment below; Firefox receives the closest
+   supported native treatment through scrollbar-color/scrollbar-width. */
+:root{
+  --scrollbar-size:11px;
+  --scrollbar-thumb-a:color-mix(in srgb,var(--signal) 72%,var(--accent));
+  --scrollbar-thumb-b:color-mix(in srgb,var(--accent) 58%,var(--signal));
+  --scrollbar-thumb-hover-a:color-mix(in srgb,var(--signal) 88%,white 12%);
+  --scrollbar-thumb-hover-b:color-mix(in srgb,var(--accent) 72%,var(--signal));
+  --scrollbar-thumb-active:color-mix(in srgb,var(--signal) 82%,var(--accent));
+  --scrollbar-firefox-thumb:color-mix(in srgb,var(--signal) 70%,var(--accent));
+  --scrollbar-firefox-track:transparent;
+}
+[data-theme="dark"]{
+  --scrollbar-thumb-a:color-mix(in srgb,var(--signal) 78%,var(--accent));
+  --scrollbar-thumb-b:color-mix(in srgb,var(--accent) 62%,var(--signal));
+  --scrollbar-thumb-hover-a:color-mix(in srgb,var(--signal) 92%,white 8%);
+  --scrollbar-thumb-hover-b:color-mix(in srgb,var(--accent) 76%,var(--signal));
+  --scrollbar-thumb-active:color-mix(in srgb,var(--signal) 86%,var(--accent));
+  --scrollbar-firefox-thumb:color-mix(in srgb,var(--signal) 76%,var(--accent));
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme]){
+    --scrollbar-thumb-a:color-mix(in srgb,var(--signal) 78%,var(--accent));
+    --scrollbar-thumb-b:color-mix(in srgb,var(--accent) 62%,var(--signal));
+    --scrollbar-thumb-hover-a:color-mix(in srgb,var(--signal) 92%,white 8%);
+    --scrollbar-thumb-hover-b:color-mix(in srgb,var(--accent) 76%,var(--signal));
+    --scrollbar-thumb-active:color-mix(in srgb,var(--signal) 86%,var(--accent));
+    --scrollbar-firefox-thumb:color-mix(in srgb,var(--signal) 76%,var(--accent));
+  }
+}
+/* Firefox only: standardized properties are intentionally isolated because modern
+   Chromium gives them precedence over ::-webkit-scrollbar and would otherwise
+   fall back to a native-looking Windows scrollbar. */
+@supports (-moz-appearance:none){
+  html,body,*{
+    scrollbar-width:thin;
+    scrollbar-color:var(--scrollbar-firefox-thumb) var(--scrollbar-firefox-track);
+  }
+}
+html::-webkit-scrollbar,body::-webkit-scrollbar,*::-webkit-scrollbar{
+  width:var(--scrollbar-size);
+  height:var(--scrollbar-size);
+  background:transparent;
+}
+html::-webkit-scrollbar-track,body::-webkit-scrollbar-track,*::-webkit-scrollbar-track{
+  background:transparent;
+  border-radius:999px;
+}
+html::-webkit-scrollbar-thumb,body::-webkit-scrollbar-thumb,*::-webkit-scrollbar-thumb{
+  min-height:42px;
+  min-width:42px;
+  border:3px solid transparent;
+  border-radius:999px;
+  background:linear-gradient(180deg,var(--scrollbar-thumb-a),var(--scrollbar-thumb-b)) padding-box;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--signal) 14%,transparent);
+}
+html::-webkit-scrollbar-thumb:hover,body::-webkit-scrollbar-thumb:hover,*::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(180deg,var(--scrollbar-thumb-hover-a),var(--scrollbar-thumb-hover-b)) padding-box;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--signal) 24%,transparent),0 0 10px color-mix(in srgb,var(--signal) 12%,transparent);
+}
+html::-webkit-scrollbar-thumb:active,body::-webkit-scrollbar-thumb:active,*::-webkit-scrollbar-thumb:active{
+  background:var(--scrollbar-thumb-active) padding-box;
+}
+html::-webkit-scrollbar-corner,body::-webkit-scrollbar-corner,*::-webkit-scrollbar-corner{background:transparent}
+
+.proofline-spinner{--spinner-size:24px;display:inline-grid;place-items:center;width:var(--spinner-size);height:var(--spinner-size);flex:0 0 auto;vertical-align:middle}
+.proofline-spinner.is-sm{--spinner-size:15px}.proofline-spinner.is-md{--spinner-size:24px}.proofline-spinner.is-lg{--spinner-size:38px}
+.proofline-spinner>span{width:100%;height:100%;border-radius:50%;border:2px solid var(--armar-loader-track);border-top-color:var(--armar-loader-accent);border-right-color:var(--armar-loader-accent-2);animation:proofline-spin .72s cubic-bezier(.55,.12,.45,.88) infinite;box-shadow:0 0 0 1px color-mix(in srgb,var(--armar-loader-accent) 5%,transparent)}
+.proofline-spinner.is-lg>span{border-width:3px}
+@keyframes proofline-spin{to{transform:rotate(360deg)}}
+.proofline-skeleton{display:block;max-width:100%;background:linear-gradient(105deg,var(--armar-skeleton-base) 25%,var(--armar-skeleton-highlight) 44%,var(--armar-skeleton-base) 63%);background-size:220% 100%;animation:proofline-skeleton 1.45s ease-in-out infinite}
+@keyframes proofline-skeleton{0%{background-position:120% 0}100%{background-position:-120% 0}}
+.proofline-skeleton-text{display:grid;gap:9px;width:100%}
+.proofline-skeleton-table{display:grid;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg-solid)}
+.proofline-skeleton-table-row{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(96px,1fr);align-items:center;gap:18px;min-height:46px;padding:0 15px;border-bottom:1px solid var(--border)}
+.proofline-skeleton-table-row:last-child{border-bottom:0}.proofline-skeleton-table-row.is-head{min-height:40px;background:var(--surface-muted)}
+.proofline-page-loading{width:min(100%,1440px);padding:30px;display:grid;gap:22px;min-height:60vh}
+.proofline-page-loading-head{display:flex;justify-content:space-between;align-items:center;gap:24px}.proofline-page-loading-head>div{display:grid;gap:12px;min-width:0}
+.proofline-page-loading-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.proofline-loading-card{display:grid;gap:13px;align-content:start;padding:20px;border:1px solid var(--border);border-radius:15px;background:var(--bg-elevated);min-height:150px}.proofline-loading-card.is-wide{grid-column:1/-1;min-height:250px}
+.proofline-loading-block{min-height:96px;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--text-soft);font-size:14px}
+.proofline-background-loading{display:inline-flex;align-items:center;gap:7px;color:var(--text-soft);font-size:12px;font-weight:650;white-space:nowrap}
+.proofline-state-panel{display:flex;align-items:flex-start;gap:13px;padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--bg-elevated);max-width:760px}
+.proofline-state-panel h1,.proofline-state-panel h3{margin:0 0 4px;font-size:18px;letter-spacing:-.02em}.proofline-state-panel p{margin:0;color:var(--text-soft);font-size:14px}.proofline-state-panel small{display:block;color:var(--text-soft);margin-top:8px}.proofline-state-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--surface-muted);color:var(--text-soft);flex:0 0 auto}.proofline-state-panel.is-error{border-color:color-mix(in srgb,var(--danger) 28%,var(--border))}.proofline-state-panel.is-error .proofline-state-icon{background:var(--danger-soft);color:var(--danger)}.proofline-state-panel.is-success .proofline-state-icon{background:var(--signal-soft);color:var(--signal)}.proofline-state-action{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+.proofline-route-error{min-height:70vh;display:grid;place-items:center;padding:32px}.proofline-route-error .proofline-state-panel{width:min(100%,640px)}
+.proofline-loading-button{position:relative}.proofline-loading-button-content{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:0}.proofline-loading-button[aria-busy="true"]{cursor:progress}.proofline-loading-button[disabled]{pointer-events:none}.proofline-loading-button .proofline-spinner{margin-inline:-1px 1px}
+@media(max-width:850px){.proofline-page-loading{padding:20px 14px}.proofline-page-loading-grid{grid-template-columns:1fr}.proofline-loading-card.is-wide{grid-column:auto}.proofline-page-loading-head{align-items:flex-start}.proofline-page-loading-head>.proofline-skeleton:last-child{display:none}}
+@media(prefers-reduced-motion:reduce){.proofline-spinner>span{animation:none;border-top-color:var(--armar-loader-accent);border-right-color:var(--armar-loader-accent-2)}.proofline-skeleton{animation:none;background:var(--armar-skeleton-base)}}
+
+.proofline-loading-icon{animation:proofline-spin .72s linear infinite}
+@media(prefers-reduced-motion:reduce){.proofline-loading-icon{animation:none}}
+
+/* PROOFLINE · ARMAR table pagination */
+.proofline-pagination{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:13px 14px;border-top:1px solid var(--border);background:color-mix(in srgb,var(--bg-solid) 78%,transparent);font-size:12px;color:var(--text-soft)}
+.proofline-pagination-summary{display:flex;align-items:baseline;gap:6px;min-width:150px}.proofline-pagination-summary strong{color:var(--text);font-size:13px}.proofline-pagination-summary small{margin-left:4px;color:var(--muted)}
+.proofline-pagination-size{display:flex;align-items:center;gap:7px}.proofline-pagination-size label{display:flex;align-items:center;gap:7px}.proofline-pagination-size select{height:32px;min-width:66px;padding:0 26px 0 9px;border:1px solid var(--border);border-radius:8px;background:var(--bg-solid);color:var(--text);font:inherit}.proofline-pagination-size button{height:32px;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);font:inherit;font-weight:700;cursor:pointer}.proofline-pagination-size button:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--border));background:color-mix(in srgb,var(--accent-soft) 32%,var(--surface))}
+.proofline-pagination-nav{display:flex;align-items:center;gap:10px}.proofline-pagination-nav>a{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:0 10px;border:1px solid var(--border);border-radius:8px;color:var(--text);text-decoration:none;font-weight:700}.proofline-pagination-nav>a:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--border));background:color-mix(in srgb,var(--accent-soft) 30%,transparent)}.proofline-pagination-nav>a.is-disabled{opacity:.38;pointer-events:none}.proofline-pagination-nav>span{min-width:92px;text-align:center;font-variant-numeric:tabular-nums}
+@media(max-width:720px){.proofline-pagination{align-items:stretch}.proofline-pagination-summary{width:100%}.proofline-pagination-size,.proofline-pagination-nav{justify-content:space-between;flex:1 1 100%}.proofline-pagination-nav>a span{display:none}}
+
+
+/* PROOFLINE UI-ICONS-FIX · utility actions icon-only across all surfaces.
+   The font-size reset also hides legacy text nodes if a stale compiled bundle renders them.
+   This rule deliberately does NOT affect ordinary buttons, navigation or scrollbars. */
+a.proofline-utility-button,button.proofline-utility-button {
+  width:36px;min-width:36px;flex:0 0 36px;
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:0!important;white-space:nowrap;font-size:0!important;line-height:0;
+}
+a.proofline-utility-button svg,button.proofline-utility-button svg {
+  width:17px;height:17px;display:block;flex:none;opacity:1;
+}

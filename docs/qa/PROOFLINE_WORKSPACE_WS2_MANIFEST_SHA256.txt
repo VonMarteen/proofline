@@ -1,0 +1,13 @@
+PROOFLINE Workspace · WS-2/5 — Manifiesto incremental
+Base verificada: WS-1/5 instalada
+
+3180b5eca89c4887b3e185e8026e1e3305df65ca4d807757b576d9f1e1d4e521  apps/api/src/assessments/assessments.controller.ts
+2b74bbef09df6e5e23e9f3349dbd7fc9a768ed39d3286fc84ef87379b4c8664c  apps/api/src/imports/import.service.ts
+17932373d771cf0480e0ad35f93c6e46b3045295ebb73cb2dc9225fc86537cc5  apps/api/src/imports/imports.controller.ts
+0c6f64bacc2e8c064f9594a79dea123c75fde6db1c99f35902ea47f81a1a6825  apps/api/src/workspace.controller.ts
+bbe2830e9da22ab5a74c5d0931ae9feea3623a5fd7fe63f87bc8f16c7613cde1  apps/web/components/framework-start-button.tsx
+5bd5ee06ec667bdfe5cec48c45c34803c1b018d51e1ee8580922b378c3870b63  apps/web/components/import-assessment-wizard.tsx
+085807df1b314e43f29c9211471d5075251a718a9a8cf6dd172e65ccc458f177  apps/web/components/manual-assessment-start.tsx
+77587a808bf2b3b1138c26e64e7e147e3aa5dc0e5ed80303e7f318fccab8f8ed  docs/qa/PROOFLINE_WORKSPACE_WS2_VALIDACION_20261020.md
+ca544a067021fa8118b0984a37928c3c33ddc5b7d327174c5eac8ed5cc293ba7  package.json
+4062ae1abde15c66d63d8279cd4691c3e74498fdb90998a102d20ded762ea231  tests/workspace-ws2-creation-lifecycle.test.mjs

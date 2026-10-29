@@ -21,8 +21,8 @@ async function bootstrap() {
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["content-type", "authorization", "x-proofline-user", "x-proofline-role", "x-proofline-organization", "x-service-token"],
   });
-  await app.listen(Number(process.env.PORT ?? 4100), "0.0.0.0");
-  console.log(`[proofline-api] http://localhost:${process.env.PORT ?? 4100}`);
+  await app.listen(Number(process.env.PORT ?? 4201), "0.0.0.0");
+  console.log(`[proofline-api] http://localhost:${process.env.PORT ?? 4201}`);
 }
 
 bootstrap().catch((error) => {

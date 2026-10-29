@@ -2,7 +2,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.js";
 import { randomBytes, scryptSync } from "node:crypto";
 
-const LOCAL_DATABASE_URL = "postgresql://proofline:proofline_local_only@127.0.0.1:55432/proofline?schema=public";
+const LOCAL_DATABASE_URL = "postgresql://proofline:proofline_local_only@127.0.0.1:4232/proofline?schema=public";
 const url = process.env.PROOFLINE_DATABASE_URL ?? LOCAL_DATABASE_URL;
 const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
 function hashPassword(password: string) { const salt = randomBytes(16).toString("base64url"); const digest = scryptSync(password, salt, 32).toString("base64url"); return `scrypt$${salt}$${digest}`; }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { controlSessionToken } from "../../../../lib/session";
 
-const base = process.env.CONTROL_API_INTERNAL_URL ?? "http://127.0.0.1:4200";
+const base = process.env.CONTROL_API_INTERNAL_URL ?? "http://127.0.0.1:4206";
 
 export async function GET(request: Request) {
   const token = await controlSessionToken();

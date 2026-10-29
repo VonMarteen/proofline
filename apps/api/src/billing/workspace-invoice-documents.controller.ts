@@ -22,6 +22,11 @@ export class WorkspaceInvoiceDocumentsController {
     return this.invoices.workspaceInvoices(req);
   }
 
+  @Get("invoices/table")
+  table(@Req() req: HeaderRequest, @Query("page") page?: string, @Query("pageSize") pageSize?: string) {
+    return this.invoices.workspaceInvoicesPage(req,{page,pageSize});
+  }
+
   @Get("invoice-documents/:id")
   async document(@Req() req: HeaderRequest, @Param("id") id: string, @Query("download") rawDownload: string | undefined, @Res() reply: any) {
     const download = rawDownload === "1" || rawDownload === "true";

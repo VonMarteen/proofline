@@ -1,38 +1,43 @@
-import { Brand, Icon } from "@proofline/ui";
+import { Icon } from "@proofline/ui";
 import type { Locale } from "@proofline/i18n";
 
 export function EvidencePreview({ locale }: { locale: Locale }) {
   const es = locale === "es";
-  const signals = [
-    { label: es ? "Compromiso" : "Engagement", value: 82, delta: "+6%" },
-    { label: es ? "Alineación" : "Alignment", value: 76, delta: "+4%" },
-    { label: es ? "Cultura" : "Culture", value: 71, delta: "+2%" },
-    { label: es ? "Liderazgo" : "Leadership", value: 64, delta: "−3%" },
+  const dimensions = [
+    { label: es ? "Liderazgo" : "Leadership", value: 82 },
+    { label: es ? "Cultura" : "Culture", value: 76 },
+    { label: es ? "Ejecución" : "Execution", value: 68 },
+    { label: es ? "Cambio" : "Change", value: 71 },
   ];
+
   return (
-    <div className="pl-product-window" aria-label={es ? "Vista de producto con datos sintéticos" : "Product preview with synthetic data"}>
-      <div className="pl-product-chrome"><Brand compact/><div className="pl-product-user"><span>MC</span><div><strong>María Castillo</strong><small>People Director</small></div></div></div>
-      <div className="pl-product-body">
-        <aside className="pl-product-side">
-          <span className="active"><Icon name="overview" size={15}/>{es ? "Visión general" : "Overview"}</span>
-          <span><Icon name="people" size={15}/>{es ? "Personas" : "People"}</span>
-          <span><Icon name="assessments" size={15}/>Assessments</span>
-          <span><Icon name="reports" size={15}/>{es ? "Informes" : "Reports"}</span>
-          <span><Icon name="security" size={15}/>{es ? "Confianza" : "Trust"}</span>
+    <div className="pl2-dashboard" role="img" aria-label={es ? "Vista ilustrativa de Proofline con datos de demostración" : "Illustrative Proofline view with demonstration data"}>
+      <div className="pl2-dashboard-header">
+        <span className="pl2-dashboard-brand"><img src="/brand/proofline-mark-official.png" alt="" aria-hidden="true"/><strong>Proofline</strong></span>
+        <span className="pl2-demo-badge">{es ? "Demo" : "Demo"}</span>
+      </div>
+      <div className="pl2-dashboard-body">
+        <aside className="pl2-dashboard-side" aria-hidden="true">
+          <span className="active"><Icon name="overview" size={14}/>{es ? "Resumen" : "Overview"}</span>
+          <span><Icon name="assessments" size={14}/>Assessments</span>
+          <span><Icon name="people" size={14}/>{es ? "Personas" : "People"}</span>
+          <span><Icon name="reports" size={14}/>{es ? "Resultados" : "Results"}</span>
+          <span><Icon name="library" size={14}/>{es ? "Evidencia" : "Evidence"}</span>
         </aside>
-        <div className="pl-product-main">
-          <div className="pl-product-heading"><div><span>{es ? "VISIÓN GENERAL" : "OVERVIEW"}</span><h2>{es ? "Salud organizacional" : "Organizational health"}</h2></div><button type="button">{es ? "Últimos 90 días" : "Last 90 days"}</button></div>
-          <div className="pl-health-grid">
-            <div className="pl-health-score"><div className="pl-score-ring"><strong>78</strong><span>/100</span></div><div><span>{es ? "Índice global" : "Overall index"}</span><b>+6%</b></div></div>
-            <div className="pl-signal-list">{signals.map(s=><div key={s.label}><span>{s.label}</span><strong>{s.value}</strong><em className={s.delta.startsWith("−")?"down":"up"}>{s.delta}</em></div>)}</div>
+        <div className="pl2-dashboard-main">
+          <div className="pl2-dashboard-title"><div><h2>{es ? "Salud organizacional" : "Organizational health"}</h2><span>{es ? "Lectura ejecutiva" : "Executive reading"}</span></div><b>{es ? "T2 2026" : "Q2 2026"}</b></div>
+          <div className="pl2-dashboard-summary">
+            <div className="pl2-index-panel"><div className="pl2-index-ring"><strong>78</strong></div><div><span>{es ? "Índice general" : "Overall index"}</span><b>+6%</b><small>{es ? "vs. periodo anterior" : "vs. previous period"}</small></div></div>
+            <div className="pl2-dimensions-panel"><strong>{es ? "Dimensiones" : "Dimensions"}</strong>{dimensions.map((item) => <div className="pl2-dimension-row" key={item.label}><span>{item.label}</span><i><b style={{ width: `${item.value}%` }}/></i><em>{item.value}</em></div>)}</div>
           </div>
-          <div className="pl-preview-grid">
-            <div className="pl-trend-card"><div className="pl-card-title"><strong>{es ? "Tendencia de señales" : "Signal trend"}</strong><span>{es ? "6 meses" : "6 months"}</span></div><svg viewBox="0 0 360 120" role="img" aria-label={es ? "Tendencia sintética" : "Synthetic trend"}><path className="grid" d="M0 20H360M0 60H360M0 100H360"/><path className="line secondary" d="M0 88 C45 82 62 77 92 72 S145 62 181 66 S250 45 360 38"/><path className="line primary" d="M0 78 C46 70 65 66 98 62 S155 50 196 55 S268 34 360 25"/></svg><div className="pl-trend-legend"><span><i/>Compromiso</span><span><i/>Alineación</span></div></div>
-            <div className="pl-distribution-card"><div className="pl-card-title"><strong>{es ? "Señales verificadas" : "Verified signals"}</strong><span>312</span></div><div className="pl-donut"><strong>312</strong><span>{es ? "señales" : "signals"}</span></div><div className="pl-mini-legend"><span>People <b>35%</b></span><span>{es ? "Procesos" : "Process"} <b>24%</b></span><span>{es ? "Liderazgo" : "Leadership"} <b>22%</b></span></div></div>
+          <div className="pl2-dashboard-lower">
+            <div className="pl2-trend-panel"><div className="pl2-dashboard-card-title"><strong>{es ? "Evolución" : "Trend"}</strong><span>{es ? "6 meses" : "6 months"}</span></div><svg viewBox="0 0 360 105" aria-hidden="true"><path className="grid" d="M0 20H360M0 52H360M0 84H360"/><path className="area" d="M0 82 C42 77 72 71 105 65 S160 59 198 55 S273 43 360 25 L360 105 L0 105Z"/><path className="line" d="M0 82 C42 77 72 71 105 65 S160 59 198 55 S273 43 360 25"/><circle cx="360" cy="25" r="4"/></svg><div className="pl2-months"><span>Ene</span><span>Feb</span><span>Mar</span><span>Abr</span><span>May</span><span>Jun</span></div></div>
+            <div className="pl2-distribution-panel"><div className="pl2-dashboard-card-title"><strong>{es ? "Participación" : "Participation"}</strong></div><div className="pl2-dashboard-donut"><strong>312</strong><span>{es ? "respuestas" : "responses"}</span></div><div className="pl2-donut-legend"><span><i/>People <b>40%</b></span><span><i/>Strategy <b>34%</b></span><span><i/>Risk <b>16%</b></span></div></div>
           </div>
-          <div className="pl-product-note"><Icon name="approved" size={15}/>{es ? "Datos demostrativos · no representan resultados reales" : "Demo data · does not represent real results"}</div>
+          <div className="pl2-insight-bar"><Icon name="sparkles" size={16}/><div><strong>{es ? "Lectura destacada" : "Key reading"}</strong><span>{es ? "Liderazgo mejora de forma consistente; ejecución concentra la principal brecha frente al resto de dimensiones." : "Leadership improves consistently; execution holds the main gap versus other dimensions."}</span></div></div>
         </div>
       </div>
+      <div className="pl2-dashboard-foot"><Icon name="approved" size={13}/><span>{es ? "Datos de demostración · no representan resultados reales" : "Demonstration data · not real client results"}</span></div>
     </div>
   );
 }

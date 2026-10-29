@@ -4,12 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "next dev --webpack -p 3103",
+    "dev": "next dev --webpack -p 4204",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "node --test",
-    "dev:turbopack": "next dev --turbopack -p 3103"
+    "dev:turbopack": "next dev --turbopack -p 4204"
   },
   "dependencies": {
     "@proofline/design-tokens": "workspace:*",

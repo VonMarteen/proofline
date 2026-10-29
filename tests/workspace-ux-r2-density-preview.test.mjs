@@ -1,0 +1,15 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const read=(p)=>readFileSync(new URL(`../${p}`,import.meta.url),"utf8");
+const css=read("apps/web/app/workspace.css"),page=read("apps/web/app/[locale]/assessments/[id]/page.tsx"),editor=read("apps/web/components/question-editor.tsx"),people=read("apps/web/components/population-editor.tsx");
+const patch=css.slice(css.indexOf("/* WS-UX-R2 ·"));
+test("R2: assessment details use a dedicated scope",()=>assert.match(page,/workspace-page workspace-assessment-detail-page/));
+test("R2: question type and dimension have proportional desktop widths",()=>assert.match(patch,/grid-template-columns:minmax\(240px,290px\) minmax\(250px,1fr\)/));
+test("R2: numeric responses use restrained field widths",()=>assert.match(patch,/label:has\(input\[type=number\]\)/));
+test("R2: add question uses content-sized CTA",()=>{assert.match(editor,/className="btn btn-accent builder-submit"/);assert.match(patch,/\.builder-submit\{width:auto/)});
+test("R2: lists retain original add edit delete and reorder actions",()=>{for(const x of ["/questions/reorder","/questions/${q.id}/update","remove(q.id)","add(e:"])assert.ok(editor.includes(x),x)});
+test("R2: participant preview and report have scoped typography and layout",()=>{assert.match(patch,/\.preview-page \.participant-preview-questions article/);assert.match(patch,/\.report-preview-page \.report-dimension-grid>div>div/)});
+test("R2: population browser retains server pagination and exclusion",()=>{for(const x of ["picker.pagination.hasNext","picker.pagination.hasPrevious","toggle(exclude","setPageSize"])assert.ok(people.includes(x),x)});
+test("R2: list rows and numeric controls collapse responsively",()=>{assert.match(patch,/@media\(max-width:620px\)/);assert.match(patch,/\.population-person-list\{max-height:360px\}/)});
+test("R2: no overrides of site, control or shared scrollbars",()=>{for(const x of [".control-",".site-","::-webkit-scrollbar",".workspace-sidebar",".workspace-header"])assert.ok(!patch.includes(x),x)});

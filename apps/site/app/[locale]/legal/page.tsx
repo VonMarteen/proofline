@@ -174,7 +174,6 @@ export default async function LegalPage({ params }: { params: Promise<{ locale: 
           text={es
             ? "Proofline modela las interacciones legales como eventos distintos y versionados. Informar a una persona, aceptar unos términos, formalizar un acuerdo de tratamiento o dar un consentimiento específico son acciones diferentes, con finalidades distintas y evidencias distintas."
             : "Proofline models legal interactions as distinct, versioned events. Informing a person, accepting terms, formalising a processing agreement or giving a specific consent are different actions, with different purposes and different evidence."}
-          aside={<div className="page-intro-note"><strong>{es ? "Centro legal de producto" : "Product legal center"}</strong><span>{es ? "La arquitectura funcional ya separa documentos, avisos, acuerdos y consentimientos. La redacción jurídica definitiva se valida antes de producción." : "The functional architecture already separates documents, notices, agreements and consents. Final legal wording is validated before production."}</span></div>}
         />
       </div>
     </section>

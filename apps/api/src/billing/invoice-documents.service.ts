@@ -7,6 +7,7 @@ import type { HeaderRequest } from "../auth/dev-auth.js";
 import { requireInternalCapability } from "../control/internal-access.js";
 import { buildInvoicePdf, type InvoicePdfSnapshot } from "./invoice-pdf.js";
 import { buildStoredZip } from "./zip.js";
+import { parsePagination, paged } from "../common/pagination.js";
 
 type DownloadMode = "view" | "download";
 
@@ -89,6 +90,9 @@ export class InvoiceDocumentsService {
   }
 
   private async materialize(invoice: any) {
+    if (invoice.documentRecord && ["BLOCKED", "ANONYMIZED", "DESTROYED"].includes(String(invoice.documentRecord.status))) {
+      throw new NotFoundException("Invoice document is unavailable under its data lifecycle policy");
+    }
     if (invoice.status === "DRAFT") {
       throw new BadRequestException({
         code: "INVOICE_NOT_ISSUED",
@@ -256,6 +260,18 @@ export class InvoiceDocumentsService {
       select: { id: true, invoiceNumber: true, externalRef: true, amountCents: true, taxCents: true, currency: true, status: true, issuedAt: true, dueAt: true, paidAt: true, documentRecordId: true },
       orderBy: { issuedAt: "desc" },
     });
+  }
+
+  async workspaceInvoicesPage(req: HeaderRequest, input: { page?: string; pageSize?: string }) {
+    const ctx = await requireCapability(this.db, req, "billing.invoices");
+    const pg = parsePagination(input);
+    const where:any = { organizationId: ctx.organization.id, status: { not: "DRAFT" } };
+    const select = { id: true, invoiceNumber: true, externalRef: true, amountCents: true, taxCents: true, currency: true, status: true, issuedAt: true, dueAt: true, paidAt: true, documentRecordId: true } as const;
+    const [total,items] = await Promise.all([
+      this.db.billingInvoice.count({ where }),
+      this.db.billingInvoice.findMany({ where, skip: pg.skip, take: pg.take, select, orderBy: [{ issuedAt: "desc" }, { id: "asc" }] }),
+    ]);
+    return paged(items,total,pg.page,pg.pageSize);
   }
 
   async workspaceDocument(req: HeaderRequest, id: string, mode: DownloadMode) {

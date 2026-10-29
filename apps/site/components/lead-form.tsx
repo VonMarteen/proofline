@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LoadingButton } from "@proofline/ui";
 
 export function LeadForm({ locale }: { locale: "es" | "en" }) {
   const [state, setState] = useState<"idle" | "sending" | "ok" | "error">("idle");
@@ -20,7 +21,7 @@ export function LeadForm({ locale }: { locale: "es" | "en" }) {
       locale,
     };
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4100"}/v1/public/commercial-requests`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4201"}/v1/public/commercial-requests`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(body),
@@ -54,7 +55,7 @@ export function LeadForm({ locale }: { locale: "es" | "en" }) {
 
     <p className="contact-privacy-note">{es ? "Usaremos los datos de esta solicitud únicamente para gestionarla y responderte. Las comunicaciones comerciales son opcionales y se registran de forma independiente." : "We will use the data in this request only to manage it and respond to you. Marketing communications are optional and recorded separately."}</p>
     <div className="contact-submit-row">
-      <button className="btn btn-accent" disabled={state === "sending"}>{state === "sending" ? (es ? "Enviando…" : "Sending…") : (es ? "Solicitar conversación" : "Request conversation")}</button>
+      <LoadingButton className="btn btn-accent" type="submit" loading={state === "sending"} loadingLabel={es ? "Enviando…" : "Sending…"}>{es ? "Solicitar conversación" : "Request conversation"}</LoadingButton>
     </div>
     {state === "ok" ? <div className="form-status success">{es ? "Solicitud recibida. Gracias; te responderemos usando los datos que has indicado." : "Request received. Thank you; we will reply using the details you provided."}</div> : null}
     {state === "error" ? <div className="form-status error">{es ? "No hemos podido registrar la solicitud. Inténtalo de nuevo en unos instantes." : "We could not register the request. Please try again in a moment."}</div> : null}

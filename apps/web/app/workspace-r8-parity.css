@@ -1,0 +1,115 @@
+/* PROOFLINE Workspace R8 — alignment and navigation parity, scoped only.
+   No changes to routes, security, data, or API calls. */
+
+/* Directorio: every filter and adjacent action has the SAME actual box-height.
+   The form has exactly three visible controls (q, unit, Filtrar); hidden inputs
+   do not create phantom grid columns. */
+.workspace-content .directory-manager > .workspace-toolbar {
+  display:flex; align-items:center; column-gap:8px; row-gap:9px;
+}
+.workspace-content .directory-manager > .workspace-toolbar > .workspace-filter-form {
+  flex:1 1 540px;
+  min-width:0; width:auto;
+  display:grid;
+  grid-template-columns:minmax(185px,1.55fr) minmax(150px,.82fr) auto;
+  align-items:center; gap:8px;
+  margin:0;
+}
+.workspace-content .directory-manager > .workspace-toolbar > .workspace-card-actions {
+  flex:0 0 auto; display:flex; align-items:center; gap:7px; min-width:0;
+}
+.workspace-content .directory-manager > .workspace-toolbar :is(.input,.select,.btn) {
+  box-sizing:border-box;
+  height:38px; min-height:38px; max-height:38px;
+  margin:0;
+  border-radius:9px;
+  font-size:11px;
+  line-height:1.25;
+}
+.workspace-content .directory-manager > .workspace-toolbar :is(.input,.select) {
+  display:block; width:100%; min-width:0; padding-block:0;
+}
+.workspace-content .directory-manager > .workspace-toolbar .btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:0 11px; flex-shrink:0; white-space:nowrap;
+}
+.workspace-content .directory-manager > .workspace-toolbar .workspace-filter-form input[type="hidden"] { display:none; }
+
+/* Privacidad: same icon/label/value design language as the dashboard KPI row. */
+.workspace-content .privacy-overview.ws-r8-privacy-overview {
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px;
+}
+.workspace-content .privacy-overview.ws-r8-privacy-overview > article.ws-r8-privacy-kpi {
+  display:grid;grid-template-columns:34px minmax(0,1fr) auto;
+  align-items:center;align-content:center; gap:9px;
+  min-width:0; min-height:72px;
+  padding:11px 13px;
+  border-radius:12px;
+}
+.workspace-content .privacy-overview.ws-r8-privacy-overview .ws-r8-privacy-icon {
+  display:grid;place-items:center;
+  width:34px;height:34px;border-radius:9px;
+  background:var(--accent-soft);color:var(--accent);
+}
+.workspace-content .privacy-overview.ws-r8-privacy-overview .ws-r8-privacy-label {
+  min-width:0; margin:0; color:var(--text-soft);
+  font-size:11px;line-height:1.25;
+  overflow-wrap:break-word;
+}
+.workspace-content .privacy-overview.ws-r8-privacy-overview > article.ws-r8-privacy-kpi > strong {
+  margin:0;min-width:24px;
+  font-size:clamp(19px,1.9vw,25px);line-height:1.15;
+  text-align:right; font-variant-numeric:tabular-nums;
+}
+
+/* Workspace sidebar: framed active category as in Control, with the exact
+   active link still more prominent. The role-based links and scroll remain. */
+.workspace-sidebar .workspace-nav-group.is-active {
+  border:1px solid color-mix(in srgb,var(--accent) 33%,var(--border));
+  border-radius:12px;
+  background:color-mix(in srgb,var(--accent-soft) 20%,var(--bg-solid));
+  padding:9px 7px 8px;
+  gap:5px;
+}
+.workspace-sidebar .workspace-nav-group.is-active > .workspace-nav-group-title {
+  color:var(--text); padding:2px 5px 5px;
+}
+.workspace-sidebar .workspace-nav-group.is-active .workspace-nav-group-items > a.active {
+  background:color-mix(in srgb,var(--accent-soft) 78%,var(--bg-solid));
+  color:var(--text);
+  font-weight:760;
+}
+.workspace-sidebar .workspace-nav-group.is-active .workspace-nav-group-items > a.active .proofline-icon {
+  color:var(--accent);
+}
+.workspace-sidebar .workspace-nav-group.is-active + .workspace-nav-group {
+  margin-top:7px;
+}
+/* Do not frame groups in the bottom mobile navigation; it is horizontal. */
+
+@media(max-width:1290px) {
+  .workspace-content .directory-manager > .workspace-toolbar > .workspace-filter-form {
+    flex:1 1 100%;
+  }
+  .workspace-content .directory-manager > .workspace-toolbar > .workspace-card-actions {
+    flex:0 1 auto;
+  }
+}
+@media(max-width:900px) {
+  .workspace-content .privacy-overview.ws-r8-privacy-overview {grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(max-width:690px) {
+  .workspace-content .directory-manager > .workspace-toolbar > .workspace-filter-form {
+    grid-template-columns:minmax(0,1fr);
+    width:100%;
+  }
+  .workspace-content .directory-manager > .workspace-toolbar > .workspace-card-actions {
+    width:100%; flex-wrap:wrap;
+  }
+}
+@media(max-width:480px) {
+  .workspace-content .privacy-overview.ws-r8-privacy-overview {grid-template-columns:minmax(0,1fr);}
+}
+@media(prefers-reduced-motion:reduce) {
+  .workspace-sidebar .workspace-nav-group.is-active .workspace-nav-group-items > a {transition:none;}
+}

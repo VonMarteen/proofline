@@ -75,7 +75,7 @@ export class BrandingService {
     const validated = validateBranding(base);
     let logo: null | { fileName: string; mimeType: string; dataUrl: string; contentHash: string } = null;
     if (includeLogo && row?.logoDocumentId) {
-      const record = await this.db.documentRecord.findFirst({ where: { id: row.logoDocumentId, organizationId, recordClass: "BRAND_ASSET" }, include: { blob: true } });
+      const record = await this.db.documentRecord.findFirst({ where: { id: row.logoDocumentId, organizationId, recordClass: "BRAND_ASSET", status: { notIn: ["BLOCKED", "ANONYMIZED", "DESTROYED"] } }, include: { blob: true } });
       if (record?.blob) {
         const bytes = decryptBytes(record.blob.bytes);
         logo = { fileName: record.fileName, mimeType: record.mimeType, dataUrl: `data:${record.mimeType};base64,${bytes.toString("base64")}`, contentHash: record.contentHash };
@@ -90,7 +90,7 @@ export class BrandingService {
     const validated = validateBranding(snapshot);
     let logo: null | { fileName: string; mimeType: string; dataUrl: string; contentHash: string } = null;
     if (snapshot.logoDocumentId) {
-      const record = await this.db.documentRecord.findFirst({ where: { id: String(snapshot.logoDocumentId), organizationId, recordClass: "BRAND_ASSET" }, include: { blob: true } });
+      const record = await this.db.documentRecord.findFirst({ where: { id: String(snapshot.logoDocumentId), organizationId, recordClass: "BRAND_ASSET", status: { notIn: ["BLOCKED", "ANONYMIZED", "DESTROYED"] } }, include: { blob: true } });
       if (record?.blob) { const bytes = decryptBytes(record.blob.bytes); logo = { fileName: record.fileName, mimeType: record.mimeType, dataUrl: `data:${record.mimeType};base64,${bytes.toString("base64")}`, contentHash: record.contentHash }; }
     }
     const configured = Boolean(snapshot.enabled && snapshot.logoDocumentId && snapshot.updatedBy);

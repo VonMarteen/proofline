@@ -1,6 +1,5 @@
 import { normalizeLocale } from "@proofline/i18n";
-import { PageIntro } from "../../../components/page-intro";
-import { CtaBand } from "../../../components/cta-band";
+import { Icon } from "@proofline/ui";
 
 export default async function ProductPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale: raw } = await params;
@@ -8,170 +7,159 @@ export default async function ProductPage({ params }: { params: Promise<{ locale
   const es = locale === "es";
 
   const stages = es ? [
-    {
-      title: "Define qué necesitas poder responder",
-      text: "Cada assessment empieza por un objetivo explícito y por la decisión que ese resultado debería apoyar. Proofline conserva esa pregunta como referencia para revisar el instrumento y para construir una salida final coherente.",
-      details: ["Objetivo de investigación o negocio", "Decisión esperada", "Población y segmentación prevista"],
-    },
-    {
-      title: "Importa, adapta o parte de un framework",
-      text: "Puedes traer un cuestionario existente, trabajar con un framework de la Library o utilizar una metodología privada. El sistema conserva procedencia, reglas de edición, estructura de scoring y condiciones de comparabilidad.",
-      details: ["Tipos de pregunta y escalas", "Dimensiones y scoring", "Versionado y procedencia"],
-    },
-    {
-      title: "Comprueba el assessment antes de lanzarlo",
-      text: "Proofline Check revisa si el instrumento parece preparado para responder al objetivo declarado y señala problemas que conviene resolver antes de recoger una sola respuesta.",
-      details: ["Cobertura y redundancia", "Claridad y consistencia de escalas", "Carga, análisis y privacidad"],
-    },
-    {
-      title: "Recoge respuestas con controles visibles",
-      text: "La colección se diseña alrededor de propósito, confidencialidad, avisos versionados, tokens seguros y segmentación gobernada. La identidad puede permanecer separada del Response Store cuando el modo lo requiere.",
-      details: ["Invitaciones y recordatorios", "Confidencialidad por cohortes", "Trazabilidad de avisos"],
-    },
-    {
-      title: "Convierte datos en una respuesta trazable",
-      text: "El motor estadístico produce las métricas reproducibles y las capacidades de IA ayudan a revisar, sintetizar e interpretar. La salida conserva la diferencia entre observación, asociación, hipótesis y recomendación.",
-      details: ["Respuesta ejecutiva", "Insights y tendencias", "Evidencia y limitaciones"],
-    },
+    { icon: "clipboard-check" as const, title: "Definir", text: "Objetivo, decisión esperada y población quedan vinculados al assessment desde el inicio." },
+    { icon: "library" as const, title: "Diseñar", text: "Framework, cuestionario, dimensiones, escalas y scoring se construyen como una única versión controlada." },
+    { icon: "gauge" as const, title: "Revisar", text: "Proofline Check hace visibles problemas de cobertura, claridad, carga, análisis y privacidad antes del lanzamiento." },
+    { icon: "people" as const, title: "Recoger", text: "Invitaciones, confidencialidad, cohortes y avisos permanecen gobernados durante la recogida." },
+    { icon: "reports" as const, title: "Interpretar", text: "Resultados, evidencia y limitaciones se estructuran para apoyar una decisión, no sólo para mostrar métricas." },
   ] : [
-    {
-      title: "Define what you need to answer",
-      text: "Every assessment starts with an explicit objective and the decision the result should support. Proofline keeps that question as the reference point for reviewing the instrument and building a coherent final output.",
-      details: ["Research or business objective", "Expected decision", "Population and planned segmentation"],
-    },
-    {
-      title: "Import, adapt or start from a framework",
-      text: "Bring an existing questionnaire, use a Library framework or work with a private methodology. The system preserves provenance, edit rules, scoring structure and comparability conditions.",
-      details: ["Question types and scales", "Dimensions and scoring", "Versioning and provenance"],
-    },
-    {
-      title: "Check the assessment before launch",
-      text: "Proofline Check reviews whether the instrument appears ready to answer the declared objective and flags issues worth resolving before a single response is collected.",
-      details: ["Coverage and redundancy", "Clarity and scale consistency", "Burden, analysis and privacy"],
-    },
-    {
-      title: "Collect responses with visible controls",
-      text: "Collection is designed around purpose, confidentiality, versioned notices, secure tokens and governed segmentation. Identity can remain separated from the Response Store when the mode requires it.",
-      details: ["Invitations and reminders", "Cohort confidentiality", "Notice traceability"],
-    },
-    {
-      title: "Turn data into a traceable answer",
-      text: "The statistical engine produces reproducible metrics while AI capabilities help review, synthesise and interpret. The output preserves the distinction between observation, association, hypothesis and recommendation.",
-      details: ["Executive answer", "Insights and trends", "Evidence and limitations"],
-    },
+    { icon: "clipboard-check" as const, title: "Define", text: "Objective, expected decision and population remain linked to the assessment from the start." },
+    { icon: "library" as const, title: "Design", text: "Framework, questionnaire, dimensions, scales and scoring are built as one controlled version." },
+    { icon: "gauge" as const, title: "Review", text: "Proofline Check surfaces coverage, clarity, burden, analysis and privacy issues before launch." },
+    { icon: "people" as const, title: "Collect", text: "Invitations, confidentiality, cohorts and notices remain governed throughout collection." },
+    { icon: "reports" as const, title: "Interpret", text: "Results, evidence and limitations are structured to support a decision, not just display metrics." },
   ];
 
-  return <>
-    <section className="page-hero">
-      <div className="container">
-        <PageIntro
-          title={es ? "Sofisticación analítica sin complejidad operativa." : "Analytical sophistication without operational complexity."}
-          text={es
-            ? "Proofline cubre el ciclo del assessment desde la pregunta inicial hasta la distribución del resultado. El objetivo es concentrar en un mismo sistema el trabajo metodológico, operativo y de evidencia que normalmente queda repartido entre formularios, hojas de cálculo, documentos y análisis manuales."
-            : "Proofline covers the assessment cycle from the initial question to result distribution. The goal is to bring methodological, operational and evidence work into one system instead of scattering it across forms, spreadsheets, documents and manual analysis."}
-          aside={<div className="page-intro-note"><strong>{es ? "Principio de producto" : "Product principle"}</strong><span>{es ? "Menos operación manual. Más claridad metodológica, trazabilidad y evidencia visible." : "Less manual operation. More methodological clarity, traceability and visible evidence."}</span></div>}
-        />
+  const checkItems = es ? [
+    ["Cobertura", "El instrumento responde al objetivo declarado y cubre las dimensiones necesarias."],
+    ["Calidad", "Ambigüedad, redundancia, sesgos evidentes y escalas inconsistentes quedan señalados para revisión."],
+    ["Viabilidad", "La estructura permite el análisis, las comparaciones y el reporting que se quieren obtener."],
+    ["Privacidad", "Los datos solicitados y la segmentación se revisan desde la finalidad y el riesgo de disclosure."],
+  ] : [
+    ["Coverage", "The instrument answers the declared objective and covers the required dimensions."],
+    ["Quality", "Ambiguity, redundancy, obvious bias and inconsistent scales are flagged for review."],
+    ["Feasibility", "The structure supports the intended analysis, comparisons and reporting."],
+    ["Privacy", "Requested data and segmentation are reviewed against purpose and disclosure risk."],
+  ];
+
+  return <main className="pp3-page">
+    <section className="pp3-hero">
+      <div className="container pp3-hero-grid">
+        <div className="pp3-hero-copy">
+          <h1>{es ? "Un sistema para convertir assessments en decisiones defendibles." : "A system for turning assessments into defensible decisions."}</h1>
+          <p>{es
+            ? "Proofline conecta diseño metodológico, recogida, análisis y reporting en un mismo ciclo. El contexto no se pierde entre formularios, hojas de cálculo y documentos: permanece unido al objetivo, la población y la evidencia que explican el resultado."
+            : "Proofline connects methodological design, collection, analysis and reporting in one cycle. Context is not lost across forms, spreadsheets and documents: it stays linked to the objective, population and evidence that explain the result."}</p>
+          <div className="pp3-actions">
+            <a className="btn btn-primary" href={`/${locale}/contact`}>{es ? "Solicitar una demo" : "Book a demo"}<Icon name="arrow-right" size={15}/></a>
+            <a className="pp3-link" href={`/${locale}/library`}>{es ? "Explorar frameworks" : "Explore frameworks"}<Icon name="chevron-right" size={15}/></a>
+          </div>
+        </div>
+
+        <div className="pp3-architecture" aria-label={es ? "Arquitectura del ciclo Proofline" : "Proofline cycle architecture"}>
+          <div className="pp3-architecture-head">
+            <span>{es ? "Objetivo" : "Objective"}</span>
+            <strong>{es ? "¿Qué necesitas poder decidir?" : "What do you need to decide?"}</strong>
+          </div>
+          <div className="pp3-architecture-line" aria-hidden="true" />
+          <div className="pp3-architecture-row">
+            <div><Icon name="assessments" size={18}/><span>{es ? "Instrumento" : "Instrument"}</span></div>
+            <div><Icon name="people" size={18}/><span>{es ? "Población" : "Population"}</span></div>
+            <div><Icon name="governance" size={18}/><span>{es ? "Gobernanza" : "Governance"}</span></div>
+          </div>
+          <div className="pp3-architecture-line" aria-hidden="true" />
+          <div className="pp3-architecture-result">
+            <Icon name="reports" size={20}/>
+            <div><span>{es ? "Resultado" : "Result"}</span><strong>{es ? "Lectura + evidencia + límites" : "Reading + evidence + limits"}</strong></div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section className="section section-tinted">
+    <section className="pp3-section pp3-section-muted">
       <div className="container">
-        <div className="content-heading">
-          <h2>{es ? "Un ciclo completo, con contexto en cada etapa." : "A complete cycle with context at every stage."}</h2>
-          <p>{es ? "Cada fase conserva lo que necesita la siguiente, desde el objetivo hasta el informe." : "Each phase preserves what the next one needs, from the objective through to the report."}</p>
+        <div className="pp3-heading">
+          <h2>{es ? "De la pregunta a una respuesta que conserva su contexto." : "From the question to an answer that keeps its context."}</h2>
+          <p>{es ? "Cada etapa conserva la información que necesita la siguiente. No son cinco herramientas conectadas: es un solo ciclo de trabajo." : "Each stage preserves what the next one needs. It is not five connected tools: it is one working cycle."}</p>
         </div>
-        <div className="product-timeline">
-          {stages.map((stage) => <article className="product-stage" key={stage.title}>
-            <div className="product-stage-copy">
-              <h3>{stage.title}</h3>
-              <p>{stage.text}</p>
-            </div>
-            <ul className="product-stage-details">{stage.details.map((detail) => <li key={detail}>{detail}</li>)}</ul>
+        <div className="pp3-flow">
+          {stages.map((stage, index) => <article className="pp3-flow-item" key={stage.title}>
+            <div className="pp3-flow-icon"><Icon name={stage.icon} size={19}/></div>
+            <h3>{stage.title}</h3>
+            <p>{stage.text}</p>
+            {index < stages.length - 1 ? <span className="pp3-flow-connector" aria-hidden="true"><Icon name="arrow-right" size={20}/></span> : null}
           </article>)}
         </div>
       </div>
     </section>
 
-    <section className="section">
-      <div className="container check-grid">
-        <div>
-          <h2>{es ? "Proofline Check: mejorar el instrumento antes de invertir en la recogida." : "Proofline Check: improve the instrument before investing in collection."}</h2>
+    <section className="pp3-section">
+      <div className="container pp3-check-layout">
+        <div className="pp3-check-copy">
+          <h2>{es ? "Proofline Check revisa el instrumento antes de que corregirlo sea caro." : "Proofline Check reviews the instrument before fixing it becomes expensive."}</h2>
           <p>{es
-            ? "Una vez lanzado un assessment, cambiar preguntas, escalas o dimensiones puede romper comparaciones y obligar a repetir trabajo. La revisión previa ayuda a detectar problemas cuando todavía es barato corregirlos y deja documentado qué se revisó antes del lanzamiento."
-            : "Once an assessment is live, changing questions, scales or dimensions can break comparisons and force rework. Pre-launch review helps surface issues while they are still inexpensive to fix and documents what was checked before launch."}</p>
-          <div className="check-list">
-            {(es ? [
-              ["Cobertura", "¿Las preguntas cubren realmente el objetivo declarado y las dimensiones necesarias?"],
-              ["Calidad", "¿Hay ambigüedad, redundancia, sesgos evidentes o escalas inconsistentes?"],
-              ["Viabilidad", "¿La estructura permite el análisis, las comparaciones y el reporting que después se quieren realizar?"],
-              ["Privacidad", "¿Se pide algún dato sin finalidad suficiente o con un riesgo de disclosure que debería revisarse?"],
-            ] : [
-              ["Coverage", "Do the questions actually cover the declared objective and required dimensions?"],
-              ["Quality", "Is there ambiguity, redundancy, obvious bias or inconsistent scaling?"],
-              ["Feasibility", "Does the structure support the intended analysis, comparisons and reporting?"],
-              ["Privacy", "Is any data point requested without sufficient purpose or with disclosure risk that should be reviewed?"],
-            ]).map(([title, text]) => <div key={title}><strong>{title}</strong><span>{text}</span></div>)}
+            ? "Una vez lanzado un assessment, cambiar preguntas, escalas o dimensiones puede romper comparaciones y obligar a repetir trabajo. La revisión previa concentra los puntos que merece la pena resolver antes de recoger respuestas."
+            : "Once an assessment is live, changing questions, scales or dimensions can break comparisons and force rework. Pre-launch review concentrates the issues worth resolving before responses are collected."}</p>
+          <div className="pp3-readiness">
+            <div className="pp3-readiness-score"><strong>78</strong><span>{es ? "Readiness" : "Readiness"}</span></div>
+            <div><strong>{es ? "Preparación operativa visible" : "Visible operational readiness"}</strong><p>{es ? "El score resume señales verificables del instrumento. No sustituye una validación científica especializada cuando ésta sea necesaria." : "The score summarises verifiable instrument signals. It does not replace specialist scientific validation where that is required."}</p></div>
           </div>
         </div>
-        <aside className="method-note">
-          <strong>{es ? "Preparación metodológica visible" : "Visible methodological readiness"}</strong>
-          <p>{es
-            ? "El Readiness Score resume señales operativas de preparación y hace visibles los puntos que requieren revisión. Cuando una metodología necesita validación psicométrica o científica especializada, Proofline conserva ese trabajo como una responsabilidad profesional diferenciada y documentable."
-            : "The Readiness Score summarises operational readiness signals and makes review points visible. Where a methodology requires specialist psychometric or scientific validation, Proofline keeps that work as a distinct, documentable professional responsibility."}</p>
-        </aside>
+        <div className="pp3-check-list">
+          {checkItems.map(([title, text]) => <div className="pp3-check-item" key={title}>
+            <Icon name="check-circle" size={18}/>
+            <div><strong>{title}</strong><p>{text}</p></div>
+          </div>)}
+        </div>
       </div>
     </section>
 
-    <section className="section section-tinted">
+    <section className="pp3-section pp3-section-deep">
       <div className="container">
-        <div className="content-heading two-column-heading">
-          <h2>{es ? "Un motor de análisis donde cada capacidad hace el trabajo que mejor sabe hacer." : "An analysis engine where each capability does the work it is best suited for."}</h2>
-          <p>{es ? "La estadística produce métricas reproducibles; la IA ayuda a interpretar, sintetizar y navegar la evidencia sin ocultar de dónde sale la lectura." : "Statistics produce reproducible metrics; AI helps interpret, synthesise and navigate evidence without hiding where the reading comes from."}</p>
+        <div className="pp3-heading pp3-heading-light">
+          <h2>{es ? "Cálculo e interpretación cumplen funciones distintas." : "Calculation and interpretation perform different jobs."}</h2>
+          <p>{es ? "Las métricas reproducibles no se mezclan con la lectura asistida. Proofline mantiene visible qué se calcula, qué se interpreta y qué necesita revisión humana." : "Reproducible metrics are not mixed with assisted interpretation. Proofline keeps visible what is calculated, what is interpreted and what requires human review."}</p>
         </div>
-        <div className="analysis-layers">
-          <article><h3>{es ? "Estadística reproducible" : "Reproducible statistics"}</h3><p>{es ? "Scores, distribuciones, brechas, cohortes, tendencias, significancia y tamaños de efecto se calculan con reglas explícitas y pueden volver a ejecutarse sobre la misma base de datos." : "Scores, distributions, gaps, cohorts, trends, significance and effect sizes are calculated through explicit rules and can be rerun against the same data."}</p></article>
-          <article><h3>{es ? "Lectura cualitativa asistida" : "Assisted qualitative reading"}</h3><p>{es ? "Comentarios abiertos pueden pasar por redacción de PII, agrupación temática, frecuencias y contrastes para acelerar la revisión sin convertir la síntesis en una caja negra." : "Open comments can go through PII redaction, thematic grouping, frequency analysis and contrasts to speed up review without turning synthesis into a black box."}</p></article>
-          <article><h3>{es ? "Evidencia conectada" : "Connected evidence"}</h3><p>{es ? "Cada insight puede conservar el camino hacia distribuciones, comparaciones, comentarios, población y limitaciones, de modo que la lectura ejecutiva siga siendo revisable." : "Each insight can preserve the path back to distributions, comparisons, comments, population and limitations so the executive reading remains reviewable."}</p></article>
+        <div className="pp3-analysis-grid">
+          <article>
+            <div className="pp3-analysis-icon"><Icon name="activity" size={20}/></div>
+            <h3>{es ? "Motor estadístico" : "Statistical engine"}</h3>
+            <p>{es ? "Scoring, dimensiones, comparaciones, cohortes y tendencias parten de reglas reproducibles y de una fuente de verdad versionada." : "Scoring, dimensions, comparisons, cohorts and trends are based on reproducible rules and a versioned source of truth."}</p>
+            <ul><li>{es ? "Scoring 0–100 y polaridad" : "0–100 scoring and polarity"}</li><li>{es ? "Pesos y dimensiones" : "Weights and dimensions"}</li><li>{es ? "Cohortes y supresión" : "Cohorts and suppression"}</li></ul>
+          </article>
+          <article>
+            <div className="pp3-analysis-icon"><Icon name="sparkles" size={20}/></div>
+            <h3>{es ? "Interpretación asistida" : "Assisted interpretation"}</h3>
+            <p>{es ? "La IA puede resumir, comparar y ayudar a navegar la evidencia, pero trabaja dentro del objetivo y los datos disponibles y no convierte una hipótesis en un hecho." : "AI can summarise, compare and help navigate evidence, but it works within the objective and available data and does not turn a hypothesis into a fact."}</p>
+            <ul><li>{es ? "Síntesis de evidencia" : "Evidence synthesis"}</li><li>{es ? "Patrones y temas" : "Patterns and themes"}</li><li>{es ? "Apoyo a la lectura" : "Reading support"}</li></ul>
+          </article>
         </div>
-      </div>
-    </section>
-
-    <section className="section">
-      <div className="container output-grid">
-        <div>
-          <h2>{es ? "El resultado cambia según quién lo necesita." : "The result changes depending on who needs it."}</h2>
-          <p>{es
-            ? "La misma evidencia puede presentarse de forma distinta a dirección, People, managers, analistas o una consultora. La audiencia cambia la profundidad y la forma de lectura; la fuente de verdad sigue siendo la misma."
-            : "The same evidence can be presented differently to leadership, People teams, managers, analysts or a consultancy. The audience changes depth and reading format; the source of truth remains the same."}</p>
-        </div>
-        <div className="output-cards">
-          <div><strong>{es ? "Brief ejecutivo" : "Executive brief"}</strong><span>{es ? "Qué está ocurriendo, por qué importa, qué nivel de evidencia existe y qué merece atención a continuación." : "What is happening, why it matters, what level of evidence exists and what deserves attention next."}</span></div>
-          <div><strong>{es ? "Informe de análisis" : "Analysis report"}</strong><span>{es ? "Dimensiones, comparaciones, tendencias, análisis cualitativo, evolución entre oleadas y limitaciones de interpretación." : "Dimensions, comparisons, trends, qualitative analysis, movement across waves and interpretation limitations."}</span></div>
-          <div><strong>{es ? "Evidencia y metodología" : "Evidence & methodology"}</strong><span>{es ? "Scoring, versiones, población, reglas, cobertura, decisiones de revisión y anexos disponibles para quien necesita comprobar el detalle." : "Scoring, versions, population, rules, coverage, review decisions and appendices for anyone who needs to verify the detail."}</span></div>
+        <div className="pp3-evidence-line">
+          <span>{es ? "Dato" : "Data"}</span><Icon name="chevron-right" size={15}/><span>{es ? "Métrica" : "Metric"}</span><Icon name="chevron-right" size={15}/><span>{es ? "Lectura" : "Reading"}</span><Icon name="chevron-right" size={15}/><span>{es ? "Evidencia" : "Evidence"}</span><Icon name="chevron-right" size={15}/><span>{es ? "Decisión" : "Decision"}</span>
         </div>
       </div>
     </section>
 
-    <section className="section product-boundaries">
-      <div className="container boundaries-panel">
-        <div>
-          <h2>{es ? "Especialización que permite profundizar." : "Specialisation that enables depth."}</h2>
-          <p className="boundaries-intro">{es ? "Proofline concentra su arquitectura en assessments e inteligencia organizacional para poder tratar con más calidad los problemas que realmente importan dentro de ese ciclo." : "Proofline focuses its architecture on assessments and organizational intelligence so it can handle the important problems inside that cycle with greater depth."}</p>
+    <section className="pp3-section">
+      <div className="container pp3-output-layout">
+        <div className="pp3-output-copy">
+          <h2>{es ? "Una misma fuente de verdad, distintas profundidades de lectura." : "One source of truth, different depths of reading."}</h2>
+          <p>{es ? "Dirección, People, managers y analistas no necesitan la misma cantidad de detalle. La profundidad cambia; el snapshot y la evidencia que sostienen el resultado no." : "Leadership, People teams, managers and analysts do not need the same level of detail. Depth changes; the snapshot and evidence supporting the result do not."}</p>
         </div>
-        <div className="boundaries-list">
-          <p><strong>{es ? "Assessment intelligence." : "Assessment intelligence."}</strong> {es ? "Objetivo, cuestionario, población, scoring, recogida y resultados permanecen conectados en lugar de operar como piezas sueltas." : "Objective, questionnaire, population, scoring, collection and results stay connected instead of operating as isolated pieces."}</p>
-          <p><strong>{es ? "Gobernanza incorporada." : "Built-in governance."}</strong> {es ? "Versiones, roles, privacidad, auditoría y distribución forman parte del flujo y no dependen de una hoja de control externa." : "Versions, roles, privacy, audit and distribution are part of the flow rather than depending on an external control sheet."}</p>
-          <p><strong>{es ? "IA con contexto." : "AI with context."}</strong> {es ? "Las capacidades de IA trabajan dentro del objetivo, la metodología y la evidencia disponible, para acelerar revisión e interpretación sin desconectarse del dato." : "AI capabilities work within the objective, methodology and available evidence to accelerate review and interpretation without disconnecting from the data."}</p>
+        <div className="pp3-output-stack">
+          <article className="pp3-output-featured"><Icon name="reports" size={20}/><div><h3>{es ? "Lectura ejecutiva" : "Executive reading"}</h3><p>{es ? "Qué está ocurriendo, por qué importa, qué nivel de evidencia existe y dónde conviene poner atención." : "What is happening, why it matters, what level of evidence exists and where attention is needed."}</p></div></article>
+          <article><Icon name="activity" size={18}/><div><h3>{es ? "Análisis" : "Analysis"}</h3><p>{es ? "Dimensiones, comparaciones, tendencias, cohortes y evolución." : "Dimensions, comparisons, trends, cohorts and movement."}</p></div></article>
+          <article><Icon name="governance" size={18}/><div><h3>{es ? "Evidencia" : "Evidence"}</h3><p>{es ? "Metodología, población, scoring, versiones, cobertura y limitaciones." : "Methodology, population, scoring, versions, coverage and limitations."}</p></div></article>
         </div>
       </div>
     </section>
 
-    <CtaBand
-      locale={locale}
-      title={es ? "Veamos qué tendría que responder tu próximo assessment." : "Let's define what your next assessment needs to answer."}
-      text={es ? "Una demo útil empieza por tu problema, el instrumento que ya utilizas y el tipo de decisión que quieres apoyar." : "A useful demo starts with your problem, the instrument you already use and the kind of decision you want to support."}
-      secondaryHref={`/${locale}/library`}
-      secondaryLabel={es ? "Explorar la Library" : "Explore the Library"}
-    />
-  </>;
+    <section className="pp3-section pp3-governance">
+      <div className="container">
+        <div className="pp3-governance-grid">
+          <div><Icon name="history" size={18}/><strong>{es ? "Versionado" : "Versioning"}</strong><span>{es ? "Qué cambió y cuándo." : "What changed and when."}</span></div>
+          <div><Icon name="security" size={18}/><strong>{es ? "Privacidad" : "Privacy"}</strong><span>{es ? "Identidad y respuestas gobernadas." : "Identity and responses governed."}</span></div>
+          <div><Icon name="people" size={18}/><strong>{es ? "Población" : "Population"}</strong><span>{es ? "Snapshot y cohortes trazables." : "Traceable snapshot and cohorts."}</span></div>
+          <div><Icon name="approved" size={18}/><strong>{es ? "Auditoría" : "Audit"}</strong><span>{es ? "Acciones relevantes con evidencia." : "Relevant actions with evidence."}</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section className="pp3-final">
+      <div className="container pp3-final-inner">
+        <div><h2>{es ? "Veamos qué tendría que responder tu próximo assessment." : "Let's define what your next assessment needs to answer."}</h2><p>{es ? "Una demo útil empieza por el problema que necesitas comprender y la decisión que quieres apoyar." : "A useful demo starts with the problem you need to understand and the decision you want to support."}</p></div>
+        <div className="pp3-final-actions"><a className="btn btn-primary" href={`/${locale}/contact`}>{es ? "Solicitar una demo" : "Book a demo"}<Icon name="arrow-right" size={15}/></a><a className="btn" href={`/${locale}/library`}>{es ? "Explorar frameworks" : "Explore frameworks"}</a></div>
+      </div>
+    </section>
+  </main>;
 }

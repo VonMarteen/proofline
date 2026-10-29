@@ -1,0 +1,10 @@
+"use client";
+import {useState} from "react";
+import {useRouter} from "next/navigation";
+import {AssessmentLevelSelect} from "./assessment-level-select";
+
+export function AssessmentMethodConfig({assessmentId,locale,level,editable}:{assessmentId:string;locale:"es"|"en";level:string;editable:boolean}){
+  const es=locale==="es",router=useRouter(),[value,setValue]=useState(level||"L2"),[busy,setBusy]=useState(false),[message,setMessage]=useState("");
+  async function save(){setBusy(true);setMessage("");try{const r=await fetch(`/api/proxy/v1/assessments/${assessmentId}/config`,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({level:value})}),b=await r.json().catch(()=>({}));if(!r.ok)throw new Error(Array.isArray(b?.message)?b.message.join(" · "):b?.message??`API ${r.status}`);setMessage(es?"Nivel guardado. Proofline Check usará esta profundidad.":"Level saved. Proofline Check will use this depth.");router.refresh()}catch(e){setMessage(e instanceof Error?e.message:String(e))}finally{setBusy(false)}}
+  return <section className="workspace-section assessment-method-card"><div className="workspace-section-head clean"><div><h2>{es?"Nivel y contrato metodológico":"Level and methodological contract"}</h2><p>{es?"El nivel controla la profundidad esperada del instrumento y del informe. Las respuestas originales nunca se alteran; el scoring se normaliza a 0–100 y queda congelado al lanzar.":"The level controls expected instrument and report depth. Raw answers are never altered; scoring is normalized to 0–100 and frozen at launch."}</p></div></div><AssessmentLevelSelect locale={locale} value={value} onChange={setValue} disabled={!editable||busy}/>{editable?<div className="workspace-card-actions"><button className="btn btn-accent" type="button" disabled={busy||value===level} onClick={save}>{busy?(es?"Guardando…":"Saving…"):(es?"Guardar nivel":"Save level")}</button></div>:null}{message?<div className={`workspace-alert ${/API|Error|error|locked/i.test(message)?"danger":""}`}>{message}</div>:null}</section>
+}

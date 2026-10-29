@@ -1,0 +1,115 @@
+/* PROOFLINE Workspace R7 — KPI density and unambiguous exclusion states.
+   Scoped presentation only. No data, calculation, permission, or action changes. */
+/* Resumen: icon at left, label and value on the same baseline, supporting datum below. */
+.workspace-content .ws-r3-dashboard .workspace-kpi-grid {grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+.workspace-content .ws-r3-dashboard .workspace-kpi-card.ws-r7-kpi {
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  grid-template-rows:auto auto;
+  grid-template-areas:"icon label value" "icon note note";
+  gap:4px 10px;
+  align-content:center;
+  align-items:center;
+  min-width:0;
+  min-height:72px;
+  padding:10px 13px;
+}
+.workspace-content .ws-r3-dashboard .ws-r7-kpi > .ws-r7-kpi-icon {
+  grid-area:icon;
+  display:grid;place-items:center;
+  width:34px;height:34px;
+  background:var(--accent-soft);
+  border-radius:9px;
+  color:var(--accent);
+}
+.workspace-content .ws-r3-dashboard .ws-r7-kpi > .ws-r7-kpi-label {
+  grid-area:label;
+  margin:0;min-width:0;
+  font-size:11px;line-height:1.25;
+  color:var(--text-soft);
+}
+.workspace-content .ws-r3-dashboard .ws-r7-kpi > strong {
+  grid-area:value;
+  margin:0;
+  font-size:clamp(20px,1.85vw,25px);
+  line-height:1.12;
+  text-align:right;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.workspace-content .ws-r3-dashboard .ws-r7-kpi > small {
+  grid-area:note;
+  color:var(--text-soft);
+  font-size:10px;line-height:1.3;
+  min-width:0;
+}
+/* Facturación: six real KPI cards remain six; icon and copy share each card's row. */
+.workspace-content .billing-kpis:not(.payment-kpis) article {
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr);
+  grid-template-rows:auto auto auto;
+  grid-template-areas:"icon label" "icon value" "icon note";
+  align-content:center;align-items:center;
+  gap:2px 9px;
+  min-width:0;
+  min-height:68px;
+  padding:9px 10px;
+}
+.workspace-content .billing-kpis:not(.payment-kpis) article > .ws-r6-billing-icon {
+  grid-area:icon;
+  order:0;
+  display:grid;place-items:center;
+  width:30px;height:30px;
+  border-radius:8px;
+  background:var(--accent-soft);
+  color:var(--accent);
+  align-self:center;
+}
+.workspace-content .billing-kpis:not(.payment-kpis) article > span:not(.ws-r6-billing-icon) {
+  grid-area:label;
+  margin:0;min-width:0;
+  color:var(--text-soft);
+  font-size:10px;line-height:1.2;
+}
+.workspace-content .billing-kpis:not(.payment-kpis) article > strong {
+  grid-area:value;
+  margin:0;min-width:0;
+  font-size:clamp(14px,1.35vw,19px);
+  font-variant-numeric:tabular-nums;
+  line-height:1.2;
+  overflow-wrap:anywhere;
+}
+.workspace-content .billing-kpis:not(.payment-kpis) article > small {
+  grid-area:note;
+  margin:0;min-width:0;
+  font-size:9px;line-height:1.25;
+  color:var(--text-soft);
+}
+/* Exclusion hover: NO mixing violet accent hover with red exclusion.
+   Normal: entirely neutral; pressed/active: entirely red. */
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude:not(.active) {
+  color:var(--text);
+  background:var(--surface-muted);
+  border-color:var(--border-strong,var(--border));
+}
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude:not(.active):hover {
+  color:var(--text);
+  background:color-mix(in srgb,var(--text) 9%,var(--bg-elevated));
+  border-color:var(--text-soft);
+}
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude.active,
+.workspace-content .workspace-assessment-detail-page .population-person-list button.exclude.active:hover {
+  color:var(--danger);
+  background:color-mix(in srgb,var(--danger) 14%,var(--bg-elevated));
+  border-color:var(--danger);
+}
+/* Existing R6 breakpoints for billing remain authoritative. Resumen gets a safe 2/1 fallback. */
+@media(max-width:1120px) {
+  .workspace-content .ws-r3-dashboard .workspace-kpi-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(max-width:580px) {
+  .workspace-content .ws-r3-dashboard .workspace-kpi-grid {grid-template-columns:minmax(0,1fr);}
+}
+@media(prefers-reduced-motion:reduce) {
+  .workspace-content .workspace-assessment-detail-page .population-person-list button.exclude {transition:none!important;}
+}

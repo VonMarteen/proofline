@@ -1,0 +1,676 @@
+/* PROOFLINE H6 — final commercial density, hierarchy and regression baseline. */
+
+/* Secondary-page hierarchy: compact, enterprise and readable. */
+.page-hero {
+  padding: 56px 0 42px;
+}
+.page-intro {
+  display: block;
+  max-width: 980px;
+}
+.page-intro-copy {
+  gap: 16px;
+}
+.page-intro-copy h1 {
+  max-width: 900px;
+  font-size: clamp(40px, 4.8vw, 58px);
+  line-height: 1.02;
+  letter-spacing: -.045em;
+  font-weight: 590;
+}
+.page-intro-copy > p {
+  max-width: 780px;
+  font-size: 16px;
+  line-height: 1.66;
+}
+.page-intro-aside,
+.page-intro-note,
+.mode-audience {
+  display: none !important;
+}
+
+.section {
+  padding: 62px 0;
+}
+.section-tinted {
+  background: color-mix(in srgb, var(--surface-muted) 46%, transparent);
+}
+.content-heading {
+  margin-bottom: 22px;
+}
+.content-heading h2,
+.two-column-heading h2 {
+  font-size: clamp(27px, 3vw, 38px);
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+.two-column-heading {
+  grid-template-columns: minmax(0, .9fr) minmax(300px, .7fr);
+  gap: 36px;
+  align-items: end;
+}
+.two-column-heading > p {
+  max-width: 560px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+/* Solutions */
+.modes-detail-grid {
+  gap: 14px;
+}
+.mode-detail-panel {
+  padding: 24px;
+  border-radius: 17px;
+  box-shadow: none;
+}
+.mode-detail-header h2 {
+  margin: 0 0 10px;
+  font-size: 30px;
+  line-height: 1.05;
+}
+.mode-detail-header p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.62;
+}
+.mode-detail-sections {
+  margin-top: 20px;
+}
+.mode-detail-sections div {
+  padding: 13px 0;
+  grid-template-columns: 118px 1fr;
+  gap: 14px;
+  font-size: 13px;
+}
+.mode-detail-sections p {
+  line-height: 1.55;
+}
+.mode-feature-list {
+  margin: 19px 0 22px;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.comparison-table-wrap {
+  border-radius: 14px;
+}
+.comparison-table th,
+.comparison-table td {
+  padding: 13px 15px;
+  font-size: 12.5px;
+}
+.use-case-grid {
+  gap: 12px;
+}
+.use-case-card {
+  min-height: 0;
+  padding: 18px;
+  border-left-width: 1px;
+  border-radius: 12px;
+}
+.use-case-card h3 {
+  margin-bottom: 7px;
+  font-size: 17px;
+}
+.use-case-card p {
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+/* Library / frameworks */
+.library-guidance {
+  border-radius: 14px;
+}
+.library-guidance div {
+  padding: 18px;
+  gap: 6px;
+}
+.library-guidance strong {
+  font-size: 13px;
+}
+.library-guidance span {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.framework-grid {
+  gap: 14px;
+}
+.framework-card {
+  min-height: 270px;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: none;
+}
+.framework-card:hover {
+  transform: translateY(-2px);
+  box-shadow: none;
+}
+.framework-card h3 {
+  margin: 0 0 9px;
+  font-size: 20px;
+  line-height: 1.15;
+}
+.framework-card > p {
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.framework-meta {
+  padding-top: 18px;
+  gap: 10px;
+}
+.framework-meta span,
+.framework-audience span,
+.framework-provenance span {
+  font-size: 9.5px;
+  letter-spacing: .035em;
+}
+.framework-meta strong,
+.framework-audience strong,
+.framework-provenance strong {
+  font-size: 12px;
+}
+.framework-audience,
+.framework-provenance {
+  margin-top: 10px;
+}
+.framework-link {
+  padding-top: 16px;
+  font-size: 11px;
+}
+.private-library-grid {
+  grid-template-columns: .82fr 1.18fr;
+  gap: 34px;
+}
+.private-library-grid > div:first-child p {
+  font-size: 14px;
+  line-height: 1.65;
+}
+.private-library-list div {
+  padding: 14px 0;
+  grid-template-columns: 125px 1fr;
+  gap: 16px;
+  font-size: 12.5px;
+}
+
+/* Trust */
+.trust-nav-grid {
+  gap: 12px;
+}
+.trust-nav-card {
+  min-height: 166px;
+  padding: 19px;
+  border-radius: 14px;
+}
+.trust-nav-card h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  line-height: 1.15;
+}
+.trust-nav-card p {
+  font-size: 12px;
+  line-height: 1.52;
+}
+.trust-nav-card > strong {
+  padding-top: 12px;
+  font-size: 11px;
+}
+.architecture-panel {
+  padding: 26px;
+  border-radius: 18px;
+}
+.architecture-panel > div:first-child p {
+  font-size: 14px;
+  line-height: 1.62;
+}
+.architecture-flow {
+  margin-top: 24px;
+  grid-template-columns: minmax(120px,1fr) 34px minmax(120px,1fr) 34px minmax(120px,1fr) 34px minmax(120px,1fr);
+  gap: 6px;
+}
+.architecture-flow > div {
+  min-width: 0;
+  min-height: 76px;
+  padding: 13px;
+  border-radius: 12px;
+}
+.architecture-flow i {
+  font-size: 22px;
+  text-align: center;
+}
+.trust-detail-section {
+  padding-top: 18px;
+}
+.trust-detail {
+  display: block;
+  padding: 34px 0;
+}
+.trust-detail-main h2 {
+  margin: 0 0 10px;
+  font-size: clamp(25px, 2.5vw, 34px);
+  line-height: 1.08;
+}
+.trust-detail-intro {
+  max-width: 900px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.64;
+}
+.trust-control-grid {
+  margin-top: 18px;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 12px;
+}
+.trust-control {
+  min-height: 0;
+  padding: 17px;
+  border-radius: 13px;
+}
+.trust-control strong {
+  font-size: 13px;
+}
+.trust-control p {
+  font-size: 11.5px;
+  line-height: 1.52;
+}
+.trust-verification {
+  display: none !important;
+}
+.trust-evidence-summary {
+  margin-top: 20px;
+  padding: 26px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--bg-elevated) 88%, transparent);
+  display: grid;
+  grid-template-columns: .72fr 1.28fr;
+  gap: 32px;
+}
+.trust-evidence-summary h2 {
+  margin: 0 0 9px;
+  font-size: 27px;
+  line-height: 1.08;
+}
+.trust-evidence-summary p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.trust-evidence-summary ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+}
+.trust-evidence-summary li {
+  position: relative;
+  padding: 12px 0 12px 17px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+.trust-evidence-summary li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 18px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.production-readiness-grid {
+  gap: 34px;
+}
+.production-readiness-grid > div p {
+  font-size: 14px;
+}
+.production-checklist li {
+  padding: 13px 0 13px 24px;
+  font-size: 12px;
+}
+
+/* Start + demo: compact professional forms. */
+.start-page,
+.contact-page {
+  padding: 56px 0 76px;
+}
+.start-page .page-intro,
+.contact-page .page-intro {
+  margin-bottom: 28px;
+}
+.start-grid,
+.contact-grid {
+  grid-template-columns: minmax(0, 1.12fr) minmax(290px, .72fr);
+  gap: 24px;
+  margin-top: 0;
+}
+.start-form,
+.contact-form {
+  padding: 22px;
+  border-radius: 16px;
+  gap: 14px;
+  box-shadow: none;
+}
+.start-form .form-row,
+.contact-form .form-row {
+  gap: 12px;
+}
+.start-form .label,
+.contact-form .label {
+  gap: 6px;
+  font-size: 12px;
+}
+.start-form .input,
+.contact-form .input,
+.start-form .textarea,
+.contact-form .textarea {
+  padding: 10px 12px;
+  min-height: 40px;
+  border-radius: 10px;
+  font-size: 13px;
+}
+.start-form .textarea,
+.contact-form .textarea {
+  min-height: 112px;
+}
+.contact-legal-controls {
+  gap: 10px;
+}
+.contact-consent {
+  font-size: 11px;
+  line-height: 1.45;
+}
+.start-explainer,
+.contact-expectations {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: color-mix(in srgb,var(--surface-muted) 52%,transparent);
+}
+.start-explainer {
+  gap: 0;
+}
+.start-explainer h2,
+.contact-expectations h2 {
+  margin: 0 0 12px;
+  font-size: 21px;
+  line-height: 1.1;
+}
+.start-explainer > div,
+.contact-expectations > div {
+  display: block;
+  padding: 13px 0;
+  border-top: 1px solid var(--border);
+}
+.start-explainer > div > strong,
+.contact-expectations strong {
+  width: auto;
+  height: auto;
+  display: block;
+  background: none;
+  color: var(--text);
+  font-size: 12.5px;
+}
+.start-explainer p,
+.contact-expectations p {
+  margin: 5px 0 0;
+  color: var(--text-soft);
+  font-size: 11.5px;
+  line-height: 1.55;
+}
+
+/* CTA: preserve the artwork proportions and align it to the right. */
+.pl2-cta-banner {
+  min-height: 278px;
+  background:
+    linear-gradient(90deg, rgba(3,18,25,.98) 0%, rgba(3,18,25,.89) 30%, rgba(3,18,25,.34) 58%, rgba(3,18,25,.10) 100%),
+    url("/brand/proofline-signal-network.png") center right / contain no-repeat,
+    linear-gradient(110deg,#061d24 0%,#071821 58%,#07141d 100%);
+}
+
+/* Shared CTA and table polish. */
+.cta-band {
+  padding-block: 32px;
+}
+.cta-band h2 {
+  font-size: clamp(26px, 3vw, 36px);
+}
+.site-main table {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 980px) {
+  .modes-detail-grid,
+  .trust-evidence-summary,
+  .start-grid,
+  .contact-grid,
+  .private-library-grid,
+  .production-readiness-grid {
+    grid-template-columns: 1fr;
+  }
+  .trust-control-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .framework-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .architecture-flow {
+    grid-template-columns: 1fr;
+  }
+  .architecture-flow i {
+    transform: rotate(90deg);
+    line-height: 1;
+  }
+}
+
+@media (max-width: 680px) {
+  .page-hero { padding: 42px 0 30px; }
+  .page-intro-copy h1 { font-size: clamp(34px, 11vw, 46px); }
+  .page-intro-copy > p { font-size: 14px; }
+  .section { padding: 48px 0; }
+  .two-column-heading,
+  .framework-grid,
+  .trust-control-grid,
+  .trust-evidence-summary ul,
+  .use-case-grid,
+  .library-guidance {
+    grid-template-columns: 1fr;
+  }
+  .library-guidance div { border-right: 0; border-bottom: 1px solid var(--border); }
+  .library-guidance div:last-child { border-bottom: 0; }
+  .mode-detail-sections div,
+  .private-library-list div {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .pl2-cta-banner {
+    min-height: 410px;
+    background-size: auto 100%, auto 100%, 100% 100%;
+    background-position: center, 61% center, center;
+  }
+}
+
+.cookie-policy-page {
+  padding-top: 54px;
+  padding-bottom: 72px;
+  gap: 28px;
+}
+.cookie-policy-page header { max-width: 780px; }
+.cookie-policy-page h1 {
+  margin: 0 0 14px;
+  font-size: clamp(36px, 4.4vw, 52px);
+  line-height: 1.04;
+  letter-spacing: -.04em;
+}
+.cookie-policy-page header p,
+.cookie-policy-page section p {
+  font-size: 14px;
+  line-height: 1.65;
+}
+.cookie-policy-page h2 { font-size: 20px; }
+
+/* ========================================================================== */
+/* H6.2 · Enterprise navigation · stable route transitions                    */
+/* ========================================================================== */
+
+/* Site routes must never inherit the product-wide smooth-scroll behavior.
+   Route changes snap to the top before paint and scrollbar space stays stable. */
+html[data-proofline-surface="site"] {
+  scroll-behavior: auto !important;
+  scroll-padding-top: 88px;
+  scrollbar-gutter: stable;
+}
+
+/* Enterprise active state: stable underline, no pill and no dot. */
+.site-nav {
+  align-items: center;
+}
+.site-nav a {
+  position: relative;
+  padding: 7px 6px 10px;
+  border-radius: 0;
+  text-decoration: none !important;
+  transform: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transition: color 150ms var(--site-ease-standard);
+}
+.site-nav a::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 2px;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--proofline-teal), color-mix(in srgb, var(--proofline-teal) 58%, #8be8ff));
+  opacity: 0;
+  pointer-events: none;
+}
+.site-nav a:hover {
+  color: var(--text);
+  background: transparent !important;
+}
+.site-nav a.active {
+  color: color-mix(in srgb, var(--text) 88%, var(--proofline-teal) 12%);
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.site-nav a.active::after {
+  opacity: 1;
+}
+.site-nav a:focus-visible,
+.site-brand-link:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--proofline-teal) 72%, transparent);
+  outline-offset: 3px;
+  text-decoration: none !important;
+}
+
+/* Home: intentional breathing room under the sticky header, with a calmer H1. */
+.pl2-hero {
+  padding-top: 76px;
+  padding-bottom: 54px;
+}
+.pl2-hero-copy h1 {
+  font-size: clamp(40px, 3.75vw, 54px);
+  line-height: 1.045;
+  letter-spacing: -.041em;
+  font-weight: 585;
+}
+.pl2-lead {
+  font-size: clamp(14px, 1vw, 16px);
+  line-height: 1.66;
+}
+.pl2-section-heading h2,
+.pl2-trust-copy h2,
+.pl2-cta-banner h2 {
+  font-size: clamp(27px, 2.45vw, 35px);
+  line-height: 1.11;
+  letter-spacing: -.033em;
+}
+
+/* Product: same enterprise scale instead of a campaign-sized hero. */
+.pp3-hero {
+  padding-top: 68px;
+  padding-bottom: 58px;
+}
+.pp3-hero-copy h1 {
+  font-size: clamp(39px, 3.85vw, 54px);
+  line-height: 1.045;
+  letter-spacing: -.043em;
+  font-weight: 575;
+}
+.pp3-heading h2,
+.pp3-check-copy h2,
+.pp3-output-copy h2,
+.pp3-final h2 {
+  font-size: clamp(27px, 2.55vw, 35px);
+  line-height: 1.1;
+  letter-spacing: -.034em;
+}
+
+/* Secondary commercial pages: quieter hierarchy, higher information density. */
+.page-hero {
+  padding-top: 52px;
+  padding-bottom: 38px;
+}
+.page-intro-copy h1 {
+  max-width: 860px;
+  font-size: clamp(36px, 4vw, 50px);
+  line-height: 1.055;
+  letter-spacing: -.039em;
+  font-weight: 585;
+}
+.page-intro-copy > p {
+  max-width: 760px;
+  font-size: 15px;
+}
+.content-heading h2,
+.two-column-heading h2 {
+  font-size: clamp(25px, 2.45vw, 34px);
+  line-height: 1.1;
+  letter-spacing: -.031em;
+}
+.mode-detail-header h2 {
+  font-size: 27px;
+}
+.trust-detail-main h2 {
+  font-size: clamp(24px, 2.25vw, 31px);
+}
+.trust-evidence-summary h2 {
+  font-size: 25px;
+}
+.cta-band h2 {
+  font-size: clamp(24px, 2.35vw, 32px);
+}
+.cookie-policy-page h1 {
+  font-size: clamp(34px, 3.8vw, 46px);
+  line-height: 1.06;
+}
+
+@media (max-width: 680px) {
+  html[data-proofline-surface="site"] { scroll-padding-top: 78px; }
+  .pl2-hero { padding: 56px 0 44px; }
+  .pl2-hero-copy h1 { font-size: clamp(34px, 9.4vw, 42px); }
+  .pl2-section-heading h2,
+  .pl2-trust-copy h2,
+  .pl2-cta-banner h2 { font-size: 28px; }
+
+  .pp3-hero { padding: 50px 0 44px; }
+  .pp3-hero-copy h1 { font-size: clamp(34px, 9.6vw, 42px); }
+  .pp3-heading h2,
+  .pp3-check-copy h2,
+  .pp3-output-copy h2,
+  .pp3-final h2 { font-size: 28px; }
+
+  .page-hero { padding: 40px 0 30px; }
+  .page-intro-copy h1 { font-size: clamp(32px, 9.8vw, 40px); }
+  .content-heading h2,
+  .two-column-heading h2 { font-size: 27px; }
+  .cookie-policy-page h1 { font-size: 34px; }
+}

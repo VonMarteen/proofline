@@ -1,0 +1,9 @@
+52be1075773d0f4b121c638d2e83c422905f15ff5837ff319d1df6b0150844ab  apps/api/src/workspace.controller.ts
+216ec63d6fcacdf7c6a308345cdeeba3a4f8d7cf90e16d8bd2f59e38b39ac292  apps/web/app/workspace.css
+1447f97fcff7fa3d0d8ad70246b1831ca524634fe8972066a3d8dba8394a4624  apps/web/app/[locale]/reports/[id]/page.tsx
+301d9d3ca1e133842c4d83762c90fb4c4c4db926c2318cdf1e28fec6deb7b375  apps/web/app/[locale]/reports/page.tsx
+198ea5f774a7613898fccca6390868bb20468fd9b2cf69160aa088929bb633a6  apps/web/lib/report-view.mjs
+76ea36ed433c554d36b1d7213bccfc0b2a645101dcc930548e83170e89221f46  apps/web/lib/report-view.d.mts
+620b6db3728ba19d67967b71295c3723ae4670b4cc0fe5e7c963ca347a771be0  package.json
+4fe6ae0459b120f8cd5fdd15fe340ac8000b25fa6e8d055e5a1105a4fc4de5d2  tests/workspace-ws3-report-visual-contract.test.mjs
+05d287dbfbe374c831efd8e5b57a9ee6a1fc59ec31224f06c4d042ba06a78a65  docs/qa/PROOFLINE_WORKSPACE_WS3_PARIDAD_INFORMES_20261021.md

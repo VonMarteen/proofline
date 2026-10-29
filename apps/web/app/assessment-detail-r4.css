@@ -1,0 +1,252 @@
+/* PROOFLINE Assessment Detail R4 — only the assessment detail route.
+   Layout-only; no global tokens, state transitions, form names, APIs or role changes.
+   Protects R3 Workspaces and all other surfaces from regression. */
+
+/* Launch checklist: separate the explanation, status chips, notice and actions. */
+.workspace-content .workspace-assessment-detail-page .workspace-governance {
+  display:grid;
+  gap:11px;
+  padding:16px 18px;
+}
+.workspace-content .workspace-assessment-detail-page .workspace-governance > div:first-child p {
+  margin:5px 0 0;
+  line-height:1.5;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-governance {
+  display:grid;
+  gap:12px;
+  min-width:0;
+}
+.workspace-content .workspace-assessment-detail-page .launch-checklist {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px 15px;
+  margin:0;
+  padding:11px 0;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.workspace-content .workspace-assessment-detail-page .launch-checklist > span {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  margin:0;
+  padding:2px 0;
+  line-height:1.45;
+  min-height:22px;
+  white-space:normal;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-governance > .workspace-alert {
+  margin:0;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:9px 13px;
+  padding:10px 12px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-governance > .workspace-alert span {flex:1 1 330px;}
+.workspace-content .workspace-assessment-detail-page .assessment-governance > .workspace-card-actions {
+  margin:0;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+
+/* Question editor: full-width prompt above two balanced configuration groups. */
+.workspace-content .workspace-assessment-detail-page .question-composer {min-width:0;}
+.workspace-content .workspace-assessment-detail-page .question-composer form.assessment-question-form {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  align-items:start;
+  justify-items:stretch;
+  column-gap:18px;
+  row-gap:10px;
+  width:100%;
+  min-width:0;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > label.label:first-child {
+  grid-column:1 / -1;
+  width:100%;
+  max-width:none;
+  min-width:0;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > label.label:first-child > .textarea {
+  min-height:62px;
+  max-height:180px;
+  width:100%;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .builder-primary-row {
+  grid-column:1;
+  display:grid;
+  width:100%;
+  max-width:none;
+  min-width:0;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:10px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .type-config {
+  grid-column:2;
+  width:100%;
+  max-width:none;
+  min-width:0;
+  padding:0;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .type-config > label.label:has(textarea) {
+  width:100%;
+  max-width:none;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .type-config .form-row {
+  gap:8px;
+  justify-content:flex-start;
+  align-items:end;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .type-config .form-row > .label:has(input[type=number]) {
+  flex:0 1 108px;
+  max-width:118px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .type-config .form-row > .label:not(:has(input[type=number])) {
+  flex:1 1 160px;
+  max-width:none;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .advanced-question-config {
+  grid-column:1 / -1;
+  width:100%;
+  max-width:none;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .workspace-alert {
+  grid-column:1 / -1;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-question-form > .builder-submit {
+  grid-column:1 / -1;
+  justify-self:start;
+  min-width:0;
+}
+
+/* Population is a SINGLE conceptual task: scope/units and people/exclusions in parallel. */
+.workspace-content .workspace-assessment-detail-page .assessment-population-section {
+  display:grid;
+  gap:10px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-editor:not(.population-locked) {
+  display:grid;
+  grid-template-columns:minmax(0, .95fr) minmax(0,1.05fr);
+  align-items:start;
+  gap:10px 14px;
+  margin-top:0;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-summary {
+  grid-column:1 / -1;
+  min-height:40px;
+  margin:0;
+  padding:7px 12px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-summary strong {font-size:20px;}
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-summary b {margin-left:auto;}
+.workspace-content .workspace-assessment-detail-page .population-targets {
+  display:grid;
+  align-content:start;
+  gap:8px;
+  border:1px solid var(--border);
+  background:var(--bg-solid);
+  border-radius:12px;
+  padding:12px;
+  min-width:0;
+}
+.workspace-content .workspace-assessment-detail-page .population-targets-heading {
+  display:grid;
+  gap:2px;
+  margin-bottom:3px;
+}
+.workspace-content .workspace-assessment-detail-page .population-targets-heading strong,
+.workspace-content .workspace-assessment-detail-page .population-browser-head strong {font-size:13px;}
+.workspace-content .workspace-assessment-detail-page .population-targets-heading small,
+.workspace-content .workspace-assessment-detail-page .population-targets-note {font-size:11px;line-height:1.4;color:var(--text-soft);}
+.workspace-content .workspace-assessment-detail-page .population-targets-note {margin:0;padding:8px;}
+.workspace-content .workspace-assessment-detail-page .population-targets .population-all {min-height:42px;padding:7px 9px;border-radius:9px;}
+.workspace-content .workspace-assessment-detail-page .population-targets .population-units {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}
+.workspace-content .workspace-assessment-detail-page .population-targets .population-units label {min-height:42px;min-width:0;padding:6px 9px;gap:7px;}
+.workspace-content .workspace-assessment-detail-page .population-targets .population-units label strong {font-size:12px;line-height:1.3;overflow-wrap:anywhere;}
+.workspace-content .workspace-assessment-detail-page .population-targets .population-units label small {font-size:10px;}
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-browser {
+  margin:0;
+  align-self:start;
+  min-width:0;
+  padding:12px;
+  gap:8px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-browser-filters {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(130px,.4fr);
+  gap:8px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-person-list {
+  max-height:300px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding-right:5px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-browser-pager {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-start;
+  align-items:center;
+  gap:7px;
+  font-size:11px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-editor > .btn.btn-accent,
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-editor > .workspace-alert {
+  grid-column:1 / -1;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-population-section .population-editor > .btn.btn-accent {justify-self:start;margin-top:0;}
+
+/* Privacy goes BELOW population at the full page width, not in an adjacent tall column. */
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section {
+  display:grid;
+  gap:11px;
+  margin-top:5px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor {padding:14px 16px;gap:9px;}
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:10px 16px;
+  padding-top:12px;
+}
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form > .form-row {grid-column:1 / -1;display:flex;gap:10px;flex-wrap:wrap;}
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form > .form-row > .label {flex:1 1 210px;min-width:0;}
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form > .workspace-checkbox,
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form > .workspace-alert {grid-column:1 / -1;}
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form > .btn.btn-accent {grid-column:1 / -1;justify-self:start;width:auto;padding-inline:18px;}
+.workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor textarea {min-height:62px;max-height:160px;}
+
+@media(max-width:1150px) {
+  .workspace-content .workspace-assessment-detail-page .assessment-population-section .population-editor:not(.population-locked) {grid-template-columns:minmax(0,1fr);}
+  .workspace-content .workspace-assessment-detail-page .assessment-population-section .population-summary,
+  .workspace-content .workspace-assessment-detail-page .assessment-population-section .population-editor > .btn.btn-accent,
+  .workspace-content .workspace-assessment-detail-page .assessment-population-section .population-editor > .workspace-alert {grid-column:1;}
+  .workspace-content .workspace-assessment-detail-page .assessment-population-section .population-person-list {max-height:330px;}
+}
+@media(max-width:850px) {
+  .workspace-content .workspace-assessment-detail-page .question-composer form.assessment-question-form {grid-template-columns:minmax(0,1fr);}
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > label.label:first-child,
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .builder-primary-row,
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .type-config,
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .advanced-question-config,
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .builder-submit,
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .workspace-alert {grid-column:1;}
+  .workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form {grid-template-columns:minmax(0,1fr);}
+  .workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form > .form-row,
+  .workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form > .workspace-checkbox,
+  .workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form > .workspace-alert,
+  .workspace-content .workspace-assessment-detail-page .assessment-privacy-section .workspace-legal-editor form > .btn.btn-accent {grid-column:1;}
+}
+@media(max-width:530px) {
+  .workspace-content .workspace-assessment-detail-page .assessment-question-form > .builder-primary-row {grid-template-columns:minmax(0,1fr);}
+  .workspace-content .workspace-assessment-detail-page .population-targets .population-units {grid-template-columns:minmax(0,1fr);}
+  .workspace-content .workspace-assessment-detail-page .assessment-population-section .population-browser-filters {grid-template-columns:minmax(0,1fr);}
+}

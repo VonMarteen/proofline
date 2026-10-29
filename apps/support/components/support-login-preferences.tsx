@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ThemeToggle } from "@proofline/ui/client";
+import { Icon } from "@proofline/ui";
 
 export function SupportLoginPreferences({
   locale,
@@ -23,9 +24,11 @@ export function SupportLoginPreferences({
         className="btn btn-small btn-ghost proofline-utility-button"
         href={`/login?locale=${next}`}
         onClick={remember}
-        aria-label={locale === "es" ? "Cambiar idioma" : "Change language"}
+        aria-label={locale === "es" ? "Cambiar idioma a inglés" : "Switch language to Spanish"}
+        title={locale === "es" ? "Cambiar idioma a inglés" : "Switch language to Spanish"}
+        data-proofline-utility="locale"
       >
-        {next.toUpperCase()}
+        <Icon name="languages" size={17} />
       </Link>
 
       <ThemeToggle

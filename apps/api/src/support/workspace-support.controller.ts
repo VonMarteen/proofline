@@ -31,6 +31,12 @@ const Change = z.object({
 export class WorkspaceSupportController {
   constructor(@Inject(SupportService) private readonly support: SupportService) {}
 
+
+  @Get("support/table")
+  queuePage(@Req() req: HeaderRequest,@Query("page")page?:string,@Query("pageSize")pageSize?:string,@Query("q")q?:string,@Query("status")status?:string) {
+    return this.support.workspaceQueuePage(req,{page,pageSize,q,status});
+  }
+
   @Get("support")
   queue(@Req() req: HeaderRequest) {
     return this.support.workspaceQueue(req);

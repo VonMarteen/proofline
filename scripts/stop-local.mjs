@@ -25,7 +25,7 @@ if (existsSync(pidFile)) {
 
 if (win) {
   const out = spawnSync("netstat", ["-ano", "-p", "tcp"], { encoding: "utf8", shell: true }).stdout ?? "";
-  const targetPorts = new Set([3100, 3101, 3102, 3103, 3104, 4100, 4200]);
+  const targetPorts = new Set([4200, 4201, 4202, 4203, 4204, 4205, 4206]);
   for (const line of out.split(/\r?\n/)) {
     const m = line.match(/^\s*TCP\s+\S+:(\d+)\s+\S+\s+LISTENING\s+(\d+)\s*$/i);
     if (m && targetPorts.has(Number(m[1]))) pids.add(Number(m[2]));

@@ -22,7 +22,6 @@ export default async function LibraryPage({ params }: { params: Promise<{ locale
           text={es
             ? "La Library reúne frameworks que pueden servir como punto de partida, convivir con metodologías privadas o complementarse con cuestionarios importados. Cada pieza explica qué intenta responder, para qué contextos está pensada y qué estructura habría que revisar antes de utilizarla."
             : "The Library brings together frameworks that can serve as a starting point, coexist with private methodologies or complement imported questionnaires. Each item explains what it aims to answer, which contexts it is designed for and which structure should be reviewed before use."}
-          aside={<div className="page-intro-note"><strong>{es ? "Biblioteca gobernada" : "Governed library"}</strong><span>{es ? "Originales, plantillas, frameworks partner y metodologías privadas pueden compartir el mismo sistema sin perder procedencia, reglas de edición ni trazabilidad." : "Originals, templates, partner frameworks and private methodologies can share the same system without losing provenance, edit rules or traceability."}</span></div>}
         />
       </div>
     </section>

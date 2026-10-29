@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 export const dynamic="force-dynamic";
-const base=process.env.CONTROL_API_INTERNAL_URL??"http://127.0.0.1:4200";
+const base=process.env.CONTROL_API_INTERNAL_URL??"http://127.0.0.1:4206";
 type Ticket={id:string;subject:string;status:string;priority:string;updatedAt:string;lastCustomerReplyAt?:string|null;lastInternalReplyAt?:string|null;escalatedAt?:string|null;organization:{name:string};assignee?:{email?:string|null}|null};type Snapshot={status:string;updatedAt:string;customer:string;internal:string;escalated:string;assignee:string};
 const snap=(t:Ticket):Snapshot=>({status:t.status,updatedAt:t.updatedAt,customer:t.lastCustomerReplyAt??"",internal:t.lastInternalReplyAt??"",escalated:t.escalatedAt??"",assignee:t.assignee?.email??""});
 const changed=(a:Snapshot|undefined,b:Snapshot)=>!a||a.status!==b.status||a.updatedAt!==b.updatedAt||a.customer!==b.customer||a.internal!==b.internal||a.escalated!==b.escalated||a.assignee!==b.assignee;

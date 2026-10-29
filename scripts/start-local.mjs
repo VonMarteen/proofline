@@ -100,9 +100,10 @@ if (!existsSync("node_modules") || !existsSync("apps/api/src/generated/prisma/cl
 }
 
 sync("node", ["scripts/static-audit.mjs"], "Compatibilidad estática");
-sync("docker", ["compose", "-f", "docker-compose.dev.yml", "up", "-d", "--wait", "--remove-orphans"], "Infraestructura");
+sync("node", ["scripts/armar-preflight.mjs"], "ARMAR preflight");
+sync("docker", ["compose", "-p", "armar-proofline", "-f", "docker-compose.dev.yml", "up", "-d", "--wait", "--remove-orphans"], "Infraestructura");
 
-for (const port of [3100,3101,3102,3103,3104,4100,4200]) {
+for (const port of [4200,4201,4202,4203,4204,4205,4206]) {
   if (await portInUse(port)) {
     console.error(`\n[FALLO] El puerto ${port} ya está ocupado.`);
     console.error("Ejecuta desde VS Code la tarea ‘Proofline: 2B · DETENER APPS’ y vuelve a arrancar.\n");
@@ -115,33 +116,33 @@ console.log("Ctrl+C o Stop Task detendrá todos los procesos Node iniciados por 
 
 try {
   const api = start("api", "dev:api");
-  await waitHttp("API", "http://127.0.0.1:4100/health", api);
+  await waitHttp("API", "http://127.0.0.1:4201/health", api);
 
   start("worker", "dev:worker");
 
   const site = start("site", "dev:site");
-  await waitHttp("Web comercial", "http://127.0.0.1:3100/es", site);
+  await waitHttp("Web comercial", "http://127.0.0.1:4200/es", site);
 
   const web = start("web", "dev:web");
-  await waitHttp("App cliente", "http://127.0.0.1:3101/es", web);
+  await waitHttp("App cliente", "http://127.0.0.1:4202/es", web);
 
   const respond = start("respond", "dev:respond");
-  await waitHttp("Participante", "http://127.0.0.1:3102/es/demo-token-2026", respond);
+  await waitHttp("Participante", "http://127.0.0.1:4203/es/demo-token-2026", respond);
 
   const control = start("control", "dev:control");
-  await waitHttp("Proofline Control", "http://127.0.0.1:3103/es", control);
+  await waitHttp("Proofline Control", "http://127.0.0.1:4204/es", control);
 
   const support = start("support", "dev:support");
-  await waitHttp("Proofline Support", "http://127.0.0.1:3104/login?locale=es", support);
+  await waitHttp("Proofline Support", "http://127.0.0.1:4205/login?locale=es", support);
 
   console.log("\n[OK] Todas las superficies están listas.");
-  console.log("Site     http://localhost:3100/es");
-  console.log("App      http://localhost:3101/es");
-  console.log("Respond  http://localhost:3102/es/demo-token-2026");
-  console.log("Control  http://localhost:3103/es");
-  console.log("Support  http://localhost:3104/es");
-  console.log("API      http://localhost:4100/health");
-  console.log("Mailpit  http://localhost:58025\n");
+  console.log("Site     http://localhost:4200/es");
+  console.log("App      http://localhost:4202/es");
+  console.log("Respond  http://localhost:4203/es/demo-token-2026");
+  console.log("Control  http://localhost:4204/es");
+  console.log("Support  http://localhost:4205/es");
+  console.log("API      http://localhost:4201/health");
+  console.log("Mailpit  http://localhost:4280\n");
 } catch (error) {
   console.error(`\n[FALLO] ${error instanceof Error ? error.message : String(error)}`);
   shutdown(1);

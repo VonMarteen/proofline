@@ -1,0 +1,92 @@
+/* PROOFLINE SUITE UX SHELL PARITY · 27 October 2026
+   Reference: existing Control C2.3 (untouched). Applies only to authenticated
+   Workspace shell, never login, Respond, Control, APIs or assessment body.
+   Media constraints retain the existing mobile navigation behavior. */
+@media (min-width:901px) {
+  /* Control desktop contract: 274px navigation + 64px app header. */
+  .workspace-shell { grid-template-columns:274px minmax(0,1fr); }
+  .workspace-sidebar { min-width:0; width:auto; padding:20px 13px 17px;
+    background:color-mix(in srgb,var(--bg-solid) 74%,var(--bg)); }
+  .workspace-sidebar > .workspace-brand {
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    min-height:0; padding:3px 9px 13px; border-bottom:1px solid var(--border);
+    color:var(--text); text-decoration:none;
+  }
+  .workspace-brand > span:last-child {
+    font-size:11px; font-weight:700; line-height:1.2;
+    color:var(--text-soft); letter-spacing:.08em; text-transform:uppercase;
+  }
+  .workspace-sidebar > .workspace-org {
+    margin:14px 5px 5px; padding:10px;
+    background:var(--bg-solid); border-radius:11px;
+  }
+  .workspace-sidebar > .workspace-nav {
+    row-gap:7px; margin:0; padding:0 3px 0 0;
+    scrollbar-width:thin; scrollbar-color:var(--border-strong) transparent;
+  }
+  .workspace-sidebar .workspace-nav-group { gap:4px; padding:6px 5px 8px;
+    border:1px solid transparent; border-radius:11px; }
+  .workspace-sidebar .workspace-nav-group + .workspace-nav-group {
+    margin-top:0; padding-top:11px; border-top-color:var(--border);
+    border-radius:0;
+  }
+  .workspace-sidebar .workspace-nav-group.is-active {
+    border:1px solid color-mix(in srgb,var(--accent) 16%,var(--border));
+    border-radius:11px;
+    background:color-mix(in srgb,var(--accent-soft) 38%,transparent);
+    gap:4px; padding:6px 5px 8px;
+  }
+  .workspace-sidebar .workspace-nav-group.is-active + .workspace-nav-group {
+    border-top-color:transparent; margin-top:0;
+  }
+  .workspace-sidebar .workspace-nav-group-title,
+  .workspace-sidebar .workspace-nav-group.is-active > .workspace-nav-group-title {
+    font-size:9px; font-weight:800; letter-spacing:.075em;
+    padding:0 7px 3px; line-height:1.2;
+  }
+  .workspace-sidebar .workspace-nav-group-items { gap:2px; }
+  .workspace-sidebar .workspace-nav-group-items > a {
+    display:flex; align-items:center; gap:9px; min-height:36px;
+    padding:8px 9px; border-radius:9px;
+    font-size:12px; font-weight:580; line-height:1.35;
+  }
+  .workspace-sidebar .workspace-nav-group-items > a.active,
+  .workspace-sidebar .workspace-nav-group.is-active .workspace-nav-group-items > a.active {
+    background:color-mix(in srgb,var(--accent-soft) 72%,var(--bg-solid));
+    font-weight:720; color:var(--text);
+  }
+  .workspace-sidebar .workspace-nav-group-items > a::before { display:none; }
+  .workspace-sidebar .workspace-nav-group-items > a .proofline-icon { color:var(--text-soft); opacity:.8; }
+  .workspace-sidebar .workspace-nav-group-items > a:hover .proofline-icon,
+  .workspace-sidebar .workspace-nav-group-items > a.active .proofline-icon {
+    color:var(--accent); opacity:1;
+  }
+  .workspace-sidebar > .workspace-sidebar-footer {
+    margin-top:0; padding:14px 7px 0; gap:5px;
+    border-top:1px solid var(--border);
+  }
+  .workspace-sidebar-footer .workspace-user strong { font-size:12px; }
+  .workspace-sidebar-footer .workspace-user small { font-size:10.5px; }
+  .workspace-header { height:64px; min-height:64px; padding:11px 30px;
+    background:color-mix(in srgb,var(--bg) 88%,transparent);
+    backdrop-filter:blur(16px);
+  }
+  .workspace-header-context { display:grid; align-content:center; align-items:center; gap:3px; }
+  .workspace-header-context > strong { font-size:13px; line-height:1.25; color:var(--text); }
+  .workspace-header-context > .workspace-header-sub {
+    font-size:11px; line-height:1.2; margin:0; color:var(--text-soft);
+    max-width:min(40vw,380px); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .workspace-header .nav-actions { gap:10px; }
+  .workspace-content { padding:30px 34px 58px; max-width:1680px; }
+}
+@media (min-width:851px) and (max-width:900px) {
+  /* Preserve the current Workspace desktop navigation in the transition range. */
+  .workspace-header { min-height:54px; }
+}
+@media (max-width:850px) {
+  .workspace-brand > span:last-child { display:none; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .workspace-sidebar .workspace-nav a { transition:none; }
+}

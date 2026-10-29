@@ -6,7 +6,7 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
       <div className="eyebrow">PROOFLINE APP</div>
       <h1>No se pudo cargar la información</h1>
       <p className="muted">
-        Comprueba que la API esté activa en <code>http://localhost:4100/health</code>. La interfaz sigue disponible y puedes reintentar sin reiniciar todo Proofline.
+        Comprueba que la API esté activa en <code>http://localhost:4201/health</code>. La interfaz sigue disponible y puedes reintentar sin reiniciar todo Proofline.
       </p>
       <details className="muted" style={{ margin: "18px 0" }}>
         <summary>Detalle técnico</summary>

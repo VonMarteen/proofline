@@ -15,7 +15,6 @@ export default async function SolutionsPage({ params }: { params: Promise<{ loca
           text={es
             ? "Proofline Direct está pensado para organizaciones que ejecutan sus propios estudios. Proofline Professional añade una capa multi-cliente para consultoras, expertos y partners que necesitan convertir metodología en una operación repetible."
             : "Proofline Direct is designed for organizations running their own studies. Proofline Professional adds a multi-client layer for consultancies, experts and partners who need to turn methodology into a repeatable operation."}
-          aside={<div className="page-intro-note"><strong>{es ? "Mismo núcleo" : "Same core"}</strong><span>{es ? "Assessment, privacidad, análisis, evidencia y reporting comparten la misma arquitectura." : "Assessment, privacy, analysis, evidence and reporting share the same architecture."}</span></div>}
         />
       </div>
     </section>
@@ -24,7 +23,6 @@ export default async function SolutionsPage({ params }: { params: Promise<{ loca
       <div className="container modes-detail-grid">
         <article id="direct" className="mode-detail-panel">
           <div className="mode-detail-header">
-            <p className="mode-audience">{es ? "Equipos internos · operación propia" : "Internal teams · own operation"}</p>
             <h2>Proofline Direct</h2>
             <p>{es
               ? "Para equipos internos que necesitan diseñar, lanzar, analizar y distribuir assessments sin depender de una consultora para cada paso ni operar una suite difícil de mantener."
@@ -47,7 +45,6 @@ export default async function SolutionsPage({ params }: { params: Promise<{ loca
 
         <article id="professional" className="mode-detail-panel professional">
           <div className="mode-detail-header">
-            <p className="mode-audience">{es ? "Consultoras y partners · operación multi-cliente" : "Consultancies & partners · multi-client operation"}</p>
             <h2>Proofline Professional</h2>
             <p>{es
               ? "Para firmas que ya poseen metodología, expertise o una cartera de clientes y necesitan una capa de producto que les permita operar con más consistencia sin perder propiedad intelectual ni calidad."
